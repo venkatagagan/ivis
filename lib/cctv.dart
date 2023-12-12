@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/fetchdata.dart';
-import 'package:ivis_security/cctv/camBigScreen.dart';
+//import 'package:ivis_security/cctv/camBigScreen.dart';
 import 'package:ivis_security/cctv/camList.dart';
-import 'package:ivis_security/cctv/screens.dart';
+//import 'package:ivis_security/cctv/screens.dart';
 import 'package:ivis_security/alarm.dart';
 import 'package:ivis_security/development.dart';
 import 'package:ivis_security/center.dart';
 import 'package:ivis_security/hdtv.dart';
 import 'package:ivis_security/home.dart';
+import 'package:ivis_security/apis/Monitoring.dart';
 
 void main() {
   runApp(const CctvScreen());
@@ -28,11 +29,25 @@ class _MyHomePageState extends State<CctvScreen> {
   List<TdpCamera> listOfCamera = [];
   int sitID = 36301;
 
+  Set<dynamic> siteNames = {};
+
   @override
   void initState() {
-    // TODO: implement initState
+    super.initState();
+    fetchSiteNames();
     retrieveTheCamerasData();
     super.initState();
+  }
+
+  Future<void> fetchSiteNames() async {
+    try {
+      List<dynamic> sites = await BussinessInterface.fetchSiteNames();
+      setState(() {
+        siteNames = sites.toSet();
+      });
+    } catch (e) {
+      print('Error fetching site names: $e');
+    }
   }
 
   void retrieveTheCamerasData() async {
@@ -193,64 +208,6 @@ class _MyHomePageState extends State<CctvScreen> {
             ),
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
-              if (listOfCamera.isNotEmpty)
-                const SizedBox(
-                  height: 300,
-                ),
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            if (startIndex >= 2) {
-                              startIndex -= 2;
-                              endIndex -= 2;
-                            }
-                            shouldReloadContainers = true;
-                          });
-                        },
-                        child: Text('Back'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            if (endIndex < listOfCamera.length) {
-                              startIndex += 2;
-                              endIndex += 2;
-                            }
-                            shouldReloadContainers = true;
-                          });
-                        },
-                        child: Text('Next'),
-                      ),
-                    ],
-                  ),
-                  ...listOfCamera.sublist(startIndex, endIndex).map(
-                    (e) {
-                      // GetData();
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (ctx) => BigScreen(
-                                  rtspLInk: e.rtspUrl,
-                                  cameraId: e.status,
-                                  cameraName: e.name)));
-                        },
-                        child: VideoPlayerScreen(
-                            rtspLInk: e.rtspUrl,
-                            status: e.status,
-                            cameraName: e.name),
-                      );
-                    },
-                  )
-                ],
-              ),
-
-              if (listOfCamera.isEmpty) const CircularProgressIndicator()
-
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2
@@ -296,19 +253,22 @@ class _MyHomePageState extends State<CctvScreen> {
                             const SizedBox(
                                 width:
                                     176), // Add spacing between text and next image
-                            ElevatedButton(
-                              onPressed: () {
-                                // Add your button functionality here
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CenterScreen()),
+                                );
+
+                                // Add your desired action here
                               },
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors
-                                    .transparent, // Remove the button color
-                                side: BorderSide(
-                                    color: Colors
-                                        .black), // Add a border to the button
+                              child: Image.asset(
+                                'assets/logos/Rectangle.png',
+                                height: 25,
+                                width: 45,
                               ),
-                              child: Text('Button'),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -318,7 +278,6 @@ class _MyHomePageState extends State<CctvScreen> {
                     ),
                     Container(
                       width: 300,
-                      height: 180,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(1),
                         borderRadius: BorderRadius.circular(5),
@@ -329,33 +288,77 @@ class _MyHomePageState extends State<CctvScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const SizedBox(width: 15),
-                            Image.asset(
-                              'assets/logos/eye.jpg', // Replace with your image path
-                              width: 19.7, // Adjust image width as needed
-                              height: 13.13, // Adjust image height as needed
-                            ),
-                            const SizedBox(
-                                width:
-                                    10.3), // Add spacing between text and image
-                            TextButton(
-                              onPressed: () {
-                                // Add your TextButton action here
-                              },
-                              child: const Text(
-                                'One Stop Odessa',
-                                style: TextStyle(
-                                  color: Colors.black,
+                            Column(
+                              children: [
+                                Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 23,
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 266,
+                                        ),
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CenterScreen()),
+                                            );
+                                            // Add your desired action here
+                                          },
+                                          child: Image.asset(
+                                            'assets/logos/plus-square.jpg',
+                                            height: 13,
+                                            width: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 22,
+                                    ),
+                                    for (Map<String, dynamic> site in siteNames)
+                                      SingleChildScrollView(
+                                          child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 25,
+                                              ),
+                                              Text(
+                                                site['monitoringname'],
+
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize:
+                                                      11, // Set the text color to black
+                                                ), //#ABABAB
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 16,
+                                          ),
+                                          Divider(
+                                            color: Colors.black,
+                                            height: 1,
+                                            thickness: 1,
+
+                                            // Thickness of the divider
+                                          ),
+                                          SizedBox(
+                                            height: 16,
+                                          ),
+                                        ],
+                                      )),
+                                  ],
                                 ),
-                              ),
-                            ),
-                            const SizedBox(
-                                width:
-                                    95), // Add spacing between text and next image
-                            Image.asset(
-                              'assets/logos/arrow.jpg', // Replace with your image path
-                              width: 7.04, // Adjust image width as needed
-                              height: 13, // Adjust image height as needed
+                              ],
                             ),
                           ],
                         ),
@@ -369,7 +372,7 @@ class _MyHomePageState extends State<CctvScreen> {
               ),
             ] else if (selectedButtonIndex == 2) ...[
               const Positioned(
-                top: 230, // Adjust the position from the bottom
+                top: 250, // Adjust the position from the bottom
                 left: 230.5,
                 right: 29.5,
                 child: Divider(
@@ -378,202 +381,16 @@ class _MyHomePageState extends State<CctvScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
               ),
-              Positioned(
-                top: 255, // Adjust the position from the bottom
-                left: 30,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 35,
-                    ),
-                    Container(
-                      width: 300,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(width: 15),
-                            Image.asset(
-                              'assets/logos/eye.jpg', // Replace with your image path
-                              width: 19.7, // Adjust image width as needed
-                              height: 13.13, // Adjust image height as needed
-                            ),
-                            const SizedBox(
-                                width:
-                                    10.3), // Add spacing between text and image
-                            const Text(
-                              'Alpha Omega Contract Sales ….',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(
-                                width:
-                                    41), // Add spacing between text and next image
-                            Image.asset(
-                              'assets/logos/arrow.jpg', // Replace with your image path
-                              width: 7.04, // Adjust image width as needed
-                              height: 13, // Adjust image height as needed
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      width: 300,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(width: 15),
-                            Image.asset(
-                              'assets/logos/eye.jpg', // Replace with your image path
-                              width: 19.7, // Adjust image width as needed
-                              height: 13.13, // Adjust image height as needed
-                            ),
-                            const SizedBox(
-                                width:
-                                    10.3), // Add spacing between text and image
-                            TextButton(
-                              onPressed: () {
-                                // Add your TextButton action here
-                              },
-                              child: const Text(
-                                'One Stop Odessa',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                                width:
-                                    95), // Add spacing between text and next image
-                            Image.asset(
-                              'assets/logos/arrow.jpg', // Replace with your image path
-                              width: 7.04, // Adjust image width as needed
-                              height: 13, // Adjust image height as needed
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      width: 300,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(width: 15),
-                            Image.asset(
-                              'assets/logos/eye.jpg', // Replace with your image path
-                              width: 19.7, // Adjust image width as needed
-                              height: 13.13, // Adjust image height as needed
-                            ),
-                            const SizedBox(
-                                width:
-                                    10.3), // Add spacing between text and image
-                            TextButton(
-                              onPressed: () {
-                                // Add your TextButton action here
-                              },
-                              child: const Text(
-                                'One Stop Odessa',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                                width:
-                                    95), // Add spacing between text and next image
-                            Image.asset(
-                              'assets/logos/arrow.jpg', // Replace with your image path
-                              width: 7.04, // Adjust image width as needed
-                              height: 13, // Adjust image height as needed
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      width: 300,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(width: 15),
-                            Image.asset(
-                              'assets/logos/eye.jpg', // Replace with your image path
-                              width: 19.7, // Adjust image width as needed
-                              height: 13.13, // Adjust image height as needed
-                            ),
-                            const SizedBox(
-                                width:
-                                    10.3), // Add spacing between text and image
-                            TextButton(
-                              onPressed: () {
-                                // Add your TextButton action here
-                              },
-                              child: const Text(
-                                'One Stop Odessa',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                                width:
-                                    95), // Add spacing between text and next image
-                            Image.asset(
-                              'assets/logos/arrow.jpg', // Replace with your image path
-                              width: 7.04, // Adjust image width as needed
-                              height: 13, // Adjust image height as needed
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+              Center(
+                child: Text(
+                  'Coming Soon',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
+              )
             ],
           ],
         ),

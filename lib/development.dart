@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:ivis_security/home.dart';
 import 'package:ivis_security/apis/analytics.dart';
+import 'dart:convert';
 
 // Import your API service file
 
@@ -29,17 +30,36 @@ class _MyHomePageState extends State<DevelopmentScreen> {
   DateTime selectedDate = DateTime.now();
   DateTime FromDate = DateTime.now();
   DateTime ToDate = DateTime.now();
-
+  int siteId = 1002;
   TextEditingController dateController = TextEditingController();
+  TextEditingController fromDateController = TextEditingController();
+  TextEditingController toDateController = TextEditingController();
+  DateTime selectedFromDate = DateTime.now();
+  DateTime selectedToDate = DateTime.now();
+  DateTime? _selectedDay;
+  List<String> disabledDates = [];
 
   @override
   void initState() {
     super.initState();
+    fromDateController = TextEditingController();
+    toDateController = TextEditingController();
+
     dateController = TextEditingController();
     selectedDate = DateTime.now();
-    FromDate = DateTime.now();
-    ToDate = DateTime.now();
-    // Initialize selectedDate here
+
+    fetchLastWorkday(siteId).then((lastWorkday) {
+      setState(() {
+        selectedDate = lastWorkday;
+        dateController.text = lastWorkday.toString().split(' ')[0];
+      });
+    });
+    // Initialize selectedFromDate and selectedToDate here
+    fetchNotWorkingDates().then((dates) {
+      setState(() {
+        disabledDates = dates;
+      });
+    });
   }
 
   int selectedButtonIndex = 0; // Track the selected button
@@ -221,104 +241,90 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
-                      const SizedBox(
-                        height: 285,
-                      ),
-                      Container(
-                        width: 300,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(1),
-                          borderRadius: BorderRadius.circular(5),
+              SingleChildScrollView(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        const SizedBox(
+                          height: 285,
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 10, top: 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(left: 10),
-                                  child: TextField(
-                                    controller: dateController,
-                                    decoration: InputDecoration(
-                                      hintText: 'yyyy-mm-dd',
-                                      border: InputBorder.none,
+                        Container(
+                          width: 300,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(1),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 10, top: 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 10),
+                                    child: TextField(
+                                      controller: dateController,
+                                      decoration: InputDecoration(
+                                        hintText: 'yyyy-mm-dd',
+                                        border: InputBorder.none,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2030),
-                                  ).then((selectedDate) {
-                                    if (selectedDate != null) {
-                                      setState(() {
-                                        this.selectedDate = selectedDate;
-                                        dateController.text = selectedDate
-                                            .toString()
-                                            .split(' ')[0];
-                                      });
-                                    }
-                                  });
-                                },
-                                icon: Icon(Icons.calendar_today),
-                              ),
-                            ],
+                                IconButton(
+                                  onPressed: () => _selectDate(context),
+                                  icon: Icon(Icons.calendar_today),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Center(
-                        child: FutureBuilder(
-                          future: fetchData(selectedDate),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                !snapshot.hasError) {
-                              if (snapshot.data != null &&
-                                  snapshot.data!['AnalyticsList'] != null) {
-                                return SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      YourWidget(
-                                        analyticsList:
-                                            (snapshot.data!['AnalyticsList']
-                                                    as List<dynamic>)
-                                                .cast<Map<String, dynamic>>(),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Center(
+                          child: FutureBuilder(
+                            future: fetchData(selectedDate, siteId),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  !snapshot.hasError) {
+                                if (snapshot.data != null &&
+                                    snapshot.data!['AnalyticsList'] != null) {
+                                  return SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        YourWidget(
+                                          analyticsList:
+                                              (snapshot.data!['AnalyticsList']
+                                                      as List<dynamic>)
+                                                  .cast<Map<String, dynamic>>(),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Text('No data available'),
+                                  );
+                                }
                               } else {
                                 return Center(
-                                  child: Text('No data available'),
+                                  child: CircularProgressIndicator(),
                                 );
                               }
-                            } else {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                          },
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
@@ -378,6 +384,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                     SizedBox(
                                       width: 23,
                                     ),
+                                    // From Date
                                     Container(
                                       width: 110,
                                       height: 35,
@@ -385,9 +392,8 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                         color: Colors.white.withOpacity(1),
                                         borderRadius: BorderRadius.circular(5),
                                         border: Border.all(
-                                          color: Colors
-                                              .grey, // Set the border color to grey
-                                          width: 1, // Set the border width
+                                          color: Colors.grey,
+                                          width: 1,
                                         ),
                                       ),
                                       child: Padding(
@@ -399,12 +405,13 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                           children: [
                                             Expanded(
                                               child: Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 5),
+                                                padding: EdgeInsets.only(
+                                                    left: 0, top: 0),
                                                 child: TextField(
                                                   style:
                                                       TextStyle(fontSize: 11),
-                                                  controller: dateController,
+                                                  controller:
+                                                      fromDateController,
                                                   decoration: InputDecoration(
                                                     hintText: 'From Date',
                                                     border: InputBorder.none,
@@ -418,15 +425,13 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                                   context: context,
                                                   initialDate: DateTime.now(),
                                                   firstDate: DateTime(2000),
-                                                  lastDate: DateTime(2030),
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
+                                                  lastDate: DateTime.now(),
+                                                ).then((FromDate) {
+                                                  if (FromDate != null) {
                                                     setState(() {
-                                                      this.selectedDate =
-                                                          selectedDate;
-                                                      dateController.text =
-                                                          selectedDate
-                                                              .toString()
+                                                      this.FromDate = FromDate;
+                                                      fromDateController.text =
+                                                          FromDate.toString()
                                                               .split(' ')[0];
                                                     });
                                                   }
@@ -444,6 +449,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                     SizedBox(
                                       width: 44,
                                     ),
+                                    // To Date
                                     Container(
                                       width: 110,
                                       height: 35,
@@ -451,9 +457,8 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                         color: Colors.white.withOpacity(1),
                                         borderRadius: BorderRadius.circular(5),
                                         border: Border.all(
-                                          color: Colors
-                                              .grey, // Set the border color to grey
-                                          width: 1, // Set the border width
+                                          color: Colors.grey,
+                                          width: 1,
                                         ),
                                       ),
                                       child: Padding(
@@ -461,20 +466,15 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                             EdgeInsets.only(left: 0, top: 0),
                                         child: Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.center,
                                           children: [
                                             Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 5),
-                                                child: TextField(
-                                                  style:
-                                                      TextStyle(fontSize: 11),
-                                                  controller: dateController,
-                                                  decoration: InputDecoration(
-                                                    hintText: 'To Date',
-                                                    border: InputBorder.none,
-                                                  ),
+                                              child: TextField(
+                                                style: TextStyle(fontSize: 11),
+                                                controller: toDateController,
+                                                decoration: InputDecoration(
+                                                  hintText: 'To Date',
+                                                  border: InputBorder.none,
                                                 ),
                                               ),
                                             ),
@@ -484,15 +484,13 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                                   context: context,
                                                   initialDate: DateTime.now(),
                                                   firstDate: DateTime(2000),
-                                                  lastDate: DateTime(2030),
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
+                                                  lastDate: DateTime.now(),
+                                                ).then((ToDate) {
+                                                  if (ToDate != null) {
                                                     setState(() {
-                                                      this.selectedDate =
-                                                          selectedDate;
-                                                      dateController.text =
-                                                          selectedDate
-                                                              .toString()
+                                                      this.ToDate = ToDate;
+                                                      toDateController.text =
+                                                          ToDate.toString()
                                                               .split(' ')[0];
                                                     });
                                                   }
@@ -784,6 +782,79 @@ class _MyHomePageState extends State<DevelopmentScreen> {
       ),
     );
   }
+
+  //disable not working dates
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+      selectableDayPredicate: (DateTime date) {
+        // Convert date to 'yyyy-MM-dd' format for comparison
+        String formattedDate =
+            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+        // Disable dates that are in the disabledDates list
+        return !disabledDates.contains(formattedDate);
+      },
+    );
+
+    if (pickedDate != null && pickedDate != _selectedDay) {
+      setState(() {
+        _selectedDay = pickedDate;
+      });
+    }
+  }
+
+  Future<List<String>> fetchNotWorkingDates() async {
+    const apiUrl =
+        "http://usmgmt.iviscloud.net:777/businessInterface/Client/notWorkingDays_1_0?siteId=1002&calling_System_Detail=IVISUSA&year=2022";
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (data['NotWorkingDaysList'] != null) {
+          List<String> notWorkingDates =
+              List<String>.from(data['NotWorkingDaysList']);
+          return notWorkingDates;
+        } else {
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Add an async function to fetch the last workday from the API
+  Future<DateTime> fetchLastWorkday(siteId) async {
+    final apiUrl =
+        "http://usmgmt.iviscloud.net:777/businessInterface/Client/notWorkingDays_1_0?siteId=$siteId&calling_System_Detail=IVISUSA&year=2021";
+
+    // Make the HTTP request
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      // Assuming the API response has a field 'lastWorkday'
+      final String lastWorkdayString = data['LastWorkingDay'];
+      // Parse the date from the string
+      final DateTime lastWorkday = DateTime.parse(lastWorkdayString);
+      return lastWorkday;
+    } else {
+      // Handle error when the API request fails
+      throw Exception('Failed to load last workday');
+    }
+  }
+
+// Modify your initState to use the async function
+
+// Rest of your code remains the same...
 
   Future<void> downloadPdf(FromDate, ToDate) async {
     // Replace 'YOUR_PDF_API_URL' with your actual API endpoint
