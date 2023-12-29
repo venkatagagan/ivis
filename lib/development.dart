@@ -31,7 +31,9 @@ class _MyHomePageState extends State<DevelopmentScreen> {
   DateTime FromDate = DateTime.now();
   DateTime ToDate = DateTime.now();
   int siteId = 1002;
+  TextEditingController defaultController = TextEditingController();
   TextEditingController dateController = TextEditingController();
+
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
   DateTime selectedFromDate = DateTime.now();
@@ -48,12 +50,18 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     dateController = TextEditingController();
     selectedDate = DateTime.now();
 
-    fetchLastWorkday(siteId).then((lastWorkday) {
-      setState(() {
-        selectedDate = lastWorkday;
-        dateController.text = lastWorkday.toString().split(' ')[0];
-      });
-    });
+    defaultController = TextEditingController();
+
+    // default
+    //fetchLastWorkday(siteId).then((lastWorkday) {
+    //setState(() {
+    //selectedDate = lastWorkday;
+    //dateController.text = lastWorkday.toString().split(' ')[0];
+    //});
+    //});
+    // selected date
+    dateController = TextEditingController();
+    selectedDate = DateTime.now();
     // Initialize selectedFromDate and selectedToDate here
     fetchNotWorkingDates().then((dates) {
       setState(() {
@@ -241,51 +249,53 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
               ),
-              SingleChildScrollView(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 285,
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    children: [
+                      const SizedBox(
+                        height: 285,
+                      ),
+                      Container(
+                        width: 300,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(1),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        Container(
-                          width: 300,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 10, top: 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 10),
-                                    child: TextField(
-                                      controller: dateController,
-                                      decoration: InputDecoration(
-                                        hintText: 'yyyy-mm-dd',
-                                        border: InputBorder.none,
-                                      ),
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 10, top: 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 10),
+                                  child: TextField(
+                                    controller: dateController,
+                                    decoration: InputDecoration(
+                                      hintText: 'yyyy-mm-dd',
+                                      border: InputBorder.none,
                                     ),
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () => _selectDate(context),
-                                  icon: Icon(Icons.calendar_today),
-                                ),
-                              ],
-                            ),
+                              ),
+                              IconButton(
+                                onPressed: () => _selectDate(context),
+                                icon: Icon(Icons.calendar_today),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Divider(),
+                      Expanded(
+                        child: SingleChildScrollView(
                           child: FutureBuilder(
                             future: fetchData(selectedDate, siteId),
                             builder: (context, snapshot) {
@@ -321,11 +331,12 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                             },
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
+
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2
@@ -831,6 +842,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     }
   }
 
+//date data
   // Add an async function to fetch the last workday from the API
   Future<DateTime> fetchLastWorkday(siteId) async {
     final apiUrl =

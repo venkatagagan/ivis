@@ -1,27 +1,32 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class BussinessInterface {
-  static Future<dynamic> fetchSiteNames() async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-            'http://usmgmt.iviscloud.net:777/cpus/Monitoring/monitoringHours?accountId=1004'),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 200) {
-        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        List<dynamic>? sites = jsonResponse['monitoringHours'];
-        print('API Response: $jsonResponse');
-        print(sites);
-        return sites;
+Future<Set<String>> fetchMonitoringNames() async {
+  final apiUrl =
+      "http://usmgmt.iviscloud.net:777/cpus/Monitoring/monitoringHours?accountId=1004";
+
+  try {
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      if (data.isNotEmpty) {
+        // Extract monitoring names from the response
+        Set<String> monitoringNames = data.map((entry) {
+          return entry['monitoringname'].toString();
+        }).toSet();
+        return monitoringNames;
       } else {
-        print('API Error: ${response.statusCode}');
-        print('API Response: ${response.body}');
-        throw Exception('Failed to load site names');
+        print("No monitoring names available.");
+        return {};
       }
-    } catch (e) {
-      throw Exception('Error fetching data: $e');
+    } else {
+      print(
+          "Failed to fetch monitoring names. Status code: ${response.statusCode}");
+      return {};
     }
+  } catch (e) {
+    print("Error fetching monitoring names: $e");
+    return {};
   }
 }

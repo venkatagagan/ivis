@@ -22,7 +22,7 @@ class BussinessInterface extends LoginApiService {
 
       final response = await http.get(
         Uri.parse(
-            'http://13.200.98.198/getSitesListForUserName_1_0/?userName=$UserName'),
+            'http://54.92.215.87:943/getSitesListForUserName_1_0/?userName=$UserName'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {

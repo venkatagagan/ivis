@@ -8,7 +8,7 @@ import 'package:ivis_security/home.dart';
 class LoginApiService {
   // static const baseUrl = 'http://34.206.37.237/userDetails/';
 // ignore: non_constant_identifier_names
-static String UserName = '';
+  static String UserName = '';
   static Future<void> login(
       BuildContext context, String user, String password) async {
     try {
@@ -58,6 +58,3 @@ static String UserName = '';
     } catch (e) {}
   }
 }
-
-
-

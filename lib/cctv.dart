@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:ivis_security/apis/fetchdata.dart';
-//import 'package:ivis_security/cctv/camBigScreen.dart';
-import 'package:ivis_security/cctv/camList.dart';
-//import 'package:ivis_security/cctv/screens.dart';
 import 'package:ivis_security/alarm.dart';
-import 'package:ivis_security/development.dart';
+import 'package:ivis_security/apis/Bussiness_int_api.dart';
+import 'package:ivis_security/apis/Monitoring.dart';
+import 'package:ivis_security/apis/fetchdata.dart';
+import 'package:ivis_security/cctv/camBigScreen.dart';
+import 'package:ivis_security/cctv/camList.dart';
+import 'package:ivis_security/cctv/screens.dart';
 import 'package:ivis_security/center.dart';
+import 'package:ivis_security/development.dart';
 import 'package:ivis_security/hdtv.dart';
 import 'package:ivis_security/home.dart';
-import 'package:ivis_security/apis/Monitoring.dart';
-
-void main() {
-  runApp(const CctvScreen());
-}
+import 'package:visibility_detector/visibility_detector.dart';
 
 bool shouldReloadContainers = false;
 
@@ -25,17 +23,17 @@ class CctvScreen extends StatefulWidget {
 
 class _MyHomePageState extends State<CctvScreen> {
   int startIndex = 0;
-  int endIndex = 2;
+  int endIndex = 1;
   List<TdpCamera> listOfCamera = [];
   int sitID = 36301;
+  bool _isVisible = false;
+  String visibilityScreenName = "";
 
   Set<dynamic> siteNames = {};
 
   @override
   void initState() {
-    super.initState();
     fetchSiteNames();
-    retrieveTheCamerasData();
     super.initState();
   }
 
@@ -44,6 +42,7 @@ class _MyHomePageState extends State<CctvScreen> {
       List<dynamic> sites = await BussinessInterface.fetchSiteNames();
       setState(() {
         siteNames = sites.toSet();
+        retrieveTheCamerasData();
       });
     } catch (e) {
       print('Error fetching site names: $e');
@@ -60,7 +59,6 @@ class _MyHomePageState extends State<CctvScreen> {
 
   int selectedButtonIndex = 0;
   // Track the selected button
-
   void onButtonPressed(int index) {
     setState(() {
       selectedButtonIndex = index; // Update the selected button index
@@ -208,6 +206,94 @@ class _MyHomePageState extends State<CctvScreen> {
             ),
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
+              const SizedBox(
+                height: 300,
+              ),
+              if (listOfCamera.isNotEmpty)
+                const SizedBox(
+                  height: 300,
+                ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 300,
+                      ),
+                      ...listOfCamera.map(
+                        (e) {
+                          // GetData();
+                          return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (ctx) => BigScreen(
+                                        rtspLInk: e.rtspUrl,
+                                        cameraId: e.status,
+                                        cameraName: e.name)));
+                              },
+                              // child: VideoPlayerScreen(
+                              //     rtspLInk: e.rtspUrl,
+                              //     status: e.status,
+                              //     cameraName: e.name),
+                              child: VisibilityDetector(
+                                key: Key(e.name.toString()),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    height: 250,
+                                    width: 300,
+                                    decoration: ShapeDecoration(
+                                      color: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Center(
+                                        child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (visibilityScreenName == e.name)
+                                          VideoPlayerScreen(
+                                              rtspLInk: e.rtspUrl,
+                                              status: e.status,
+                                              cameraName: e.name),
+                                        Text(e.name),
+                                      ],
+                                    )),
+                                  ),
+                                ),
+                                onVisibilityChanged: (visibilityInfo) {
+                                  setState(() {
+                                    // Change the flag value of _isVisible
+                                    // If it is greater than 0 means it is visible
+                                    _isVisible =
+                                        visibilityInfo.visibleFraction > 0;
+
+                                    // It will show how much percentage the widget is visible
+                                    var visiblePercentage =
+                                        visibilityInfo.visibleFraction * 100;
+                                    if (visibilityScreenName != e.name &&
+                                        visiblePercentage == 100) {
+                                      visibilityScreenName = e.name;
+
+                                      print(visibilityScreenName);
+                                    } else {
+                                      print("Hello");
+                                    }
+                                    print(
+                                        '${e.name} is ${visiblePercentage}% visible');
+                                  });
+                                },
+                              ));
+                        },
+                      )
+                    ],
+                  ),
+                ),
+              ),
+
+              if (listOfCamera.isEmpty) const CircularProgressIndicator()
+
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2

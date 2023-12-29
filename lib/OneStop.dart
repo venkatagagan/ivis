@@ -8,12 +8,14 @@ import 'package:ivis_security/center.dart';
 import 'package:ivis_security/contact.dart';
 import 'package:ivis_security/reset.dart';
 import 'package:ivis_security/apis/Services.dart';
+import 'package:ivis_security/apis/Bussiness_int_api.dart';
 
+// ignore: must_be_immutable
 class OneStopScreen extends StatefulWidget {
-  final String siteId;
-  final String Sitename;
+  String siteId;
+  String Sitename;
 
-  const OneStopScreen({
+  OneStopScreen({
     Key? key,
     required this.siteId,
     required this.Sitename,
@@ -31,19 +33,19 @@ class _OneStopScreenState extends State<OneStopScreen> {
   String se = "F";
   String ad = "F";
   late String sitename;
-  late String siteid;
+  late String siteId;
 
   late Map<String, dynamic> services;
   int accountId = 1004;
-
+  int currentSiteIndex = 0; // Counter for site IDs
   @override
   void initState() {
     super.initState();
     // Initialize sitename and siteid here
     sitename = widget.Sitename;
-    siteid = widget.siteId;
+    siteId = widget.siteId;
 
-    fetchData(int.parse(siteid)); // Pass siteid to fetchData
+    fetchData(int.parse(siteId)); // Pass siteid to fetchData
   }
 
   Future<void> fetchData(int accountId) async {
@@ -147,6 +149,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward),
                 onPressed: () {
+                  changeSite();
                   // Handle right arrow button press
                 },
 
@@ -706,5 +709,22 @@ class _OneStopScreenState extends State<OneStopScreen> {
         );
       },
     );
+  }
+
+  void changeSite() {
+    setState(() {
+      if (BussinessInterface.SiteId.isNotEmpty) {
+        currentSiteIndex++; // Increment the counter
+
+        // Check if the counter exceeds the length of SiteId list
+        if (currentSiteIndex >= BussinessInterface.SiteId.length) {
+          currentSiteIndex = 0; // If so, reset the counter to 0
+        }
+
+        // Update the current site ID
+        widget.siteId = BussinessInterface.SiteId[currentSiteIndex];
+        fetchData(int.parse(widget.siteId));
+      }
+    });
   }
 }
