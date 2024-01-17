@@ -8,6 +8,7 @@ class BussinessInterface extends LoginApiService {
   }
 
   static String SiteId = '';
+  static String names = '';
 
   static Future<dynamic> fetchSiteNames() async {
     try {

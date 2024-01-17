@@ -1,3 +1,257 @@
+if (listOfCamera.isNotEmpty)
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 300,
+                      ),
+                      ...listOfCamera.map(
+                        (e) {
+                          // GetData();
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (ctx) => BigScreen(
+                                      httpUrl: e.httpUrl,
+                                      cameraId: e.status,
+                                      cameraName: e.name)));
+                            },
+                            // child: VideoPlayerScreen(
+                            //     rtspLInk: e.rtspUrl,
+                            //     status: e.status,
+                            //     cameraName: e.name),
+                            child: Expanded(
+                                child: VisibilityDetector(
+                              key: Key(e.name.toString()),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  height: 250,
+                                  width: 300,
+                                  decoration: ShapeDecoration(
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Center(
+                                      child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (visibilityScreenName == e.name)
+                                        VideoPlayerScreen(
+                                            httpUrl: e.httpUrl,
+                                            status: e.status,
+                                            cameraName: e.name),
+                                      Text(e.name),
+                                    ],
+                                  )),
+                                ),
+                              ),
+                              onVisibilityChanged: (visibilityInfo) {
+                                setState(() {
+                                  // Change the flag value of _isVisible
+                                  // If it is greater than 0 means it is visible
+                                  _isVisible =
+                                      visibilityInfo.visibleFraction > 0;
+
+                                  // It will show how much percentage the widget is visible
+                                  var visiblePercentage =
+                                      visibilityInfo.visibleFraction * 100;
+                                  if (visibilityScreenName != e.name &&
+                                      visiblePercentage == 100) {
+                                    visibilityScreenName = e.name;
+
+                                    print(visibilityScreenName);
+                                  } else {
+                                    print("Hello");
+                                  }
+                                  print(
+                                      '${e.name} is ${visiblePercentage}% visible');
+                                });
+                              },
+                            )),
+                          );
+                        },
+                      )
+                    ],
+                  ),
+                ),
+
+              if (listOfCamera.isEmpty) const CircularProgressIndicator()
+
+************************************************************
+const Positioned(
+                top: 250, // Adjust the position from the bottom
+                left: 130.5,
+                right: 129.5,
+                child: Divider(
+                  height: 1, // Set the height of the line
+                  thickness: 6, // Set the thickness of the line
+                  color: Colors.white, // Set the color of the line
+                ),
+              ),
+              const Positioned(
+                top: 250, // Adjust the position from the bottom
+                left: 130.5,
+                right: 129.5,
+                child: Divider(
+                  height: 1, // Set the height of the line
+                  thickness: 6, // Set the thickness of the line
+                  color: Colors.white, // Set the color of the line
+                ),
+              ),
+              Positioned(
+                top: 272, // Adjust the position from the bottom
+                left: 30,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 300,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(1),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 0, left: 0), // Adjust the left padding
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                                width:
+                                    25), // Add spacing between text and image
+                            const Text(
+                              'Hours',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(
+                                width:
+                                    176), // Add spacing between text and next image
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CenterScreen()),
+                                );
+
+                                // Add your desired action here
+                              },
+                              child: Image.asset(
+                                'assets/logos/Rectangle.png',
+                                height: 25,
+                                width: 45,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: 300,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(1),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 0, left: 0), // Adjust the left padding
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 23,
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 266,
+                                        ),
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CenterScreen()),
+                                            );
+                                            // Add your desired action here
+                                          },
+                                          child: Image.asset(
+                                            'assets/logos/plus-square.jpg',
+                                            height: 13,
+                                            width: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 22,
+                                    ),
+                                    // ignore: unused_local_variable
+                                    for (String site in monitoringNames)
+                                      SingleChildScrollView(
+                                          child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 25,
+                                              ),
+                                              Text(
+                                                site,
+
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize:
+                                                      11, // Set the text color to black
+                                                ), //#ABABAB
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 16,
+                                          ),
+                                          Divider(
+                                            color: Colors.black,
+                                            height: 1,
+                                            thickness: 1,
+
+                                            // Thickness of the divider
+                                          ),
+                                          SizedBox(
+                                            height: 16,
+                                          ),
+                                        ],
+                                      )),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+              ),
+****************************************************************
 // main.
 //status
 Column(

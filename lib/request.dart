@@ -171,188 +171,184 @@ class _MyHomePageState extends State<RequestScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
               ),
-              SingleChildScrollView(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 285,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    children: [
+                      const SizedBox(
+                        height: 285,
+                      ),
+                      Container(
+                        width: 300,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(1),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        Container(
-                          width: 300,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 18,
-                                  ),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 20,
+                        child: Padding(
+                            padding: EdgeInsets.only(
+                                top: 0, left: 0), // Adjust the left padding
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 18,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Container(
+                                      height: 60,
+                                      width: 260,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
-                                      Container(
-                                        height: 60,
-                                        width: 260,
-                                        decoration: BoxDecoration(
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Container(
+                                      height: 60,
+                                      width: 260,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Container(
+                                      width: 260,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(
                                           color: Colors.grey.withOpacity(0.5),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
+                                          width: 2,
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 20,
                                       ),
-                                      Container(
-                                        height: 60,
-                                        width: 260,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
+                                      child: TextField(
+                                        decoration: InputDecoration(
+                                          hintText: 'Description here',
+                                          hintStyle:
+                                              TextStyle(color: Colors.grey),
+                                          border: InputBorder.none,
+                                          contentPadding: EdgeInsets.all(16),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 20,
                                       ),
-                                      Container(
-                                        width: 260,
-                                        height: 150,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            width: 2,
-                                          ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 17,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 12,
+                                    ),
+                                    Checkbox(
+                                      value: isChecked,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isChecked = value!;
+                                        });
+                                      },
+                                    ),
+                                    SizedBox(
+                                      width: 0,
+                                    ),
+                                    Text("Preferred Time to Call Back"),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 17,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 100,
+                                    ),
+                                    OutlinedButton(
+                                      onPressed: () {
+                                        // Add your button press logic here
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        side: BorderSide(
+                                            color: Colors
+                                                .blue), // Specify the border color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10.0), // Adjust border radius as needed
                                         ),
-                                        child: TextField(
-                                          decoration: InputDecoration(
-                                            hintText: 'Description here',
-                                            hintStyle:
-                                                TextStyle(color: Colors.grey),
-                                            border: InputBorder.none,
-                                            contentPadding: EdgeInsets.all(16),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 17,
-                                  ),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 12,
                                       ),
-                                      Checkbox(
-                                        value: isChecked,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            isChecked = value!;
-                                          });
-                                        },
+                                      child: Text(
+                                        'Set Time',
+                                        style: TextStyle(
+                                            color: Colors
+                                                .blue), // Specify text color
                                       ),
-                                      SizedBox(
-                                        width: 0,
-                                      ),
-                                      Text("Preferred Time to Call Back"),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 17,
-                                  ),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 100,
-                                      ),
-                                      OutlinedButton(
-                                        onPressed: () {
-                                          // Add your button press logic here
-                                        },
-                                        style: OutlinedButton.styleFrom(
-                                          side: BorderSide(
-                                              color: Colors
-                                                  .blue), // Specify the border color
-                                          shape: RoundedRectangleBorder(
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 30,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 75,
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {},
+                                      style: ButtonStyle(
+                                        shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
-                                                10.0), // Adjust border radius as needed
+                                                25.0), // Adjust the radius as needed
                                           ),
                                         ),
-                                        child: Text(
-                                          'Set Time',
-                                          style: TextStyle(
-                                              color: Colors
-                                                  .blue), // Specify text color
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 30,
-                                  ),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 75,
+                                        minimumSize: MaterialStateProperty.all(
+                                            const Size(
+                                                150, 50)), // Set the size here
                                       ),
-                                      ElevatedButton(
-                                        onPressed: () {},
-                                        style: ButtonStyle(
-                                          shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                  25.0), // Adjust the radius as needed
-                                            ),
-                                          ),
-                                          minimumSize:
-                                              MaterialStateProperty.all(
-                                                  const Size(150,
-                                                      50)), // Set the size here
-                                        ),
-                                        child: const Text('SUBMIT'),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                ],
-                              )),
-                        ),
-                        SizedBox(
-                          height: 50,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                                      child: const Text('SUBMIT'),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            )),
+                      ),
+                      SizedBox(
+                        height: 50,
+                      ),
+                    ],
+                  ),
+                ],
               ),
+
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2

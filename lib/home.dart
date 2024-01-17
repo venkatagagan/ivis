@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   int selectedButtonIndex = 0; // Track the selected button
-
+  int i = 0;
   List<dynamic> siteNames = [];
 
   @override
@@ -167,66 +167,74 @@ class _MyHomePageState extends State<HomePage> {
                       height: 285,
                     ),
                     const SizedBox(height: 16.0),
-                    Column(
-                      children: [
-                        for (Map<String, dynamic> site in siteNames)
-                          GestureDetector(
-                            onTap: () {
-                              // Navigate to another Dart file
-                              String siteId = site['siteId'].toString();
-                              String SiteName = site['siteName'].toString();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OneStopScreen(
-                                    siteId: siteId,
-                                    Sitename: SiteName,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: 300,
-                              height: 60,
-                              margin: const EdgeInsets.only(
-                                  bottom: 16), // Add margin for space
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(1),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 0, left: 0), // Adjust the left padding
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(width: 15),
-                                    Image.asset(
-                                      'assets/logos/eye.jpg', // Replace with your image path
-                                      width:
-                                          19.7, // Adjust image width as needed
-                                      height:
-                                          13.13, // Adjust image height as needed
-                                    ),
-                                    const SizedBox(
-                                        width:
-                                            10.3), // Add spacing between text and image
-
-                                    Text(
-                                      site['siteName']
-                                          .toString(), // Access the 'siteName' field
-                                      style: TextStyle(
-                                        color: Colors.black,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            for (Map<String, dynamic> site in siteNames)
+                              GestureDetector(
+                                onTap: () {
+                                  // Navigate to another Dart file
+                                  String siteId = site['siteId'].toString();
+                                  String SiteName = site['siteName'].toString();
+                                  i = 1;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OneStopScreen(
+                                        i: i,
+                                        siteId: siteId,
+                                        Sitename: SiteName,
                                       ),
                                     ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 300,
+                                  height: 60,
+                                  margin: const EdgeInsets.only(
+                                      bottom: 16), // Add margin for space
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(1),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 0,
+                                        left: 0), // Adjust the left padding
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(width: 15),
+                                        Image.asset(
+                                          'assets/logos/eye.jpg', // Replace with your image path
+                                          width:
+                                              19.7, // Adjust image width as needed
+                                          height:
+                                              13.13, // Adjust image height as needed
+                                        ),
+                                        const SizedBox(
+                                            width:
+                                                10.3), // Add spacing between text and image
 
-                                    // Add spacing between text and next image
-                                  ],
+                                        Text(
+                                          site['siteName']
+                                              .toString(), // Access the 'siteName' field
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+
+                                        // Add spacing between text and next image
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                      ],
+                          ],
+                        ),
+                      ),
                     ),
                   ]),
                 ],

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:ivis_security/alarm.dart';
 import 'package:ivis_security/cctv.dart';
 import 'package:ivis_security/development.dart';
@@ -8,21 +10,30 @@ import 'package:ivis_security/center.dart';
 import 'package:ivis_security/contact.dart';
 import 'package:ivis_security/reset.dart';
 import 'package:ivis_security/apis/Services.dart';
-import 'package:ivis_security/apis/Bussiness_int_api.dart';
+//import 'package:ivis_security/apis/Bussiness_int_api.dart';
 
 // ignore: must_be_immutable
 class OneStopScreen extends StatefulWidget {
   String siteId;
   String Sitename;
+  int i;
 
   OneStopScreen({
     Key? key,
     required this.siteId,
     required this.Sitename,
+    required this.i,
   }) : super(key: key);
 
   @override
   _OneStopScreenState createState() => _OneStopScreenState();
+}
+
+class Site {
+  final int siteId;
+  final String siteName;
+
+  Site(this.siteId, this.siteName);
 }
 
 class _OneStopScreenState extends State<OneStopScreen> {
@@ -34,6 +45,12 @@ class _OneStopScreenState extends State<OneStopScreen> {
   String ad = "F";
   late String sitename;
   late String siteId;
+  late String I;
+  late int i;
+  late String Id;
+  late String Name;
+  List<Site> sites = [];
+  int currentIndex = 1;
 
   late Map<String, dynamic> services;
   int accountId = 1004;
@@ -44,7 +61,8 @@ class _OneStopScreenState extends State<OneStopScreen> {
     // Initialize sitename and siteid here
     sitename = widget.Sitename;
     siteId = widget.siteId;
-
+    currentIndex = widget.i;
+    fetchSites();
     fetchData(int.parse(siteId)); // Pass siteid to fetchData
   }
 
@@ -65,6 +83,40 @@ class _OneStopScreenState extends State<OneStopScreen> {
     } catch (e) {
       print('Error fetching client services: $e');
       // Handle errors...
+    }
+  }
+
+  Future<void> fetchSites() async {
+    final response = await http.get(Uri.parse(
+        'http://54.92.215.87:943/getSitesListForUserName_1_0/?userName=ivisusnew'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> siteList = data['sites'];
+
+      setState(() {
+        sites = siteList
+            .map((site) => Site(site['siteId'], site['siteName']))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load sites');
+    }
+  }
+
+  void goToNextSite() {
+    if (currentIndex < sites.length - 1) {
+      setState(() {
+        currentIndex++;
+      });
+    }
+  }
+
+  void goToPreviousSite() {
+    if (currentIndex > 0) {
+      setState(() {
+        currentIndex--;
+      });
     }
   }
 
@@ -149,7 +201,17 @@ class _OneStopScreenState extends State<OneStopScreen> {
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward),
                 onPressed: () {
-                  changeSite();
+                  currentIndex < sites.length - 1 ? goToNextSite : null;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OneStopScreen(
+                        i: currentIndex,
+                        siteId: '${sites[currentIndex].siteId}', //siteId
+                        Sitename: "${sites[currentIndex].siteName}",
+                      ),
+                    ),
+                  );
                   // Handle right arrow button press
                 },
 
@@ -709,22 +771,5 @@ class _OneStopScreenState extends State<OneStopScreen> {
         );
       },
     );
-  }
-
-  void changeSite() {
-    setState(() {
-      if (BussinessInterface.SiteId.isNotEmpty) {
-        currentSiteIndex++; // Increment the counter
-
-        // Check if the counter exceeds the length of SiteId list
-        if (currentSiteIndex >= BussinessInterface.SiteId.length) {
-          currentSiteIndex = 0; // If so, reset the counter to 0
-        }
-
-        // Update the current site ID
-        widget.siteId = BussinessInterface.SiteId[currentSiteIndex];
-        fetchData(int.parse(widget.siteId));
-      }
-    });
   }
 }

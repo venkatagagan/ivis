@@ -12,6 +12,8 @@ import 'package:ivis_security/home.dart';
 import 'package:ivis_security/apis/analytics.dart';
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 // Import your API service file
 
 void main() async {
@@ -31,9 +33,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
   DateTime FromDate = DateTime.now();
   DateTime ToDate = DateTime.now();
   int siteId = 1002;
-  TextEditingController defaultController = TextEditingController();
   TextEditingController dateController = TextEditingController();
-
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
   DateTime selectedFromDate = DateTime.now();
@@ -50,18 +50,15 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     dateController = TextEditingController();
     selectedDate = DateTime.now();
 
-    defaultController = TextEditingController();
-
-    // default
-    //fetchLastWorkday(siteId).then((lastWorkday) {
-    //setState(() {
-    //selectedDate = lastWorkday;
-    //dateController.text = lastWorkday.toString().split(' ')[0];
-    //});
-    //});
     // selected date
-    dateController = TextEditingController();
-    selectedDate = DateTime.now();
+    fetchLastWorkday(siteId).then((lastWorkday) {
+      setState(() {
+        // Use _lastWorkday if _selectedDay is null
+        selectedDate = _selectedDay ?? lastWorkday;
+        dateController.text = selectedDate.toString().split(' ')[0];
+      });
+    });
+
     // Initialize selectedFromDate and selectedToDate here
     fetchNotWorkingDates().then((dates) {
       setState(() {
@@ -558,7 +555,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        downloadPdf(FromDate, ToDate);
+                                        _callApi(FromDate, ToDate);
                                       },
                                       style: ButtonStyle(
                                         shape: MaterialStateProperty.all<
@@ -889,6 +886,29 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     } catch (e) {
       print('Error downloading PDF: $e');
     }
+  }
+}
+
+Future<void> _callApi(DateTime FromDate, DateTime ToDate) async {
+  final String fromDate = DateFormat('yyyy/MM/dd').format(FromDate);
+  final String toDate = DateFormat('yyyy/MM/dd').format(ToDate);
+
+  final apiUrl =
+      "http://usmgmt.iviscloud.net:777/businessInterface/insights/getPdfReport?siteId=1003&startdate=$fromDate&enddate=$toDate&calling_System_Detail=IVISUSA";
+
+  try {
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      // Handle the API response as needed
+      print("API Call Successful");
+    } else {
+      // Handle errors or different status codes
+      print("API Call Failed. Status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    // Handle exceptions or network errors
+    print("Error during API call: $e");
   }
 }
 

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_vlc_player/flutter_vlc_player.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   const VideoPlayerScreen({
     Key? key,
-    required this.rtspLInk,
+    required this.httpUrl,
     required this.status,
     required this.cameraName,
   }) : super(key: key);
 
-  final String rtspLInk;
+  final String httpUrl;
   final String status;
   final String cameraName;
 
@@ -20,24 +20,26 @@ class VideoPlayerScreen extends StatefulWidget {
 bool shouldReloadContainers = false;
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late VlcPlayerController _controller;
-
-  double _currentScale = 1.0;
-  double _baseScale = 1.0;
-
   @override
   void initState() {
     super.initState();
-    _controller = VlcPlayerController.network(
-      widget.rtspLInk,
-      hwAcc: HwAcc.full,
-      autoInitialize: false,
-      autoPlay: true,
-    );
+  }
+
+  String convertHttpToHttps(String url) {
+    // Check if the URL starts with "http://"
+    if (url.startsWith("http://")) {
+      // Replace "http://" with "https://"
+      return url.replaceFirst("http://", "https://");
+    }
+
+    // If the URL doesn't start with "http://", return it as is
+    return url;
   }
 
   @override
   Widget build(BuildContext context) {
+    String httpsUrl = convertHttpToHttps(widget.httpUrl);
+
     return Container(
       child: Column(
         children: [
@@ -90,29 +92,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     right: 25,
                     child: AspectRatio(
                       aspectRatio: 16 / 9,
-                      child: GestureDetector(
-                        onScaleStart: (ScaleStartDetails details) {
-                          _baseScale = _currentScale;
-                        },
-                        onScaleUpdate: (ScaleUpdateDetails details) {
-                          setState(() {
-                            _currentScale = _baseScale * details.scale;
-                          });
-                        },
-                        onScaleEnd: (ScaleEndDetails details) {
-                          // Handle any scale end logic here if needed
-                        },
-                        child: Transform.scale(
-                          scale: _currentScale,
-                          child: VlcPlayer(
-                            controller: _controller,
-                            aspectRatio: 25 / 9,
-                            placeholder: const Center(
-                                child: CircularProgressIndicator(
-                              color: Colors.black,
-                            )),
-                          ),
-                        ),
+                      child: WebView(
+                        initialUrl: httpsUrl,
+                        javascriptMode: JavascriptMode.unrestricted,
+                        gestureNavigationEnabled: true,
                       ),
                     )),
               ],
@@ -124,11 +107,5 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }
