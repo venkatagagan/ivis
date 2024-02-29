@@ -53,7 +53,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
           Container(
             width: 300,
-            height: 200,
+            height: 260,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(1),
@@ -88,10 +88,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 ),
                 Positioned(
                     top: 36,
-                    left: 25,
-                    right: 25,
+                    left: 0,
+                    right: 0,
                     child: AspectRatio(
-                      aspectRatio: 16 / 9,
+                      aspectRatio: 16 / 12,
                       child: WebView(
                         initialUrl: httpsUrl,
                         javascriptMode: JavascriptMode.unrestricted,
@@ -101,9 +101,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               ],
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
+          
         ],
       ),
     );

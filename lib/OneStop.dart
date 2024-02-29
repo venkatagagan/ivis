@@ -116,6 +116,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
     if (currentIndex > 0) {
       setState(() {
         currentIndex--;
+        
       });
     }
   }
@@ -249,7 +250,9 @@ class _OneStopScreenState extends State<OneStopScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const CctvScreen()),
+                              builder: (context) => const CctvScreen(
+                                
+                              )),
                         );
                       } else {
                         showMyDialog(context);

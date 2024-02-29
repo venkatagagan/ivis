@@ -38,7 +38,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
   TextEditingController toDateController = TextEditingController();
   DateTime selectedFromDate = DateTime.now();
   DateTime selectedToDate = DateTime.now();
-  DateTime? _selectedDay;
+  //DateTime? _selectedDay;
   List<String> disabledDates = [];
 
   @override
@@ -48,13 +48,13 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     toDateController = TextEditingController();
 
     dateController = TextEditingController();
-    selectedDate = DateTime.now();
+    
 
     // selected date
     fetchLastWorkday(siteId).then((lastWorkday) {
       setState(() {
         // Use _lastWorkday if _selectedDay is null
-        selectedDate = _selectedDay ?? lastWorkday;
+        selectedDate = lastWorkday ?? selectedDate;
         dateController.text = selectedDate.toString().split(' ')[0];
       });
     });
@@ -280,8 +280,23 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                 ),
                               ),
                               IconButton(
-                                onPressed: () => _selectDate(context),
-                                icon: Icon(Icons.calendar_today),
+                                onPressed: () {
+                                  showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(2000),
+                                    lastDate: DateTime(2030),
+                                  ).then((selectedDate) {
+                                    if (selectedDate != null) {
+                                      setState(() {
+                                        this.selectedDate = selectedDate;
+                                        dateController.text = selectedDate
+                                            .toString()
+                                            .split(' ')[0];
+                                      });
+                                    }
+                                  });
+                                },icon: Icon(Icons.calendar_today),
                               ),
                             ],
                           ),
@@ -791,30 +806,10 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     );
   }
 
+
+
   //disable not working dates
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-      selectableDayPredicate: (DateTime date) {
-        // Convert date to 'yyyy-MM-dd' format for comparison
-        String formattedDate =
-            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-
-        // Disable dates that are in the disabledDates list
-        return !disabledDates.contains(formattedDate);
-      },
-    );
-
-    if (pickedDate != null && pickedDate != _selectedDay) {
-      setState(() {
-        _selectedDay = pickedDate;
-      });
-    }
-  }
-
+  
   Future<List<String>> fetchNotWorkingDates() async {
     const apiUrl =
         "http://usmgmt.iviscloud.net:777/businessInterface/Client/notWorkingDays_1_0?siteId=1002&calling_System_Detail=IVISUSA&year=2022";
@@ -935,7 +930,7 @@ class YourWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(height: 10),
-
+        
         // Create a list of Container widgets for each item in analyticsList
         for (var analytics in analyticsList) ...[
           SizedBox(
@@ -967,7 +962,7 @@ class YourWidget extends StatelessWidget {
                               width: 18,
                             ),
                             Text(
-                              '${analytics['service']}',
+                              analytics['service'],
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.black,

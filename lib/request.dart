@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:ivis_security/alarm.dart';
 import 'package:ivis_security/development.dart';
 import 'package:ivis_security/center.dart';
@@ -23,6 +25,136 @@ class _MyHomePageState extends State<RequestScreen> {
     setState(() {
       selectedButtonIndex = index; // Update the selected button index
     });
+  }
+
+  List<String> categoryList = [];
+  String selected = '';
+  List<String> subCatList = [];
+  int i=0;
+  String subCatSelected = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    fetchStatus();
+    subCatData(categoryList.indexOf(selected) ?? 0);
+  }
+
+  Future<void> subCatData(int i) async {
+    const String apiUrl =
+        'http://usmgmt.iviscloud.net:777/businessInterface/helpdesk/categoryList_1_0';
+
+    // JSON data to be sent in the POST request
+    Map<String, dynamic> requestData = {
+      "userName": "ivisus",
+      "accessToken": "abc",
+      "calling_System_Detail": "portal",
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> categoryData = data['CategoryList'];
+
+        if (categoryData.length > 1) {
+          final Map<String, dynamic> secondCategory = categoryData[i];
+          final List<dynamic> subCategoryList =
+              secondCategory['subCategoryList'];
+
+          setState(() {
+            subCatList = subCategoryList
+                .map((subCategory) =>
+                    subCategory['serviceSubcatName'].toString())
+                .toList();
+          });
+        }
+      } else {
+        // Handle error response
+        print('Error: ${response.statusCode}');
+        print('Response Body: ${response.body}');
+      }
+    } catch (error) {
+      // Handle network or other errors
+      print('Error: $error');
+    }
+  }
+
+  int indexOfSelectedCategory() {
+    return categoryList.indexOf(selected);
+  }
+
+  Future<void> fetchData() async {
+    const String apiUrl =
+        'http://usmgmt.iviscloud.net:777/businessInterface/helpdesk/categoryList_1_0';
+
+    // JSON data to be sent in the POST request
+    Map<String, dynamic> requestData = {
+      "userName": "ivisus",
+      "accessToken": "abc",
+      "calling_System_Detail": "portal",
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> categoryData = data['CategoryList'];
+
+        setState(() {
+          categoryList = categoryData
+              .map((category) => category['catName'].toString())
+              .toList();
+        });
+      } else {
+        // Handle error response
+        print('Error: ${response.statusCode}');
+        print('Response Body: ${response.body}');
+      }
+    } catch (error) {
+      // Handle network or other errors
+      print('Error: $error');
+    }
+  }
+
+  //status api
+  Future<Map<String, dynamic>> fetchStatus() async {
+    final response = await http.post(
+      Uri.parse(
+          'http://usmgmt.iviscloud.net:777/businessInterface/helpdesk/getServiceReq_1_0'),
+      body: jsonEncode({
+        "userName": "ivisus",
+        "accessToken": "abc",
+        "calling_System_Detail": "portal",
+        "siteId": 1004,
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      return data;
+    } else {
+      print('Failed to fetch data. Status code: ${response.statusCode}');
+      // You might want to throw an exception or handle the error case accordingly
+      throw Exception(
+          'Failed to fetch data. Status code: ${response.statusCode}');
+    }
   }
 
   @override
@@ -179,7 +311,9 @@ class _MyHomePageState extends State<RequestScreen> {
                       const SizedBox(
                         height: 285,
                       ),
-                      Container(
+                      Expanded(
+                        child: SingleChildScrollView(
+                      child:Container(
                         width: 300,
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(1),
@@ -206,6 +340,27 @@ class _MyHomePageState extends State<RequestScreen> {
                                         color: Colors.grey.withOpacity(0.5),
                                         borderRadius: BorderRadius.circular(5),
                                       ),
+                                      child: Center(
+                                        child: DropdownButton<String>(
+                                          value: selected.isNotEmpty
+                                              ? selected
+                                              : null,
+                                          hint: Text('catName'),
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              selected = newValue!;
+                                              
+                                            });
+                                          },
+                                          items: categoryList
+                                              .map((fruit) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: fruit,
+                                                    child: Text(fruit),
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      ),
                                     )
                                   ],
                                 ),
@@ -223,6 +378,26 @@ class _MyHomePageState extends State<RequestScreen> {
                                       decoration: BoxDecoration(
                                         color: Colors.grey.withOpacity(0.5),
                                         borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child:Center(
+                                      child: DropdownButton<String>(
+                                        value: subCatSelected.isNotEmpty
+                                            ? subCatSelected
+                                            : null,
+                                        hint: Text('subcat'),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            subCatSelected = newValue!;
+                                          });
+                                        },
+                                        items: subCatList
+                                            .map((fruit) =>
+                                                DropdownMenuItem<String>(
+                                                  value: fruit,
+                                                  child: Text(fruit),
+                                                ))
+                                            .toList(),
+                                      ),
                                       ),
                                     )
                                   ],
@@ -336,10 +511,12 @@ class _MyHomePageState extends State<RequestScreen> {
                                   ],
                                 ),
                                 SizedBox(
-                                  height: 10,
+                                  height: 30,
                                 ),
                               ],
                             )),
+                      ),
+                      ),
                       ),
                       SizedBox(
                         height: 50,
@@ -370,19 +547,41 @@ class _MyHomePageState extends State<RequestScreen> {
                       const SizedBox(
                         height: 285,
                       ),
-                      Container(
-                        width: 300,
-                        height: 350,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(1),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.only(
-                              top: 0, left: 0), // Adjust the left padding
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [],
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: FutureBuilder(
+                            future: fetchStatus(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  !snapshot.hasError) {
+                                if (snapshot.data != null &&
+                                    snapshot.data!['helpDeskList'] != null) {
+                                  return SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        YourWidget(
+                                          helpDeskList:
+                                              (snapshot.data!['helpDeskList']
+                                                      as List<dynamic>)
+                                                  .cast<Map<String, dynamic>>(),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Text('No data available'),
+                                  );
+                                }
+                              } else {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                            },
                           ),
                         ),
                       ),
@@ -686,5 +885,168 @@ class _MyHomePageState extends State<RequestScreen> {
     //return Scaffold(
 
     //);
+  }
+}
+
+@override
+class YourWidget extends StatelessWidget {
+  final List<Map<String, dynamic>> helpDeskList;
+
+  YourWidget({required this.helpDeskList});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(height: 10),
+
+        // Create a list of Container widgets for each item in analyticsList
+        for (var analytics in helpDeskList) ...[
+          SizedBox(
+            height: 10,
+          ),
+
+          // ignore: unnecessary_null_comparison
+          if (analytics != null && analytics is String)
+            SingleChildScrollView(
+              child: Container(
+                width: 260,
+                height: 90,
+                decoration: ShapeDecoration(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(
+                      color: Colors.grey, // Border color
+                      width: 2.0, // Border width
+                    ),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      top: 0, left: 0), // Adjust the left padding
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        child: Container(
+                          width: 260,
+                          height: 38,
+                          color: Color.fromARGB(255, 220, 222, 222),
+                          // Replace with the desired color
+                          child: Stack(
+                            children: [
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Positioned(
+                                top: 10,
+                                left: 13,
+                                child: Text(
+                                  '${'serviceId'}',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 10,
+                                left: 170,
+                                child: Text(
+                                  '${'status'}',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 10,
+                                left: 235,
+                                child: Icon(
+                                  Icons
+                                      .chevron_right, // Replace with the desired icon
+                                  size: 20,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 44,
+                        left: 13,
+                        child: Text(
+                          '${'serviceSubCategoryName'}',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 44,
+                        left: 188,
+                        child: Text(
+                          '${'createdTime'}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 63,
+                        left: 13,
+                        child: Text(
+                          '${'description'}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 63,
+                        left: 180,
+                        child: Icon(
+                          Icons.edit_rounded, // Replace with the desired icon
+                          size: 20,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      Positioned(
+                        top: 63,
+                        left: 203,
+                        child: Icon(
+                          Icons
+                              .preview_rounded, // Replace with the desired icon
+                          size: 20,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      Positioned(
+                        top: 63,
+                        left: 230,
+                        child: Icon(
+                          Icons.delete, // Replace with the desired icon
+                          size: 20,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          // Add more widgets or modify the Container as needed
+        ],
+      ],
+    );
   }
 }

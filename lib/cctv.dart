@@ -27,7 +27,7 @@ class _MyHomePageState extends State<CctvScreen> {
   int startIndex = 0;
   int endIndex = 1;
   List<TdpCamera> listOfCamera = [];
-  int sitID = 36320;
+  int sitID = 36323;
   bool _isVisible = false;
   String visibilityScreenName = "";
   Set<String> monitoringNames = Set();
@@ -260,13 +260,13 @@ class _MyHomePageState extends State<CctvScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
-                                        height: 250,
+                                        height: 260,
                                         width: 300,
                                         decoration: ShapeDecoration(
                                           color: Colors.white,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(20),
+                                                BorderRadius.circular(10),
                                           ),
                                         ),
                                         child: Center(
@@ -274,10 +274,12 @@ class _MyHomePageState extends State<CctvScreen> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             if (visibilityScreenName == e.name)
+                                            
                                               VideoPlayerScreen(
                                                   httpUrl: e.httpUrl,
                                                   status: e.status,
-                                                  cameraName: e.name),
+                                                  cameraName: e.name)
+                                            else      
                                             Text(e.name),
                                           ],
                                         )),
