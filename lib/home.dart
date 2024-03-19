@@ -218,14 +218,24 @@ class _MyHomePageState extends State<HomePage> {
                                             width:
                                                 10.3), // Add spacing between text and image
 
-                                        Text(
-                                          site['siteName']
-                                              .toString(), // Access the 'siteName' field
-                                          style: TextStyle(
-                                            color: Colors.black,
+                                        SizedBox(
+                                          height: 15,
+                                          width: 200,
+                                          child: Text(
+                                            site['siteName']
+                                                .toString(),
+                                            overflow: TextOverflow.ellipsis, // Access the 'siteName' field
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            ),
                                           ),
                                         ),
-                                        
+                                        SizedBox(width: 10,),
+                                        Icon(
+                              Icons.arrow_forward_ios,
+                              size: 18,
+                              color: Colors.black,
+                            ),
 
                                         // Add spacing between text and next image
                                       ],
@@ -264,6 +274,7 @@ class _MyHomePageState extends State<HomePage> {
                       width: 300,
                       height: 450,
                       color: Colors.white,
+                      child: Center(child: Text("comming soon..."),),
                     ),
                   ),
                 ],

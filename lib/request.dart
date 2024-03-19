@@ -9,6 +9,7 @@ import 'package:ivis_security/cctv.dart';
 import 'package:ivis_security/contact.dart';
 import 'package:ivis_security/reset.dart';
 import 'package:ivis_security/home.dart';
+import 'package:intl/intl.dart';
 
 class RequestScreen extends StatefulWidget {
   const RequestScreen({super.key});
@@ -27,133 +28,75 @@ class _MyHomePageState extends State<RequestScreen> {
     });
   }
 
-  List<String> categoryList = [];
-  String selected = '';
-  List<String> subCatList = [];
-  int i=0;
-  String subCatSelected = '';
+  List<dynamic> helpDeskList = [];
+  List<dynamic> categoryList = [];
+  List<dynamic> subCategoryList = [];
+  String? catName;
+  String? subCatName;
 
   @override
   void initState() {
     super.initState();
     fetchData();
     fetchStatus();
-    subCatData(categoryList.indexOf(selected) ?? 0);
-  }
-
-  Future<void> subCatData(int i) async {
-    const String apiUrl =
-        'http://usmgmt.iviscloud.net:777/businessInterface/helpdesk/categoryList_1_0';
-
-    // JSON data to be sent in the POST request
-    Map<String, dynamic> requestData = {
-      "userName": "ivisus",
-      "accessToken": "abc",
-      "calling_System_Detail": "portal",
-    };
-
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(requestData),
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> categoryData = data['CategoryList'];
-
-        if (categoryData.length > 1) {
-          final Map<String, dynamic> secondCategory = categoryData[i];
-          final List<dynamic> subCategoryList =
-              secondCategory['subCategoryList'];
-
-          setState(() {
-            subCatList = subCategoryList
-                .map((subCategory) =>
-                    subCategory['serviceSubcatName'].toString())
-                .toList();
-          });
-        }
-      } else {
-        // Handle error response
-        print('Error: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-      }
-    } catch (error) {
-      // Handle network or other errors
-      print('Error: $error');
-    }
-  }
-
-  int indexOfSelectedCategory() {
-    return categoryList.indexOf(selected);
   }
 
   Future<void> fetchData() async {
-    const String apiUrl =
-        'http://usmgmt.iviscloud.net:777/businessInterface/helpdesk/categoryList_1_0';
+    final response = await http.post(
+      Uri.parse(
+          'http://usmgmt.iviscloud.net:777/businessInterface/helpdesk/categoryList_1_0'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, String>{
+        'userName': 'ivisus',
+        'accessToken': 'abc',
+        'calling_System_Detail': 'portal',
+      }),
+    );
 
-    // JSON data to be sent in the POST request
-    Map<String, dynamic> requestData = {
-      "userName": "ivisus",
-      "accessToken": "abc",
-      "calling_System_Detail": "portal",
-    };
-
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(requestData),
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> categoryData = data['CategoryList'];
-
-        setState(() {
-          categoryList = categoryData
-              .map((category) => category['catName'].toString())
-              .toList();
-        });
-      } else {
-        // Handle error response
-        print('Error: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-      }
-    } catch (error) {
-      // Handle network or other errors
-      print('Error: $error');
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        categoryList = data['CategoryList'];
+      });
+    } else {
+      throw Exception('Failed to load category list');
     }
   }
 
   //status api
-  Future<Map<String, dynamic>> fetchStatus() async {
+  String formatDate(String dateString) {
+    // Parse the string into a DateTime object
+    DateTime date = DateTime.parse(dateString);
+
+    // Format the DateTime object
+    String formattedDate = DateFormat('dd, MMM, yyyy').format(date);
+
+    return formattedDate;
+  }
+
+  Future<void> fetchStatus() async {
     final response = await http.post(
       Uri.parse(
           'http://usmgmt.iviscloud.net:777/businessInterface/helpdesk/getServiceReq_1_0'),
-      body: jsonEncode({
-        "userName": "ivisus",
-        "accessToken": "abc",
-        "calling_System_Detail": "portal",
-        "siteId": 1004,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, String>{
+        'userName': 'ivisus',
+        'accessToken': 'abc',
+        'calling_System_Detail': 'portal',
       }),
-      headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      return data;
+      Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        helpDeskList = data['helpDeskList'];
+      });
     } else {
-      print('Failed to fetch data. Status code: ${response.statusCode}');
-      // You might want to throw an exception or handle the error case accordingly
-      throw Exception(
-          'Failed to fetch data. Status code: ${response.statusCode}');
+      throw Exception('Failed to load service requests');
     }
   }
 
@@ -313,210 +256,197 @@ class _MyHomePageState extends State<RequestScreen> {
                       ),
                       Expanded(
                         child: SingleChildScrollView(
-                      child:Container(
-                        width: 300,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(1),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Padding(
-                            padding: EdgeInsets.only(
-                                top: 0, left: 0), // Adjust the left padding
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 18,
-                                ),
-                                Row(
+                          child: Container(
+                            width: 300,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(1),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, left: 0), // Adjust the left padding
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     SizedBox(
-                                      width: 20,
+                                      height: 18,
                                     ),
-                                    Container(
-                                      height: 60,
-                                      width: 260,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Center(
-                                        child: DropdownButton<String>(
-                                          value: selected.isNotEmpty
-                                              ? selected
-                                              : null,
-                                          hint: Text('catName'),
-                                          onChanged: (String? newValue) {
-                                            setState(() {
-                                              selected = newValue!;
-                                              
-                                            });
-                                          },
-                                          items: categoryList
-                                              .map((fruit) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: fruit,
-                                                    child: Text(fruit),
-                                                  ))
-                                              .toList(),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
                                     SizedBox(
-                                      width: 20,
-                                    ),
-                                    Container(
-                                      height: 60,
                                       width: 260,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child:Center(
-                                      child: DropdownButton<String>(
-                                        value: subCatSelected.isNotEmpty
-                                            ? subCatSelected
-                                            : null,
-                                        hint: Text('subcat'),
-                                        onChanged: (String? newValue) {
+                                      height: 60,
+                                      child: DropdownButtonFormField<String>(
+                                        value: catName,
+                                        items: categoryList.map((item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item['catName'].toString(),
+                                            child: Text(
+                                                item['catName'].toString()),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? value) {
                                           setState(() {
-                                            subCatSelected = newValue!;
+                                            catName = value;
+                                            subCategoryList = [];
+                                            if (value != null) {
+                                              subCategoryList = categoryList
+                                                  .firstWhere((element) =>
+                                                      element['catName']
+                                                          .toString() ==
+                                                      value)['subCategoryList'];
+                                              subCatName =
+                                                  null; // Reset subcategory selection
+                                            }
                                           });
                                         },
-                                        items: subCatList
-                                            .map((fruit) =>
-                                                DropdownMenuItem<String>(
-                                                  value: fruit,
-                                                  child: Text(fruit),
-                                                ))
-                                            .toList(),
-                                      ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                    ),
-                                    Container(
-                                      width: 260,
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          width: 2,
-                                        ),
-                                      ),
-                                      child: TextField(
                                         decoration: InputDecoration(
-                                          hintText: 'Description here',
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey),
-                                          border: InputBorder.none,
-                                          contentPadding: EdgeInsets.all(16),
+                                          labelText: 'Category',
+                                          border: OutlineInputBorder(),
                                         ),
                                       ),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 17,
-                                ),
-                                Row(
-                                  children: [
+                                    ),
+                                    SizedBox(height: 20),
                                     SizedBox(
-                                      width: 12,
-                                    ),
-                                    Checkbox(
-                                      value: isChecked,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isChecked = value!;
-                                        });
-                                      },
-                                    ),
-                                    SizedBox(
-                                      width: 0,
-                                    ),
-                                    Text("Preferred Time to Call Back"),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 17,
-                                ),
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 100,
-                                    ),
-                                    OutlinedButton(
-                                      onPressed: () {
-                                        // Add your button press logic here
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        side: BorderSide(
-                                            color: Colors
-                                                .blue), // Specify the border color
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              10.0), // Adjust border radius as needed
+                                      width: 260,
+                                      height: 60,
+                                      child: DropdownButtonFormField<String>(
+                                        value: subCatName,
+                                        items: subCategoryList.map((item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item['serviceSubcatName']
+                                                .toString(),
+                                            child: Text(
+                                                item['serviceSubcatName']
+                                                    .toString()),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            subCatName = value;
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Subcategory',
+                                          border: OutlineInputBorder(),
                                         ),
                                       ),
-                                      child: Text(
-                                        'Set Time',
-                                        style: TextStyle(
-                                            color: Colors
-                                                .blue), // Specify text color
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 75,
                                     ),
-                                    ElevatedButton(
-                                      onPressed: () {},
-                                      style: ButtonStyle(
-                                        shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                25.0), // Adjust the radius as needed
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Container(
+                                          width: 260,
+                                          height: 150,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              width: 2,
+                                            ),
                                           ),
+                                          child: TextField(
+                                            decoration: InputDecoration(
+                                              hintText: 'Description here',
+                                              hintStyle:
+                                                  TextStyle(color: Colors.grey),
+                                              border: InputBorder.none,
+                                              contentPadding:
+                                                  EdgeInsets.all(16),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 17,
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 12,
                                         ),
-                                        minimumSize: MaterialStateProperty.all(
-                                            const Size(
-                                                150, 50)), // Set the size here
-                                      ),
-                                      child: const Text('SUBMIT'),
+                                        Checkbox(
+                                          value: isChecked,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isChecked = value!;
+                                            });
+                                          },
+                                        ),
+                                        SizedBox(
+                                          width: 0,
+                                        ),
+                                        Text("Preferred Time to Call Back"),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 17,
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 100,
+                                        ),
+                                        OutlinedButton(
+                                          onPressed: () {
+                                            // Add your button press logic here
+                                          },
+                                          style: OutlinedButton.styleFrom(
+                                            side: BorderSide(
+                                                color: Colors
+                                                    .blue), // Specify the border color
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                  10.0), // Adjust border radius as needed
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Set Time',
+                                            style: TextStyle(
+                                                color: Colors
+                                                    .blue), // Specify text color
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 30,
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 75,
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {},
+                                          style: ButtonStyle(
+                                            shape: MaterialStateProperty.all<
+                                                RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    25.0), // Adjust the radius as needed
+                                              ),
+                                            ),
+                                            minimumSize: MaterialStateProperty
+                                                .all(const Size(150,
+                                                    50)), // Set the size here
+                                          ),
+                                          child: const Text('SUBMIT'),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 30,
                                     ),
                                   ],
-                                ),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                              ],
-                            )),
-                      ),
-                      ),
+                                )),
+                          ),
+                        ),
                       ),
                       SizedBox(
                         height: 50,
@@ -539,55 +469,698 @@ class _MyHomePageState extends State<RequestScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
-                      const SizedBox(
-                        height: 285,
+
+              Padding(
+                padding: EdgeInsets.fromLTRB(50, 270, 50, 0),
+                child: ListView.separated(
+                  itemCount: helpDeskList.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    // Add the space between containers here
+                    return SizedBox(height: 20); // Adjust the height as needed
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    final item = helpDeskList[index];
+                    return Container(
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: FutureBuilder(
-                            future: fetchStatus(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.done &&
-                                  !snapshot.hasError) {
-                                if (snapshot.data != null &&
-                                    snapshot.data!['helpDeskList'] != null) {
-                                  return SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        YourWidget(
-                                          helpDeskList:
-                                              (snapshot.data!['helpDeskList']
-                                                      as List<dynamic>)
-                                                  .cast<Map<String, dynamic>>(),
-                                        ),
-                                      ],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 260,
+                            height: 38,
+                            color: Color.fromARGB(255, 220, 222, 222),
+                            // Replace with the desired color
+                            child: Stack(
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  left: 13,
+                                  child: Text(
+                                    '${item['serviceId']}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black,
                                     ),
-                                  );
-                                } else {
-                                  return Center(
-                                    child: Text('No data available'),
-                                  );
-                                }
-                              } else {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                            },
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  left: 170,
+                                  child: Text(
+                                    '${item['status']}',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: item['status'] == 'Deleted'
+                                          ? Colors.red
+                                          : Colors.green,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  left: 235,
+                                  child: Icon(
+                                    Icons
+                                        .chevron_right, // Replace with the desired icon
+                                    size: 20,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 13,
+                              ),
+                              SizedBox(
+                                width: 156,
+                                height: 18,
+                                child: Text(
+                                  '${item['serviceCategoryName']}',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                formatDate('${item['createdTime']}'),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 9,
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 13,
+                              ),
+                              SizedBox(
+                                width: 125,
+                                height: 15,
+                                child: Text(
+                                  '${item['description']}',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons
+                                      .edit_rounded, // Replace with the desired icon
+                                  size: 20,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  // Add your onPressed functionality here
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: Container(
+                                            width: 300,
+                                            margin: EdgeInsets.zero,
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.white.withOpacity(1),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  width: 300,
+                                                  height: 50,
+                                                  child: Container(
+                                                    color: Colors.blue,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 18,
+                                                ),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 60,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: catName,
+                                                    items: categoryList
+                                                        .map((item) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: item['catName']
+                                                            .toString(),
+                                                        child: Text(
+                                                            item['catName']
+                                                                .toString()),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        catName = value;
+                                                        subCategoryList = [];
+                                                        if (value != null) {
+                                                          subCategoryList = categoryList
+                                                              .firstWhere((element) =>
+                                                                  element['catName']
+                                                                      .toString() ==
+                                                                  value)['subCategoryList'];
+                                                          subCatName =
+                                                              null; // Reset subcategory selection
+                                                        }
+                                                      });
+                                                    },
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Category',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 20),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 60,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: subCatName,
+                                                    items: subCategoryList
+                                                        .map((item) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: item[
+                                                                'serviceSubcatName']
+                                                            .toString(),
+                                                        child: Text(item[
+                                                                'serviceSubcatName']
+                                                            .toString()),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        subCatName = value;
+                                                      });
+                                                    },
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Subcategory',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 50,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      border: Border.all(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.5),
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                    child: TextField(
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText:
+                                                            'Description here',
+                                                        hintStyle: TextStyle(
+                                                            color: Colors.grey),
+                                                        border:
+                                                            InputBorder.none,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 17,
+                                                ),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 60,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: subCatName,
+                                                    items: subCategoryList
+                                                        .map((item) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: item[
+                                                                'serviceSubcatName']
+                                                            .toString(),
+                                                        child: Text(item[
+                                                                'serviceSubcatName']
+                                                            .toString()),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        subCatName = value;
+                                                      });
+                                                    },
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Subcategory',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 17,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Checkbox(
+                                                      value: isChecked,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          isChecked = value!;
+                                                        });
+                                                      },
+                                                    ),
+                                                    Text(
+                                                      "Preferred Time to Call Back",
+                                                      style: TextStyle(
+                                                          fontSize: 12),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Center(
+                                                    child: OutlinedButton(
+                                                  onPressed: () {
+                                                    // Add your button press logic here
+                                                  },
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                    side: BorderSide(
+                                                        color: Colors
+                                                            .blue), // Specify the border color
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10.0), // Adjust border radius as needed
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'Set Time',
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .blue), // Specify text color
+                                                  ),
+                                                )),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 50,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      border: Border.all(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.5),
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                    child: TextField(
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText: 'Note here',
+                                                        hintStyle: TextStyle(
+                                                            color: Colors.grey),
+                                                        border:
+                                                            InputBorder.none,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 5),
+                                                Row(
+                                                  children: [
+                                                    ElevatedButton(
+                                                      onPressed: () {},
+                                                      style: ButtonStyle(
+                                                        shape: MaterialStateProperty
+                                                            .all<
+                                                                RoundedRectangleBorder>(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        25.0),
+                                                            side: BorderSide(
+                                                                color: Colors
+                                                                    .blue), // Blue border
+                                                          ),
+                                                        ),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all<Color>(Colors
+                                                                    .white), // White background
+                                                        minimumSize:
+                                                            MaterialStateProperty
+                                                                .all(const Size(
+                                                                    110,
+                                                                    50)), // Set the size here
+                                                      ),
+                                                      child: const Text(
+                                                        'cancel',
+                                                        style: TextStyle(
+                                                          color: Colors
+                                                              .blue, // Blue text color
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 10),
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                              title: Icon(
+                                                                Icons
+                                                                    .check, // Replace with the desired icon
+                                                                size: 50,
+                                                                color: Colors
+                                                                    .green,
+                                                              ),
+                                                              content: Text(
+                                                                  'Changes updated successfully'),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    // Close the dialog
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  },
+                                                                  child: Text(
+                                                                      'Close'),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                      style: ButtonStyle(
+                                                        shape: MaterialStateProperty
+                                                            .all<
+                                                                RoundedRectangleBorder>(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        25.0), // Adjust the radius as needed
+                                                          ),
+                                                        ),
+                                                        minimumSize:
+                                                            MaterialStateProperty
+                                                                .all(const Size(
+                                                                    110,
+                                                                    50)), // Set the size here
+                                                      ),
+                                                      child:
+                                                          const Text('SUBMIT'),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 30,
+                                                ),
+                                              ],
+                                            )),
+                                        actions: [
+                                          Container(
+                                            margin: const EdgeInsets.all(
+                                                0.0), // Adjust top margin as needed
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.preview_rounded,
+                                  size: 20,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  // Show another dialog when the IconButton is pressed
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: Container(
+                                            width: 300,
+                                            margin: EdgeInsets.zero,
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.white.withOpacity(1),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  width: 300,
+                                                  height: 50,
+                                                  child: Container(
+                                                    color: Colors.blue,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 18,
+                                                ),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 60,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: catName,
+                                                    items: categoryList
+                                                        .map((item) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: item['catName']
+                                                            .toString(),
+                                                        child: Text(
+                                                            item['catName']
+                                                                .toString()),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        catName = value;
+                                                        subCategoryList = [];
+                                                        if (value != null) {
+                                                          subCategoryList = categoryList
+                                                              .firstWhere((element) =>
+                                                                  element['catName']
+                                                                      .toString() ==
+                                                                  value)['subCategoryList'];
+                                                          subCatName =
+                                                              null; // Reset subcategory selection
+                                                        }
+                                                      });
+                                                    },
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Category',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 20),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 60,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: subCatName,
+                                                    items: subCategoryList
+                                                        .map((item) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: item[
+                                                                'serviceSubcatName']
+                                                            .toString(),
+                                                        child: Text(item[
+                                                                'serviceSubcatName']
+                                                            .toString()),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        subCatName = value;
+                                                      });
+                                                    },
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Subcategory',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  'SERVICE NAME DISPLAY',
+                                                  style: TextStyle(
+                                                      color: Colors
+                                                          .blue), // Specify text color
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text(
+                                                  'Sub Service Name Display',
+                                                  style: TextStyle(
+                                                      color: Colors
+                                                          .black), // Specify text color
+                                                ),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 50,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      border: Border.all(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.5),
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                    child: TextField(
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText:
+                                                            'Description here',
+                                                        hintStyle: TextStyle(
+                                                            color: Colors.grey),
+                                                        border:
+                                                            InputBorder.none,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 17,
+                                                ),
+                                                SizedBox(
+                                                  width: 260,
+                                                  height: 60,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: subCatName,
+                                                    items: subCategoryList
+                                                        .map((item) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: item[
+                                                                'serviceSubcatName']
+                                                            .toString(),
+                                                        child: Text(item[
+                                                                'serviceSubcatName']
+                                                            .toString()),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        subCatName = value;
+                                                      });
+                                                    },
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Subcategory',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 17,
+                                                ),
+                                                SizedBox(
+                                                  height: 30,
+                                                ),
+                                              ],
+                                            )),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              // Close the dialog
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Icon(
+                                Icons.delete, // Replace with the desired icon
+                                size: 20,
+                                color: Colors.red,
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
             ],
             Positioned(
@@ -885,168 +1458,5 @@ class _MyHomePageState extends State<RequestScreen> {
     //return Scaffold(
 
     //);
-  }
-}
-
-@override
-class YourWidget extends StatelessWidget {
-  final List<Map<String, dynamic>> helpDeskList;
-
-  YourWidget({required this.helpDeskList});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(height: 10),
-
-        // Create a list of Container widgets for each item in analyticsList
-        for (var analytics in helpDeskList) ...[
-          SizedBox(
-            height: 10,
-          ),
-
-          // ignore: unnecessary_null_comparison
-          if (analytics != null && analytics is String)
-            SingleChildScrollView(
-              child: Container(
-                width: 260,
-                height: 90,
-                decoration: ShapeDecoration(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(
-                      color: Colors.grey, // Border color
-                      width: 2.0, // Border width
-                    ),
-                  ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      top: 0, left: 0), // Adjust the left padding
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        child: Container(
-                          width: 260,
-                          height: 38,
-                          color: Color.fromARGB(255, 220, 222, 222),
-                          // Replace with the desired color
-                          child: Stack(
-                            children: [
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Positioned(
-                                top: 10,
-                                left: 13,
-                                child: Text(
-                                  '${'serviceId'}',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 10,
-                                left: 170,
-                                child: Text(
-                                  '${'status'}',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 10,
-                                left: 235,
-                                child: Icon(
-                                  Icons
-                                      .chevron_right, // Replace with the desired icon
-                                  size: 20,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 44,
-                        left: 13,
-                        child: Text(
-                          '${'serviceSubCategoryName'}',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 44,
-                        left: 188,
-                        child: Text(
-                          '${'createdTime'}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 63,
-                        left: 13,
-                        child: Text(
-                          '${'description'}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 63,
-                        left: 180,
-                        child: Icon(
-                          Icons.edit_rounded, // Replace with the desired icon
-                          size: 20,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      Positioned(
-                        top: 63,
-                        left: 203,
-                        child: Icon(
-                          Icons
-                              .preview_rounded, // Replace with the desired icon
-                          size: 20,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      Positioned(
-                        top: 63,
-                        left: 230,
-                        child: Icon(
-                          Icons.delete, // Replace with the desired icon
-                          size: 20,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          // Add more widgets or modify the Container as needed
-        ],
-      ],
-    );
   }
 }
