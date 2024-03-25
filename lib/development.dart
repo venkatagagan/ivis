@@ -60,7 +60,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     });
 
     // Initialize selectedFromDate and selectedToDate here
-    fetchNotWorkingDates().then((dates) {
+    fetchNotWorkingDates(siteId).then((dates) {
       setState(() {
         disabledDates = dates;
       });
@@ -621,10 +621,10 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                   height: 19.67,
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CctvScreen()),
-                  );
+                 // Navigator.push(
+                  //  context,
+                  //  MaterialPageRoute(builder: (context) => CctvScreen()),
+                  //);
                   // Handle home button press
                 },
               ),
@@ -810,9 +810,9 @@ class _MyHomePageState extends State<DevelopmentScreen> {
 
   //disable not working dates
   
-  Future<List<String>> fetchNotWorkingDates() async {
-    const apiUrl =
-        "http://usmgmt.iviscloud.net:777/businessInterface/Client/notWorkingDays_1_0?siteId=1002&calling_System_Detail=IVISUSA&year=2022";
+ Future<List<String>> fetchNotWorkingDates(int site) async {
+  final apiUrl =
+      "http://usmgmt.iviscloud.net:777/businessInterface/Client/notWorkingDays_1_0?siteId=$site&calling_System_Detail=IVISUSA&year=2022";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));

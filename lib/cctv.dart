@@ -13,11 +13,21 @@ import 'package:ivis_security/development.dart';
 import 'package:ivis_security/hdtv.dart';
 import 'package:ivis_security/home.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:ivis_security/apis/Bussiness_int_api.dart';
 
 bool shouldReloadContainers = false;
 
 class CctvScreen extends StatefulWidget {
-  const CctvScreen({super.key});
+  String siteId;
+  String Sitename;
+  int i;
+
+  CctvScreen({
+    Key? key,
+    required this.siteId,
+    required this.Sitename,
+    required this.i,
+  }) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -26,23 +36,31 @@ class CctvScreen extends StatefulWidget {
 class _MyHomePageState extends State<CctvScreen> {
   int startIndex = 0;
   int endIndex = 1;
+  String sitename = "";
+  String siteId = "";
+  int currentIndex = 0;
   List<TdpCamera> listOfCamera = [];
   int sitID = 36323;
   bool _isVisible = false;
   String visibilityScreenName = "";
   Set<String> monitoringNames = Set();
-  Set<dynamic> siteNames = {};
+  List<dynamic> siteNames = [];
 
   @override
   void initState() {
     super.initState();
-    fetchMonitoringNames();
+    sitename = widget.Sitename;
+    siteId = widget.siteId;
+    currentIndex = widget.i;
+
+    sitID = int.parse(widget.siteId);
+    fetchMonitoringNames(sitID);
     fetchSiteNames();
   }
 
-  Future<void> fetchMonitoringNames() async {
+  Future<void> fetchMonitoringNames(int accountId) async {
     final response = await http.get(Uri.parse(
-        "http://usmgmt.iviscloud.net:777/cpus/Monitoring/monitoringHours?accountId=1004"));
+        "http://usmgmt.iviscloud.net:777/cpus/Monitoring/monitoringHours?accountId=$accountId"));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -63,7 +81,7 @@ class _MyHomePageState extends State<CctvScreen> {
     try {
       List<dynamic> sites = await BussinessInterface.fetchSiteNames();
       setState(() {
-        siteNames = sites.toSet();
+        siteNames = sites;
         retrieveTheCamerasData();
       });
     } catch (e) {
@@ -152,8 +170,27 @@ class _MyHomePageState extends State<CctvScreen> {
                   thickness: 1, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 200,
+                        height: 15,
+                        child: Center(
+                          child: Text(
+                            sitename,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const Divider(
                   height: 1, // Set the height of the line
@@ -183,6 +220,7 @@ class _MyHomePageState extends State<CctvScreen> {
                     const SizedBox(
                       width: 24,
                     ),
+                    
                     TextButton(
                       onPressed: () => onButtonPressed(1),
                       child: const Text(
@@ -226,8 +264,72 @@ class _MyHomePageState extends State<CctvScreen> {
                 ),
               ],
             ),
+            Positioned(
+              left: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: currentIndex > 0
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex - 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex - 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CctvScreen(
+                              i: currentIndex - 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              right: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                onPressed: currentIndex < siteNames.length - 1
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex + 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex + 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CctvScreen(
+                              i: currentIndex + 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
+              const Positioned(
+                top: 250, // Adjust the position from the bottom
+                right: 230.5,
+                left: 29.5,
+                child: Divider(
+                  height: 1, // Set the height of the line
+                  thickness: 6, // Set the thickness of the line
+                  color: Colors.white, // Set the color of the line
+                ),
+              ),
               Column(
                 children: [
                   const SizedBox(
@@ -274,13 +376,12 @@ class _MyHomePageState extends State<CctvScreen> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             if (visibilityScreenName == e.name)
-                                            
                                               VideoPlayerScreen(
                                                   httpUrl: e.httpUrl,
                                                   status: e.status,
                                                   cameraName: e.name)
-                                            else      
-                                            Text(e.name),
+                                            else
+                                              Text(e.name),
                                           ],
                                         )),
                                       ),

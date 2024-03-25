@@ -10,7 +10,7 @@ import 'package:ivis_security/center.dart';
 import 'package:ivis_security/contact.dart';
 import 'package:ivis_security/reset.dart';
 import 'package:ivis_security/apis/Services.dart';
-//import 'package:ivis_security/apis/Bussiness_int_api.dart';
+import 'package:ivis_security/apis/Bussiness_int_api.dart';
 
 // ignore: must_be_immutable
 class OneStopScreen extends StatefulWidget {
@@ -29,13 +29,6 @@ class OneStopScreen extends StatefulWidget {
   _OneStopScreenState createState() => _OneStopScreenState();
 }
 
-class Site {
-  final int siteId;
-  final String siteName;
-
-  Site(this.siteId, this.siteName);
-}
-
 class _OneStopScreenState extends State<OneStopScreen> {
 // ignore: must_be_immutable
   String liveview = "F";
@@ -49,8 +42,9 @@ class _OneStopScreenState extends State<OneStopScreen> {
   late int i;
   late String Id;
   late String Name;
-  List<Site> sites = [];
+
   int currentIndex = 1;
+  List<dynamic> siteNames = [];
 
   late Map<String, dynamic> services;
   int accountId = 1004;
@@ -62,8 +56,21 @@ class _OneStopScreenState extends State<OneStopScreen> {
     sitename = widget.Sitename;
     siteId = widget.siteId;
     currentIndex = widget.i;
-    fetchSites();
-    fetchData(int.parse(siteId)); // Pass siteid to fetchData
+
+    fetchData(int.parse(siteId));
+
+    fetchSiteNames(); // Pass siteid to fetchData
+  }
+
+  Future<void> fetchSiteNames() async {
+    try {
+      List<dynamic> sites = await BussinessInterface.fetchSiteNames();
+      setState(() {
+        siteNames = sites;
+      });
+    } catch (e) {
+      print('Error fetching site names: $e');
+    }
   }
 
   Future<void> fetchData(int accountId) async {
@@ -83,41 +90,6 @@ class _OneStopScreenState extends State<OneStopScreen> {
     } catch (e) {
       print('Error fetching client services: $e');
       // Handle errors...
-    }
-  }
-
-  Future<void> fetchSites() async {
-    final response = await http.get(Uri.parse(
-        'http://54.92.215.87:943/getSitesListForUserName_1_0/?userName=ivisusnew'));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      final List<dynamic> siteList = data['sites'];
-
-      setState(() {
-        sites = siteList
-            .map((site) => Site(site['siteId'], site['siteName']))
-            .toList();
-      });
-    } else {
-      throw Exception('Failed to load sites');
-    }
-  }
-
-  void goToNextSite() {
-    if (currentIndex < sites.length - 1) {
-      setState(() {
-        currentIndex++;
-      });
-    }
-  }
-
-  void goToPreviousSite() {
-    if (currentIndex > 0) {
-      setState(() {
-        currentIndex--;
-        
-      });
     }
   }
 
@@ -176,16 +148,20 @@ class _OneStopScreenState extends State<OneStopScreen> {
               ],
             ),
             Positioned(
-              left: 116, // Adjust the position from the left
-              top: 137, // Center vertically
-              child: Text(
-                sitename,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+                left: 116, // Adjust the position from the left
+                top: 137, // Center vertically
+                child: SizedBox(
+                  height: 15,
+                  width: 200,
+                  child: Text(
+                    sitename,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.white,
+                    ),
+                  ),
+                )),
             const Positioned(
               top: 170, // Adjust the top position as needed
               left: 0.5, // Adjust the left position as needed
@@ -200,32 +176,62 @@ class _OneStopScreenState extends State<OneStopScreen> {
               right: 29.87, // Adjust the position from the right
               top: 125, // Center vertically
               child: IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: () {
-                  currentIndex < sites.length - 1 ? goToNextSite : null;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OneStopScreen(
-                        i: currentIndex,
-                        siteId: '${sites[currentIndex].siteId}', //siteId
-                        Sitename: "${sites[currentIndex].siteName}",
-                      ),
-                    ),
-                  );
-                  // Handle right arrow button press
-                },
-
-                iconSize: 21.13, // Adjust the size of the button
-                color: Colors.white, // Adjust the color of the button
+                icon: const Icon(Icons.arrow_forward_ios),
+                onPressed: currentIndex < siteNames.length - 1
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex + 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex + 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OneStopScreen(
+                              i: currentIndex + 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              left: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: currentIndex > 0
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex - 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex - 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OneStopScreen(
+                              i: currentIndex - 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 45),
-            const Positioned(
+            Positioned(
               left: 30, // Adjust the position from the right
               top: 215, // Center vertically
               child: Text(
-                'GUARD',
+                "GUARD",
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
@@ -250,9 +256,11 @@ class _OneStopScreenState extends State<OneStopScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const CctvScreen(
-                                
-                              )),
+                              builder: (context) => CctvScreen(
+                                    i: currentIndex - 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            )),
                         );
                       } else {
                         showMyDialog(context);
@@ -580,7 +588,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>  RequestScreen()),
+                            builder: (context) => RequestScreen()),
                       );
                     },
                     child: Container(

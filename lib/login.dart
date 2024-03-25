@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/login_api_service.dart';
 import 'package:ivis_security/forgot_Pass.dart';
 
-
-
 void main() {
   runApp(const LoginScreen());
 }
@@ -35,7 +33,7 @@ class LoginScreen extends StatelessWidget {
                     height: 200.0,
                     width: 300.0,
                   ),
-                  const SizedBox(height: 80),
+                  const SizedBox(height: 30),
                   const Text(
                     'SIGN IN',
                     style: TextStyle(
@@ -75,15 +73,15 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   bool _showPassword = false;
-  
-   final TextEditingController userController = TextEditingController();
+
+  final TextEditingController userController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   void _handleLogin(BuildContext context) async {
     final user = userController.text;
     final password = passwordController.text;
 
-    await LoginApiService.login(context , user, password);
+    await LoginApiService.login(context, user, password);
 
     // Navigate to the next screen
   }
@@ -124,44 +122,39 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
         const SizedBox(height: 20),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Row(
           children: [
-            Row(
-              children: [
-                const SizedBox(width: 180),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ForgotPasswordScreen()),
-                    );
-                  },
-                  child: const Text(
-                    'Forgot Password?',
-                  ),
-                ),
-              ],
+            const SizedBox(width: 160),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ForgotPasswordScreen()),
+                );
+              },
+              child: const Text(
+                'Forgot Password?',
+              ),
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Checkbox(
-                  value: false,
-                  onChanged: (bool? value) {
-                    // Handle checkbox state change
-                  },
-                ),
-                const Text(
-                  'Remember Me',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                  ),
-                ),
-              ],
+          ],
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Checkbox(
+              value: false,
+              onChanged: (bool? value) {
+                // Handle checkbox state change
+              },
+            ),
+            const Text(
+              'Remember Me',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+              ),
             ),
           ],
         ),
@@ -169,7 +162,7 @@ class _LoginFormState extends State<LoginForm> {
         ElevatedButton(
           onPressed: () {
             // Handle login button press
-           _handleLogin(context);
+            _handleLogin(context);
           },
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(150, 50),

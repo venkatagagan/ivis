@@ -8,7 +8,7 @@ import 'package:open_file/open_file.dart';
 
 import 'package:intl/intl.dart';
 
-Future<void> downloadAndOpenPdf(DateTime FromDate, DateTime ToDate) async {
+Future<void> downloadAndOpenPdf(DateTime FromDate, DateTime ToDate,int site) async {
   final String fromDate = DateFormat('yyyy-MM-dd').format(FromDate);
   final String toDate = DateFormat('yyyy-MM-dd').format(ToDate);
 
@@ -16,7 +16,7 @@ Future<void> downloadAndOpenPdf(DateTime FromDate, DateTime ToDate) async {
       'http://usmgmt.iviscloud.net:777/businessInterface/insights/getPdfReport';
 
   final String fullUrl =
-      '$apiUrl?siteId=1003&startdate=$fromDate&enddate=$toDate&calling_System_Detail=IVISUSA';
+      '$apiUrl?siteId=$site&startdate=$fromDate&enddate=$toDate&calling_System_Detail=IVISUSA';
 
   try {
     final response = await http.get(Uri.parse(fullUrl));

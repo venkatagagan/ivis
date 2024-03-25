@@ -1,3 +1,71 @@
+Positioned(
+              right: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                onPressed: currentIndex < siteNames.length - 1
+                    ? () {
+                        print('Current Index: $currentIndex');
+                        if (currentIndex + 1 < siteNames.length) {
+                          String siteId =
+                              siteNames[currentIndex + 1]['siteId'].toString();
+                          String sitename = siteNames[currentIndex + 1]
+                                  ['siteName']
+                              .toString();
+                          print('Next Site ID: $siteId');
+                          print('Next Site Name: $sitename');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OneStopScreen(
+                                i: currentIndex + 1,
+                                siteId: siteId,
+                                Sitename: sitename,
+                              ),
+                            ),
+                          );
+                        } else {
+                          print('Index out of bounds.');
+                        }
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              left: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                onPressed: () {
+                  onPressed:
+                  currentIndex > 0
+                      ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OneStopScreen(
+                                i: currentIndex - 1,
+                                siteId: siteNames[currentIndex - 1]['siteId']
+                                    .toString(),
+                                Sitename: siteNames[currentIndex - 1]
+                                        ['siteName']
+                                    .toString(),
+                              ),
+                            ),
+                          );
+                        }
+                      : null;
+
+                  // Handle right arrow button press
+                },
+
+                iconSize: 21.13, // Adjust the size of the button
+                color: Colors.white, // Adjust the color of the button
+              ),
+            ),
+**********************************************************************
 const Positioned(
                 top: 253, // Adjust the position from the bottom
                 left: 180.5,
