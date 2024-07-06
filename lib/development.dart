@@ -841,24 +841,27 @@ class YourWidget extends StatelessWidget {
   }
 
   @override
+
   Widget build(BuildContext context) {
+    double Height=MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(height: 10),
+        SizedBox(height: Height*0.01),
 
         // Create a list of Container widgets for each item in analyticsList
         for (var analytics in analyticsList) ...[
           SizedBox(
-            height: 10,
+            height: Height*0.01,
           ),
 
           // ignore: unnecessary_null_comparison
           if (analytics != null && analytics['service'] is String)
             SingleChildScrollView(
               child: Container(
-                width: 300,
-                height: 100,
+                width: Width*0.72,
+                height: Height*0.12,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(1),
                   borderRadius: BorderRadius.circular(5),
@@ -870,14 +873,14 @@ class YourWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SizedBox(
-                          height: 14,
+                          height: Height*0.01,
                         ),
                         SizedBox(
-                            width: 300,
+                            width: Width*0.72,
                             child: Row(
                               children: [
                                 SizedBox(
-                                  width: 18,
+                                  width: Width*0.05,
                                 ),
                                 Flexible(
                                   flex: 2, // Adjust this flex value as needed
@@ -892,7 +895,7 @@ class YourWidget extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: 5,
+                                  width: Width*0.01,
                                 ),
                                 Flexible(
                                   flex: 2, // Adjust this flex value as needed
@@ -908,16 +911,16 @@ class YourWidget extends StatelessWidget {
                               ],
                             )),
                         SizedBox(
-                          height: 8,
+                          height: Height*0.01,
                         ),
                         Row(
                           children: [
                             SizedBox(
-                              width: 18,
+                              width: Width*0.05,
                             ),
                             Container(
-                              height: 50,
-                              width: 80,
+                              height: Height*0.06,
+                              width: Width*0.2,
                               decoration: BoxDecoration(
                                 color: getColorBasedOnCriteria(
                                     analytics['analytics'][0]['status']),
@@ -926,12 +929,12 @@ class YourWidget extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: 8,
+                                    height: Height*0.005,
                                   ),
                                   Row(
                                     children: [
                                       SizedBox(
-                                        width: 13,
+                                        width: Width*0.03,
                                       ),
                                       Text(
                                         '${analytics['analytics'][0]['type']}',
@@ -955,7 +958,7 @@ class YourWidget extends StatelessWidget {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 5,
+                                    height: 2,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -1014,7 +1017,7 @@ class YourWidget extends StatelessWidget {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 5,
+                                    height: 2,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -1073,7 +1076,7 @@ class YourWidget extends StatelessWidget {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 5,
+                                    height: 2,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
