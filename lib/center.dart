@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:ivis_security/development.dart';
-import 'package:ivis_security/alarm.dart';
-import 'package:ivis_security/drawer.dart';
-import 'package:ivis_security/hdtv.dart';
-import 'package:ivis_security/request.dart';
-import 'package:ivis_security/cctv.dart';
-import 'package:ivis_security/contact.dart';
-import 'package:ivis_security/reset.dart';
+import 'package:ivis_security/apis/Bussiness_int_api.dart';
+import 'package:ivis_security/apis/Services.dart';
+import 'package:ivis_security/apis/fetchdata.dart';
+import 'package:ivis_security/cctv/camList.dart';
+import 'package:ivis_security/navigation.dart';
 import 'package:ivis_security/home.dart';
+import 'package:ivis_security/drawer.dart';
 
-void main() {
-  runApp(const CenterScreen());
-}
-
+// ignore: must_be_immutable
 class CenterScreen extends StatefulWidget {
-  const CenterScreen({super.key});
+  String siteId;
+  String Sitename;
+  int i;
+
+  CenterScreen({
+    Key? key,
+    required this.siteId,
+    required this.Sitename,
+    required this.i,
+  }) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -22,6 +26,68 @@ class CenterScreen extends StatefulWidget {
 
 class _MyHomePageState extends State<CenterScreen> {
   int selectedButtonIndex = 0; // Track the selected button
+
+  String siteId = '';
+  String sitename = '';
+  int currentIndex = 0;
+
+  List<TdpCamera> listOfCamera = [];
+
+  int sitID = 36323;
+
+  late Map<String, dynamic> services;
+  String se = "F";
+  //site names
+  List<dynamic> siteNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    sitename = widget.Sitename;
+    siteId = widget.siteId;
+    currentIndex = widget.i;
+
+    sitID = int.parse(widget.siteId);
+
+    fetchData(sitID);
+    fetchSiteNames();
+  }
+
+  Future<void> fetchSiteNames() async {
+    try {
+      List<dynamic> sites = await BussinessInterface.fetchSiteNames();
+      setState(() {
+        siteNames = sites;
+        retrieveTheCamerasData();
+      });
+    } catch (e) {
+      print('Error fetching site names: $e');
+    }
+  }
+
+  void retrieveTheCamerasData() async {
+    await getCameras(sitID).then((value) {
+      setState(() {
+        listOfCamera = value;
+      });
+    });
+  }
+
+  Future<void> fetchData(int accountId) async {
+    try {
+      final Map<String, dynamic> response =
+          await ApiService.fetchClientServices(accountId);
+
+      setState(() {
+        services = response;
+
+        se = services['siteServicesList']['safetyEscort'] ;
+      });
+    } catch (e) {
+      print('Error fetching client services: $e');
+      // Handle errors...
+    }
+  }
 
   void onButtonPressed(int index) {
     setState(() {
@@ -39,62 +105,104 @@ class _MyHomePageState extends State<CenterScreen> {
             Image.asset(
               'assets/images/bg.png',
               fit: BoxFit.cover,
+              height: double.infinity,
+              width: double.infinity,
               alignment: Alignment.center,
             ),
-            Column(
-              children: [
-                const SizedBox(height: 50),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Builder(
-                      builder: (context) => GestureDetector(
-                        onTap: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.menu,
-                              size: 30,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
+            Positioned(
+                top: 50, // Adjust the position from the bottom
+                left: 71,
+                child: GestureDetector(
+                  onTap: () {
+                    // Your action when the image is tapped
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                    // Add your logic here, such as navigating to a new screen or performing some action.
+                  },
+                  child: Image.asset(
+                    'assets/logos/logo.png',
+                    height: 26.87,
+                    width: 218.25,
+                  ),
+                )),
+            Positioned(
+              top: 47,
+              left: 30,
+              child: Builder(
+                builder: (context) => GestureDetector(
+                  onTap: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.menu,
+                        size: 30,
+                        color: Colors.white,
                       ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Your action when the image is tapped
-                        Navigator.push(
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: currentIndex > 0
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex - 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex - 1]['siteName'].toString();
+                        Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
+                          MaterialPageRoute(
+                            builder: (context) => CenterScreen(
+                              i: currentIndex - 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
                         );
-                        // Add your logic here, such as navigating to a new screen or performing some action.
-                      },
-                      child: Image.asset(
-                        'assets/logos/logo.png',
-                        height: 26.87,
-                        width: 218.25,
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 43.13,
-                ),
-                const Divider(
-                  height: 1, // Set the height of the line
-                  thickness: 1, // Set the thickness of the line
-                  color: Colors.white, // Set the color of the line
-                ),
-              ],
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              right: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                onPressed: currentIndex < siteNames.length - 1
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex + 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex + 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CenterScreen(
+                              i: currentIndex + 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
             ),
             const Positioned(
-              top: 170, // Adjust the top position as needed
+              top: 120, // Adjust the top position as needed
               left: 0.5, // Adjust the left position as needed
               right: 0.5, // Adjust the right position as needed
               child: Divider(
@@ -103,17 +211,32 @@ class _MyHomePageState extends State<CenterScreen> {
                 color: Colors.white, // Set the color of the line
               ),
             ),
-            Positioned(
-              left: MediaQuery.of(context).size.width / 2 -
-                  75, // Adjust the position from the left
-              top: 135, // Center vertically
-              child: const Text(
-                'ONE STOP ODESSA',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
+            const Positioned(
+              top: 175, // Adjust the top position as needed
+              left: 0.5, // Adjust the left position as needed
+              right: 0.5, // Adjust the right position as needed
+              child: Divider(
+                height: 1, // Set the height of the line
+                thickness: 1, // Set the thickness of the line
+                color: Colors.white, // Set the color of the line
               ),
+            ),
+            
+            Positioned(
+              left: MediaQuery.of(context).size.width * 0.2,
+              top: 135, // Center vertically
+              child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: MediaQuery.of(context).size.height*0.03,
+                  child: Center(child:  Text(
+                    widget.Sitename,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                    )
+                  )),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -160,7 +283,6 @@ class _MyHomePageState extends State<CenterScreen> {
                               filled: true,
                             ),
                           ),
-                          
                         ],
                       ),
                     ),
@@ -168,193 +290,35 @@ class _MyHomePageState extends State<CenterScreen> {
                 ),
               ],
             ),
-            Positioned(
-              bottom: 0, // Adjust the position from the bottom
-              left: 0,
-              right: 0,
-              child: Column(
+            if (se == "F") // change logic as alarm == "F"
+              ...[
+              Column(
                 children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.233,
+                  ),
                   Container(
-                    width: double.infinity,
-                    height: 65,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(1),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 0, left: 0), // Adjust the left padding
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              //Navigator.push(
-                              //  context,
-                              //  MaterialPageRoute(
-                              //      builder: (context) =>  CctvScreen()),
-                              //);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/bx-cctv.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const AlarmScreen()),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/alarm.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DevelopmentScreen()),
-                              );
-                              // Handle the button press event here
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/development.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/center-circle.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const HdtvScreen()),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/hdtv.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const RequestScreen()),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/plus-square.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ), // Positioned widget at the top-left corner
-                        ],
+                    height: MediaQuery.of(context).size.height * 0.7024,
+                    width: MediaQuery.of(context).size.width * 1,
+                    color: Colors.black54,
+                    child: Center(
+                      child: Text(
+                        "You have not availed this service.\n To subscribe please CONTACT",
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
-            ),
+            ],
           ],
         ),
-        drawer: DrawerWidget()
+        bottomNavigationBar: CustomBottomNavigationBar(
+          siteId: siteId,
+          Sitename: sitename,
+          i: currentIndex,
+        ),
+        drawer: DrawerWidget(),
       ),
     );
     //return Scaffold(

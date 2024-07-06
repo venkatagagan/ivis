@@ -29,15 +29,6 @@ class BussinessInterface extends LoginApiService {
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         List<dynamic>? sites = jsonResponse['sites'];
-        List<String> names =
-            sites?.map((site) => site['siteName'].toString()).toList() ?? [];
-        List<String> SiteId =
-            sites?.map((site) => site['siteId'].toString()).toList() ?? [];
-        print('API Response: $jsonResponse');
-        print(sites);
-        print(SiteId);
-        //print(requestBodyString);
-        print(names);
         return sites;
       } else {
         print('API Error: ${response.statusCode}');

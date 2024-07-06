@@ -5,7 +5,7 @@ class ApiService {
   static Future<Map<String, dynamic>> fetchClientServices(int accountId) async {
     final response = await http.get(
       Uri.parse(
-        'http://usmgmt.iviscloud.net:777/businessInterface/Client/clientServices_1_0?accountId=$accountId&Request_type=Services&calling_user_details=IVISUSA',
+        'http://rsmgmt.ivisecurity.com:943/site/listSiteServices_1_0?siteId=$accountId',
       ),
     );
 

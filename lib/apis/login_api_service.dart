@@ -9,6 +9,9 @@ class LoginApiService {
   // static const baseUrl = 'http://34.206.37.237/userDetails/';
 // ignore: non_constant_identifier_names
   static String UserName = '';
+  
+
+
   static Future<void> login(
       BuildContext context, String user, String password) async {
     try {
@@ -28,29 +31,18 @@ class LoginApiService {
         // ignore: non_constant_identifier_names
         String Status = jsonResponse['Status'];
         UserName = jsonResponse['UserName'];
+        
         if (Status == 'Success') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const HomePage()),
           );
         } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Login Failed'),
-                content: const Text(
-                    'Incorrect username or password. Please try again.'),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Login failed. Incorrect username or password.'),
+              duration: Duration(seconds: 3),
+            ),
           );
         }
       }

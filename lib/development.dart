@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:ivis_security/alarm.dart';
-import 'package:ivis_security/cctv.dart';
-import 'package:ivis_security/center.dart';
-import 'package:ivis_security/hdtv.dart';
-import 'package:ivis_security/contact.dart';
-import 'package:ivis_security/reset.dart';
+import 'package:ivis_security/apis/Bussiness_int_api.dart';
+import 'package:ivis_security/apis/Services.dart';
+import 'package:ivis_security/apis/analytics.dart';
+import 'package:ivis_security/cctv/camList.dart';
+import 'package:ivis_security/drawer.dart';
+import 'package:ivis_security/navigation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:ivis_security/home.dart';
-import 'package:ivis_security/apis/analytics.dart';
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
 
 // Import your API service file
 
-void main() async {
-  runApp(DevelopmentScreen());
-}
-
+// ignore: must_be_immutable
 class DevelopmentScreen extends StatefulWidget {
-  const DevelopmentScreen({super.key});
+  String siteId;
+  String Sitename;
+  int i;
+
+  DevelopmentScreen({
+    Key? key,
+    required this.siteId,
+    required this.Sitename,
+    required this.i,
+  }) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -32,7 +37,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
   DateTime selectedDate = DateTime.now();
   DateTime FromDate = DateTime.now();
   DateTime ToDate = DateTime.now();
-  int siteId = 1002;
+  String siteId = '';
   TextEditingController dateController = TextEditingController();
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
@@ -41,6 +46,13 @@ class _MyHomePageState extends State<DevelopmentScreen> {
   //DateTime? _selectedDay;
   List<String> disabledDates = [];
 
+  String sitename = '';
+  int currentIndex = 0;
+  int sitID = 36323;
+  String bi = "F";
+
+  late Map<String, dynamic> services;
+
   @override
   void initState() {
     super.initState();
@@ -48,7 +60,14 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     toDateController = TextEditingController();
 
     dateController = TextEditingController();
-    
+    sitename = widget.Sitename;
+    siteId = widget.siteId;
+    currentIndex = widget.i;
+
+    sitID = int.parse(widget.siteId);
+
+    fetchData(sitID);
+    fetchSiteNames();
 
     // selected date
     fetchLastWorkday(siteId).then((lastWorkday) {
@@ -60,11 +79,42 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     });
 
     // Initialize selectedFromDate and selectedToDate here
-    fetchNotWorkingDates(siteId).then((dates) {
+    fetchNotWorkingDates(int.parse(siteId)).then((dates) {
       setState(() {
         disabledDates = dates;
       });
     });
+  }
+
+  Future<void> fetchData(int accountId) async {
+    try {
+      final Map<String, dynamic> response =
+          await ApiService.fetchClientServices(accountId);
+
+      setState(() {
+        services = response;
+
+        bi = services['siteServicesList']['insights'] ?? 'F';
+      });
+    } catch (e) {
+      print('Error fetching client services: $e');
+      // Handle errors...
+    }
+  }
+
+  List<TdpCamera> listOfCamera = [];
+
+  List<dynamic> siteNames = [];
+
+  Future<void> fetchSiteNames() async {
+    try {
+      List<dynamic> sites = await BussinessInterface.fetchSiteNames();
+      setState(() {
+        siteNames = sites;
+      });
+    } catch (e) {
+      print('Error fetching site names: $e');
+    }
   }
 
   int selectedButtonIndex = 0; // Track the selected button
@@ -82,117 +132,147 @@ class _MyHomePageState extends State<DevelopmentScreen> {
       home: Scaffold(
         body: Stack(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/bg.png'),
-                  fit: BoxFit.cover,
+            Image.asset(
+              'assets/images/bg.png',
+              fit: BoxFit.cover,
+              height: double.infinity,
+              width: double.infinity,
+              alignment: Alignment.center,
+            ),
+            Positioned(
+                top: 50, // Adjust the position from the bottom
+                left: 71,
+                child: GestureDetector(
+                  onTap: () {
+                    // Your action when the image is tapped
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                    // Add your logic here, such as navigating to a new screen or performing some action.
+                  },
+                  child: Image.asset(
+                    'assets/logos/logo.png',
+                    height: 26.87,
+                    width: 218.25,
+                  ),
+                )),
+            Positioned(
+              top: 47,
+              left: 30,
+              child: Builder(
+                builder: (context) => GestureDetector(
+                  onTap: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.menu,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-
-            // Background Image
-
+            Positioned(
+              left: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: currentIndex > 0
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex - 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex - 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DevelopmentScreen(
+                              i: currentIndex - 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              right: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                onPressed: currentIndex < siteNames.length - 1
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex + 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex + 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DevelopmentScreen(
+                              i: currentIndex + 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
+            const Positioned(
+              top: 120, // Adjust the top position as needed
+              left: 0.5, // Adjust the left position as needed
+              right: 0.5, // Adjust the right position as needed
+              child: Divider(
+                height: 1, // Set the height of the line
+                thickness: 1, // Set the thickness of the line
+                color: Colors.white, // Set the color of the line
+              ),
+            ),
+            const Positioned(
+              top: 175, // Adjust the top position as needed
+              left: 0.5, // Adjust the left position as needed
+              right: 0.5, // Adjust the right position as needed
+              child: Divider(
+                height: 1, // Set the height of the line
+                thickness: 1, // Set the thickness of the line
+                color: Colors.white, // Set the color of the line
+              ),
+            ),
+            Positioned(
+              left: MediaQuery.of(context).size.width * 0.2,
+              top: 135, // Center vertically
+              child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: MediaQuery.of(context).size.height * 0.03,
+                  child: Center(
+                      child: Text(
+                    widget.Sitename,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ))),
+            ),
             Column(
               children: [
-                const SizedBox(height: 50),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.28),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Builder(
-                      builder: (context) => GestureDetector(
-                        onTap: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.menu,
-                              size: 30,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Your action when the image is tapped
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
-                        );
-                        // Add your logic here, such as navigating to a new screen or performing some action.
-                      },
-                      child: Image.asset(
-                        'assets/logos/logo.png',
-                        height: 26.87,
-                        width: 218.25,
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 43.13,
-                ),
-                const Divider(
-                  height: 1, // Set the height of the line
-                  thickness: 1, // Set the thickness of the line
-                  color: Colors.white, // Set the color of the line
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 13.13,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-
-                      onPressed: () {
-                        // Handle right arrow button press
-                      },
-                      iconSize: 40, // Adjust the size of the button
-                      color: Colors.white, // Adjust the color of the button
-                    ),
-                    SizedBox(
-                      width: 40,
-                    ),
-                    Text(
-                      'ONE STOP ODESSA',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 50,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        // Handle right arrow button press
-                      },
-                      iconSize: 40, // Adjust the size of the button
-                      color: Colors.white, // Adjust the color of the button
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 1, // Set the height of the line
-                  thickness: 1, // Set the thickness of the line
-                  color: Colors.white, // Set the color of the line
-                ),
-                SizedBox(
-                  height: 32,
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 70,
-                    ),
                     TextButton(
                       onPressed: () => onButtonPressed(0),
                       child: const Text(
@@ -203,7 +283,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                       ),
                     ),
                     SizedBox(
-                      width: 65,
+                      width: MediaQuery.of(context).size.width * 0.25,
                     ),
                     TextButton(
                       onPressed: () => onButtonPressed(1),
@@ -233,7 +313,6 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                 )
               ],
             ),
-
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
               const Positioned(
@@ -296,7 +375,8 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                       });
                                     }
                                   });
-                                },icon: Icon(Icons.calendar_today),
+                                },
+                                icon: Icon(Icons.calendar_today),
                               ),
                             ],
                           ),
@@ -309,7 +389,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                       Expanded(
                         child: SingleChildScrollView(
                           child: FutureBuilder(
-                            future: fetchData(selectedDate, siteId),
+                            future: fetchDatas(selectedDate, int.parse(siteId)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                       ConnectionState.done &&
@@ -604,215 +684,47 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                 ],
               ),
             ],
-            SizedBox(
-              height: 20,
-            ),
-            // Your API Data Display (adjust as needed)
+            if (bi == "F") // change logic as alarm == "F"
+              ...[
+              Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.233,
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.7024,
+                    width: MediaQuery.of(context).size.width * 1,
+                    color: Colors.black54,
+                    child: Center(
+                      child: Text(
+                        "You have not availed this service.\n To subscribe please CONTACT",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ],
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: Image.asset(
-                  'assets/logos/bx-cctv.png',
-                  width: 19.93, // Adjust image width as needed
-                  height: 19.67,
-                ),
-                onPressed: () {
-                 // Navigator.push(
-                  //  context,
-                  //  MaterialPageRoute(builder: (context) => CctvScreen()),
-                  //);
-                  // Handle home button press
-                },
-              ),
-              IconButton(
-                icon: Image.asset(
-                  'assets/logos/alarm.png', // Replace with your image path
-                  width: 19.93, // Adjust image width as needed
-                  height: 19.67, // Adjust image height as needed
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AlarmScreen()),
-                  ); // Handle settings button press
-                },
-              ),
-              IconButton(
-                icon: Image.asset(
-                  'assets/logos/development.jpg', // Replace with your image path
-                  width: 19.93, // Adjust image width as needed
-                  height: 19.67, // Adjust image height as needed
-                ),
-                onPressed: () {
-                  // Handle settings button press
-                },
-              ),
-              IconButton(
-                icon: Image.asset(
-                  'assets/logos/center-circle.png', // Replace with your image path
-                  width: 19.93, // Adjust image width as needed
-                  height: 19.67, // Adjust image height as needed
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CenterScreen()),
-                  );
-                  // Handle search button press
-                },
-              ),
-              IconButton(
-                icon: Image.asset(
-                  'assets/logos/hdtv.png', // Replace with your image path
-                  width: 19.93, // Adjust image width as needed
-                  height: 19.67, // Adjust image height as needed
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HdtvScreen()),
-                  );
-                  // Handle search button press
-                },
-              ),
-              IconButton(
-                icon: Image.asset(
-                  'assets/logos/plus-square.png', // Replace with your image path
-                  width: 19.93, // Adjust image width as needed
-                  height: 19.67, // Adjust image height as needed
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CenterScreen()),
-                  );
-                  // Handle search button press
-                },
-              ),
-            ],
-          ),
+        bottomNavigationBar: CustomBottomNavigationBar(
+          siteId: siteId,
+          Sitename: sitename,
+          i: currentIndex,
         ),
-        drawer: Drawer(
-          child: Column(
-            children: [
-              Container(
-                color: const Color.fromARGB(
-                    255, 120, 63, 59), // Background color for the custom header
-                height: 230, // Height of the custom header
-                child: const Stack(
-                  children: [
-                    // Positioned user avatar
-                    Positioned(
-                      top: 20,
-                      left: 20,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.blue,
-                          size: 50,
-                        ),
-                      ),
-                    ),
-                    // Positioned account name
-                    Positioned(
-                      top: 44,
-                      left: 100,
-                      right: 73,
-                      child: Text(
-                        "NAME              +91XXXXXXXXXX name@email.com",
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 108,
-                      left: 100,
-                      right: 86,
-                      child: Text(
-                        "Address Line 1 Address Line 2 District/City State, Country Pincode",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 207,
-                      left: 100,
-                      child: Text(
-                        "+91 1234512345",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    // Positioned account email
-                  ],
-                ),
-              ),
-              //
-              const SizedBox(
-                height: 25,
-              ),
-              ListTile(
-                title: const Text("RESET PASSWORD"),
-                onTap: () {
-                  // Handle home item tap
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ResetScreen()),
-                  ); // Close the drawer
-                },
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              ListTile(
-                title: const Text("CONTACT"),
-                onTap: () {
-                  // Handle settings item tap
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ContactScreen()),
-                  ); // Close the drawer
-                },
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              ListTile(
-                minLeadingWidth: 25,
-                title: const Text("TERMS & CONDITIONS"),
-                onTap: () {
-                  // Handle settings item tap
-                  Navigator.pop(context); // Close the drawer
-                },
-              ),
-            ],
-          ),
-        ),
+        drawer: DrawerWidget(),
       ),
     );
+    //return Scaffold(
+
+    //);
   }
 
-
-
   //disable not working dates
-  
- Future<List<String>> fetchNotWorkingDates(int site) async {
-  final apiUrl =
-      "http://usmgmt.iviscloud.net:777/businessInterface/Client/notWorkingDays_1_0?siteId=$site&calling_System_Detail=IVISUSA&year=2022";
+
+  Future<List<String>> fetchNotWorkingDates(int site) async {
+    final apiUrl =
+        "http://rsmgmt.ivisecurity.com:951/insights/notWorkingDays_1_0?siteId=$siteId&year=2023";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -837,8 +749,12 @@ class _MyHomePageState extends State<DevelopmentScreen> {
 //date data
   // Add an async function to fetch the last workday from the API
   Future<DateTime> fetchLastWorkday(siteId) async {
+    DateTime now = DateTime.now();
+
+    // Get the current year from the date
+    int currentYear = now.year;
     final apiUrl =
-        "http://usmgmt.iviscloud.net:777/businessInterface/Client/notWorkingDays_1_0?siteId=$siteId&calling_System_Detail=IVISUSA&year=2021";
+        "http://rsmgmt.ivisecurity.com:951/insights/notWorkingDays_1_0?siteId=$sitID&year=$currentYear";
 
     // Make the HTTP request
     final response = await http.get(Uri.parse(apiUrl));
@@ -930,7 +846,7 @@ class YourWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(height: 10),
-        
+
         // Create a list of Container widgets for each item in analyticsList
         for (var analytics in analyticsList) ...[
           SizedBox(
@@ -956,38 +872,41 @@ class YourWidget extends StatelessWidget {
                         SizedBox(
                           height: 14,
                         ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 18,
-                            ),
-                            Text(
-                              analytics['service'],
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Column(
+                        SizedBox(
+                            width: 300,
+                            child: Row(
                               children: [
                                 SizedBox(
-                                  height: 4,
+                                  width: 18,
                                 ),
-                                Text(
-                                  '(Compare with prior period)',
-                                  style: const TextStyle(
-                                    fontSize: 9,
-                                    color: Colors.grey,
+                                Flexible(
+                                  flex: 2, // Adjust this flex value as needed
+                                  child: Text(
+                                    analytics['service'],
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                )
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Flexible(
+                                  flex: 2, // Adjust this flex value as needed
+                                  child: Text(
+                                    '(Compare with prior period)',
+                                    style: const TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.grey,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                               ],
-                            ),
-                          ],
-                        ),
+                            )),
                         SizedBox(
                           height: 8,
                         ),
@@ -1023,13 +942,16 @@ class YourWidget extends StatelessWidget {
                                       SizedBox(
                                         width: 3,
                                       ),
-                                      Text(
-                                        '(${analytics['analytics'][0]['percentage']}%)',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
+                                      SizedBox(
+                                        width: 35,
+                                        child: Text(
+                                          '(${analytics['analytics'][0]['percentage']}%)',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8,
+                                          ),
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                   SizedBox(
@@ -1079,13 +1001,16 @@ class YourWidget extends StatelessWidget {
                                       SizedBox(
                                         width: 3,
                                       ),
-                                      Text(
-                                        '(${analytics['analytics'][1]['percentage']}%)',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
+                                      SizedBox(
+                                        width: 32,
+                                        child: Text(
+                                          '(${analytics['analytics'][1]['percentage']}%)',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8,
+                                          ),
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                   SizedBox(
@@ -1135,13 +1060,16 @@ class YourWidget extends StatelessWidget {
                                       SizedBox(
                                         width: 3,
                                       ),
-                                      Text(
-                                        '(${analytics['analytics'][3]['percentage']}%)',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
+                                      SizedBox(
+                                        width: 33,
+                                        child: Text(
+                                          '(${analytics['analytics'][3]['percentage']}%)',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 8,
+                                          ),
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                   SizedBox(

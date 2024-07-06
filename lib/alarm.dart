@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:ivis_security/development.dart';
-import 'package:ivis_security/center.dart';
-import 'package:ivis_security/hdtv.dart';
-import 'package:ivis_security/request.dart';
-import 'package:ivis_security/cctv.dart';
-import 'package:ivis_security/contact.dart';
-import 'package:ivis_security/reset.dart';
+import 'package:ivis_security/apis/Bussiness_int_api.dart';
+import 'package:ivis_security/apis/Services.dart';
+import 'package:http/http.dart' as http;
+import 'package:ivis_security/cctv/camList.dart';
+import 'package:ivis_security/navigation.dart';
 import 'package:ivis_security/home.dart';
 import 'package:ivis_security/drawer.dart';
+import 'dart:convert';
+import 'package:intl/intl.dart';
 
-void main() {
-  runApp(const AlarmScreen());
-}
-
+// ignore: must_be_immutable
 class AlarmScreen extends StatefulWidget {
-  const AlarmScreen({super.key});
+  String siteId;
+  String Sitename;
+  int i;
+
+  AlarmScreen({
+    Key? key,
+    required this.siteId,
+    required this.Sitename,
+    required this.i,
+  }) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -22,6 +28,101 @@ class AlarmScreen extends StatefulWidget {
 
 class _MyHomePageState extends State<AlarmScreen> {
   int selectedButtonIndex = 0; // Track the selected button
+  DateTime? FromDate;
+  DateTime? ToDate;
+
+  DateTime? _selectedFromDate;
+  DateTime? _selectedToDate;
+
+  String siteId = '';
+  String sitename = '';
+  int currentIndex = 0;
+  TextEditingController fromDateController = TextEditingController();
+  TextEditingController toDateController = TextEditingController();
+
+  List<TdpCamera> listOfCamera = [];
+
+  int sitID = 36323;
+
+  late Map<String, dynamic> services;
+  String alarm = "F";
+  //site names
+  List<dynamic> siteNames = [];
+
+  Future<Map<String, List>>? _actionTagIncidents;
+  Map<String, bool> _expandedState = {};
+
+  Future<Map<String, List>> fetchActionTagIncidents(
+      int siteId, DateTime fromDate, DateTime toDate) async {
+    final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+    final String fromDateString = dateFormat.format(fromDate);
+    final String toDateString = dateFormat.format(toDate);
+    final response = await http.get(Uri.parse(
+        'http://rsmgmt.ivisecurity.com:8945/incidents/ListIncidentsForMobileApp_1_0?siteId=$siteId&fromDate=$fromDateString&toDate=$toDateString'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      List incidents = data['IncidentList'];
+
+      Map<String, List> actionTagIncidents = {};
+
+      for (var incident in incidents) {
+        String actionTag = incident['actionTag'];
+        if (actionTagIncidents.containsKey(actionTag)) {
+          actionTagIncidents[actionTag]!.add(incident);
+        } else {
+          actionTagIncidents[actionTag] = [incident];
+        }
+      }
+
+      return actionTagIncidents;
+    } else {
+      throw Exception('Failed to load incident list');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    sitename = widget.Sitename;
+    siteId = widget.siteId;
+    currentIndex = widget.i;
+
+    sitID = int.parse(widget.siteId);
+    _selectedFromDate = FromDate ?? DateTime.now().subtract(Duration(days: 2));
+    _selectedToDate = ToDate ?? DateTime.now().subtract(Duration(days: 1));
+    _actionTagIncidents =
+        fetchActionTagIncidents(sitID, _selectedFromDate!, _selectedToDate!);
+    fetchData(sitID);
+    fetchSiteNames();
+  }
+
+  Future<void> fetchSiteNames() async {
+    try {
+      List<dynamic> sites = await BussinessInterface.fetchSiteNames();
+      setState(() {
+        siteNames = sites;
+      });
+    } catch (e) {
+      print('Error fetching site names: $e');
+    }
+  }
+
+  Future<void> fetchData(int accountId) async {
+    try {
+      final Map<String, dynamic> response =
+          await ApiService.fetchClientServices(accountId);
+
+      setState(() {
+        services = response;
+
+        alarm = services['siteServicesList']['alerts'] ?? 'F';
+      });
+    } catch (e) {
+      print('Error fetching client services: $e');
+      // Handle errors...
+    }
+  }
 
   void onButtonPressed(int index) {
     setState(() {
@@ -31,6 +132,9 @@ class _MyHomePageState extends State<AlarmScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -81,6 +185,60 @@ class _MyHomePageState extends State<AlarmScreen> {
                 ),
               ),
             ),
+            Positioned(
+              left: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: currentIndex > 0
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex - 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex - 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AlarmScreen(
+                              i: currentIndex - 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              right: 29.87, // Adjust the position from the right
+              top: 125, // Center vertically
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                onPressed: currentIndex < siteNames.length - 1
+                    ? () {
+                        String siteId =
+                            siteNames[currentIndex + 1]['siteId'].toString();
+                        String sitename =
+                            siteNames[currentIndex + 1]['siteName'].toString();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AlarmScreen(
+                              i: currentIndex + 1,
+                              siteId: siteId,
+                              Sitename: sitename,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                iconSize: 21.13,
+                color: Colors.white,
+              ),
+            ),
             const Positioned(
               top: 120, // Adjust the top position as needed
               left: 0.5, // Adjust the left position as needed
@@ -101,316 +259,410 @@ class _MyHomePageState extends State<AlarmScreen> {
                 color: Colors.white, // Set the color of the line
               ),
             ),
-            const Positioned(
-              top: 250, // Adjust the top position as needed
-              left: 30.5, // Adjust the left position as needed
-              right: 30.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            Positioned(
-              right: 30, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: () {
-                  // Handle right arrow button press
-                },
-                iconSize: 40, // Adjust the size of the button
-                color: Colors.white, // Adjust the color of the button
-              ),
-            ),
             Positioned(
               left: MediaQuery.of(context).size.width / 2 -
                   75, // Adjust the position from the left
               top: 135, // Center vertically
-              child: const Text(
-                'ONE STOP ODESSA',
+              child:SizedBox(width: MediaQuery.of(context).size.width*0.5, child: 
+               Center(child:  Text(
+                widget.Sitename,
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
                 ),
+               ),
               ),
-            ),
-            Positioned(
-              top: 202, // Adjust the position from the bottom
-              left: 37, // Adjust the position from the left
-              child: TextButton(
-                onPressed: () => onButtonPressed(0),
-                child: Text(
-                  'CURRENT',
-                  style: TextStyle(
-                    color: Colors.white, // Set the text color to black
-                    decoration: selectedButtonIndex == 0
-                        ? TextDecoration.underline
-                        : TextDecoration.none,
-                  ),
-                ),
               ),
-            ),
-            Positioned(
-              top: 202, // Adjust the position from the bottom
-              left: 120, // Adjust the position from the left
-              child: TextButton(
-                onPressed: () => onButtonPressed(1),
-                child: Text(
-                  '7 DAYS',
-                  style: TextStyle(
-                    color: Colors.white, // Set the text color to black
-                    decoration: selectedButtonIndex == 0
-                        ? TextDecoration.underline
-                        : TextDecoration.none,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 202, // Adjust the position from the bottom
-              left: 191.5, // Adjust the position from the left
-              child: TextButton(
-                onPressed: () => onButtonPressed(2),
-                child: Text(
-                  '30 DAYS',
-                  style: TextStyle(
-                    color: Colors.white, // Set the text color to black
-                    decoration: selectedButtonIndex == 0
-                        ? TextDecoration.underline
-                        : TextDecoration.none,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 202, // Adjust the position from the bottom
-              left: 266.5, // Adjust the position from the left
-              child: TextButton(
-                onPressed: () => onButtonPressed(3),
-                child: Text(
-                  '90 DAYS',
-                  style: TextStyle(
-                    color: Colors.white, // Set the text color to black
-                    decoration: selectedButtonIndex == 1
-                        ? TextDecoration.underline
-                        : TextDecoration.none,
-                  ),
-                ),
-              ),
-            ),
-            if (selectedButtonIndex == 0) ...[
-              // Display content for Button 1
+              
+              
 
-              // Add rows and columns specific to Button 1
-            ] else if (selectedButtonIndex == 1) ...[
-              // Display content for Button 2
-            ] else if (selectedButtonIndex == 2) ...[
-              Positioned(
-                top: 255, // Adjust the position from the bottom
-                left: 30,
-                child: Column(
+            ),
+            Column(
+              children: [
+                SizedBox(
+                  height: Height * 0.25,
+                ),
+                Row(
                   children: [
-                    const SizedBox(
-                      height: 35,
+                    SizedBox(
+                      width: Width * 0.05,
                     ),
-                    Container(
-                      width: 300,
-                      height: 450,
-                      color: Colors.white,
+                    Text(
+                      'Start Date',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      width: Width * 0.3,
+                    ),
+                    Text(
+                      'End Date',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
-              ),
-            ] else if (selectedButtonIndex == 3)
-              ...[],
-            Positioned(
-              bottom: 0, // Adjust the position from the bottom
-              left: 0,
-              right: 0,
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 65,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(1),
+                SizedBox(
+                  height: Height * 0.02,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: Width * 0.05,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 0, left: 0), // Adjust the left padding
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              //Navigator.push(
-                                //context,
-                                //MaterialPageRoute(
-                                  //  builder: (context) =>  CctvScreen()),
-                              //);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/bx-cctv.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
+                    Container(
+                      width: Width * 0.4,
+                      height: Height * 0.05,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(1),
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 0, top: 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                style: TextStyle(fontSize: 15),
+                                controller: toDateController,
+                                decoration: InputDecoration(
+                                  hintText: ' YYYY-MM-DD',
+                                  border: InputBorder.none,
+                                ),
                               ),
                             ),
-                          ),
-
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/alarm.jpg', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
+                            IconButton(
+                              onPressed: () {
+                                showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime.now(),
+                                ).then((ToDate) {
+                                  if (ToDate != null) {
+                                    setState(() {
+                                      this.ToDate = ToDate;
+                                      toDateController.text =
+                                          ToDate.toString().split(' ')[0];
+                                    });
+                                  }
+                                });
+                              },
+                              icon: Icon(
+                                Icons.calendar_today,
+                                size: 20,
+                                color: Colors.grey,
                               ),
                             ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DevelopmentScreen()),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/development.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const CenterScreen()),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/center-circle.jpg', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const HdtvScreen()),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/hdtv.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              // Handle the button press event here
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const RequestScreen()),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 0, left: 0), // Adjust the left padding
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.asset(
-                                    'assets/logos/plus-square.png', // Replace with your image path
-                                    width:
-                                        19.93, // Adjust image width as needed
-                                    height:
-                                        19.67, // Adjust image height as needed
-                                  ), // Add spacing between text and image
-                                ],
-                              ),
-                            ),
-                          ), // Positioned widget at the top-left corner
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
+                    SizedBox(
+                      width: Width * 0.08,
+                    ),
+                    Container(
+                      width: Width * 0.4,
+                      height: Height * 0.05,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(1),
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 0, top: 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                style: TextStyle(fontSize: 15),
+                                controller: fromDateController,
+                                decoration: InputDecoration(
+                                  hintText: ' YYYY-MM-DD',
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime.now(),
+                                ).then((FromDate) {
+                                  if (ToDate != null) {
+                                    setState(() {
+                                      this.FromDate = FromDate;
+                                      fromDateController.text =
+                                          FromDate.toString().split(' ')[0];
+                                          
+                                    });
+                                  }
+                                });
+                              },
+                              icon: Icon(
+                                Icons.calendar_today,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                FutureBuilder<Map<String, List>>(
+                  future: _actionTagIncidents,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('No incidents found.'));
+                    } else {
+                      final actionTagIncidents = snapshot.data!;
+                      return Expanded(
+                        child: ListView.builder(
+                          itemCount: actionTagIncidents.length,
+                          itemBuilder: (context, index) {
+                            String actionTag =
+                                actionTagIncidents.keys.elementAt(index);
+                            int count = actionTagIncidents[actionTag]!.length;
+                            bool isExpanded =
+                                _expandedState[actionTag] ?? false;
+
+                            return Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _expandedState[actionTag] = !isExpanded;
+                                    });
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                        bottom: Height *
+                                            0.03), // Add space between containers
+                                    height: Height * 0.05,
+                                    width: Width * 0.9,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: Width * 0.05,
+                                        ),
+                                        Image.asset(
+                                          'assets/logos/eye.jpg', // Replace with your image path
+                                          width: Width *
+                                              0.07, // Adjust image width as needed
+                                          height: Height *
+                                              0.02, // Adjust image height as needed
+                                        ),
+                                        SizedBox(
+                                          width: Width * 0.03,
+                                        ),
+                                        SizedBox(
+                                          width: Width * 0.6,
+                                          child: Text(actionTag),
+                                        ),
+                                        Text(count.toString()),
+                                        SizedBox(
+                                          width: Width * 0.03,
+                                        ),
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 18,
+                                          color: Colors.black,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                if (isExpanded)
+                                  ...actionTagIncidents[actionTag]!
+                                      .map((incident) {
+                                    DateTime startDateTime = DateTime.parse(
+                                        incident['eventFromTime']);
+                                    DateTime endDateTime =
+                                        DateTime.parse(incident['eventToTime']);
+                                    Duration duration =
+                                        endDateTime.difference(startDateTime);
+                                    String durationString =
+                                        "${duration.inHours}${duration.inMinutes.remainder(60)}";
+
+                                    return Container(
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 20),
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(5),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 1,
+                                            blurRadius: 5,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: Width * 0.67,
+                                                child: Text(incident['name'],
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ),
+                                              SizedBox(
+                                                width: Width * 0.15,
+                                                child: Text(
+                                                    incident['objectName'],
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              )
+                                            ],
+                                          ),
+                                          Text(
+                                              "Start Time: ${incident['eventFromTime']}",
+                                              style: TextStyle(fontSize: 14)),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: Width * 0.675,
+                                                child: Text(
+                                                    'End Time: ${incident['eventToTime']}',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                    )),
+                                              ),
+                                              SizedBox(
+                                                width: Width * 0.15,
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return Dialog(
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20.0),
+                                                          ),
+                                                          child: Container(
+                                                            height: 400,
+                                                            child: Column(
+                                                              children: <Widget>[
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                  child: Text(
+                                                                    'Files',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Expanded(
+                                                                  child: ListView
+                                                                      .builder(
+                                                                    itemCount: incident[
+                                                                            'files']
+                                                                        .length,
+                                                                    itemBuilder:
+                                                                        (BuildContext
+                                                                                context,
+                                                                            int index) {
+                                                                      return Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .all(
+                                                                            8.0),
+                                                                        child: Image
+                                                                            .network(
+                                                                          '${incident['files'][index]}',
+                                                                          fit: BoxFit
+                                                                              .cover,
+                                                                          errorBuilder: (context,
+                                                                              error,
+                                                                              stackTrace) {
+                                                                            return Icon(Icons.error);
+                                                                          },
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  child: Text('View'),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          Text(
+                                              "Duration: ${duration.inHours.toString().padLeft(2, '0')}:${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${duration.inSeconds.remainder(60).toString().padLeft(2, '0')}",
+                                              style: TextStyle(fontSize: 14)),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                              ],
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            )
           ],
         ),
-        drawer:DrawerWidget(),
+        bottomNavigationBar: CustomBottomNavigationBar(
+          siteId: siteId,
+          Sitename: sitename,
+          i: currentIndex,
+        ),
+        drawer: DrawerWidget(),
       ),
     );
     //return Scaffold(

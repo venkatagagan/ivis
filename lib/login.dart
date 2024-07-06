@@ -12,6 +12,8 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -27,13 +29,13 @@ class LoginScreen extends StatelessWidget {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 5),
+                  SizedBox(height: Height * 0.1),
                   Image.asset(
                     'assets/logos/logo.png',
-                    height: 200.0,
-                    width: 300.0,
+                    height: Height * 0.05,
+                    width: Width * 0.8,
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: Height * 0.1),
                   const Text(
                     'SIGN IN',
                     style: TextStyle(
@@ -41,7 +43,7 @@ class LoginScreen extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: Height * 0.05),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(20),
@@ -88,10 +90,12 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const SizedBox(height: 20),
+        SizedBox(height: Height * 0.04),
         TextFormField(
           controller: userController,
           decoration: const InputDecoration(
@@ -100,7 +104,7 @@ class _LoginFormState extends State<LoginForm> {
             filled: true,
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: Height * 0.02),
         TextFormField(
           obscureText: !_showPassword,
           controller: passwordController,
@@ -121,10 +125,10 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: Height * 0.025),
         Row(
           children: [
-            const SizedBox(width: 160),
+            SizedBox(width: Width * 0.45),
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -139,7 +143,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: Height * 0.03),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -158,7 +162,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: Height * 0.025),
         ElevatedButton(
           onPressed: () {
             // Handle login button press

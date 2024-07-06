@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:ivis_security/alarm.dart';
 import 'package:ivis_security/cctv.dart';
 import 'package:ivis_security/development.dart';
@@ -81,11 +79,11 @@ class _OneStopScreenState extends State<OneStopScreen> {
       setState(() {
         services = response;
 
-        liveview = services['Services']['LiveView'] ?? 'F';
-        alaram = services['Services']['alarms'] ?? 'F';
-        bi = services['Services']['business_intelligence'] ?? 'F';
-        se = services['Services']['safety_escort'] ?? 'F';
-        ad = services['Services']['advertising'] ?? 'F';
+        liveview = services['siteServicesList']['live'];
+        alaram = services['siteServicesList']['alerts'];
+        bi = services['siteServicesList']['insights'];
+        se = services['siteServicesList']['safetyEscort'];
+        ad = services['siteServicesList']['advertisements'];
       });
     } catch (e) {
       print('Error fetching client services: $e');
@@ -95,6 +93,8 @@ class _OneStopScreenState extends State<OneStopScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -102,12 +102,13 @@ class _OneStopScreenState extends State<OneStopScreen> {
           children: [
             Image.asset(
               'assets/images/bg.png',
-              fit: BoxFit.cover,
+              height: double.infinity,
+              width: double.infinity,
               alignment: Alignment.center,
             ),
             Column(
               children: [
-                const SizedBox(height: 50),
+                SizedBox(height: Height * 0.08),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -127,512 +128,330 @@ class _OneStopScreenState extends State<OneStopScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
+                    SizedBox(
+                      width: Width * 0.05,
                     ),
                     Image.asset(
                       'assets/logos/logo.png',
-                      height: 26.87,
-                      width: 218.25,
+                      height: Height * 0.04,
+                      width: Width * 0.6,
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 43.13,
+                SizedBox(
+                  height: Height * 0.04,
                 ),
                 const Divider(
                   height: 1, // Set the height of the line
                   thickness: 1, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
-              ],
-            ),
-            Positioned(
-                left: 116, // Adjust the position from the left
-                top: 137, // Center vertically
-                child: SizedBox(
-                  height: 15,
-                  width: 200,
-                  child: Text(
-                    sitename,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 13,
+                Row(
+                  children: [
+                    SizedBox(
+                      width: Width * 0.05,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios),
+                      onPressed: currentIndex > 0
+                          ? () {
+                              String siteId = siteNames[currentIndex - 1]
+                                      ['siteId']
+                                  .toString();
+                              String sitename = siteNames[currentIndex - 1]
+                                      ['siteName']
+                                  .toString();
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OneStopScreen(
+                                    i: currentIndex - 1,
+                                    siteId: siteId,
+                                    Sitename: sitename,
+                                  ),
+                                ),
+                              );
+                            }
+                          : null,
+                      iconSize: 21.13,
                       color: Colors.white,
                     ),
-                  ),
-                )),
-            const Positioned(
-              top: 170, // Adjust the top position as needed
-              left: 0.5, // Adjust the left position as needed
-              right: 0.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            Positioned(
-              right: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: currentIndex < siteNames.length - 1
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex + 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex + 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OneStopScreen(
-                              i: currentIndex + 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            Positioned(
-              left: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: currentIndex > 0
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex - 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex - 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OneStopScreen(
-                              i: currentIndex - 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 45),
-            Positioned(
-              left: 30, // Adjust the position from the right
-              top: 215, // Center vertically
-              child: Text(
-                "GUARD",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Positioned(
-              top: 234, // Adjust the position from the bottom
-              left: 30,
-              child: Row(
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      // Handle the button press event here
-                      if (liveview == "T") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CctvScreen(
-                                    i: currentIndex - 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            )),
-                        );
-                      } else {
-                        showMyDialog(context);
-                      }
-                    },
-                    child: Container(
-                      width: 95,
-                      height: 95,
-                      decoration: BoxDecoration(
-                        color: liveview == "T"
-                            ? Colors.white.withOpacity(1)
-                            : Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 20,
-                              width: 33,
-                            ),
-                            Image.asset(
-                              'assets/logos/Acc.png', // Replace with your image path
-                              width: 30.4, // Adjust image width as needed
-                              height: 30, // Adjust image height as needed
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            const Text(
-                              'LIVE View',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                            ),
-                            // Add spacing between text and image
-                          ],
-                        ),
-                      ),
+                    SizedBox(
+                      width: Width * 0.01,
                     ),
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  Container(
-                    width: 95,
-                    height: 95,
-                    decoration: BoxDecoration(
-                      color: alaram == "T"
-                          ? Colors.white.withOpacity(1)
-                          : Colors.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(5),
+                    SizedBox(
+                        height: Height * 0.05,
+                        width: Width * 0.6,
+                        child: Center(
+                          child: Text(
+                            sitename,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )),
+                    SizedBox(
+                      width: Width * 0.01,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 0, left: 0), // Adjust the left padding
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 20,
-                            width: 33,
-                          ),
-                          Image.asset(
-                            'assets/logos/Aalarm.png', // Replace with your image path
-                            width: 29.5, // Adjust image width as needed
-                            height: 27, // Adjust image height as needed
-                          ),
-
-                          TextButton(
-                            onPressed: () {
-                              // Add your TextButton action here
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (liveview == "T") {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AlarmScreen()),
-                                    );
-                                  } else {
-                                    showMyDialog(context);
-                                  }
-                                },
-                                child: const Text('Show Dialog'),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      onPressed: currentIndex < siteNames.length - 1
+                          ? () {
+                              String siteId = siteNames[currentIndex + 1]
+                                      ['siteId']
+                                  .toString();
+                              String sitename = siteNames[currentIndex + 1]
+                                      ['siteName']
+                                  .toString();
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OneStopScreen(
+                                    i: currentIndex + 1,
+                                    siteId: siteId,
+                                    Sitename: sitename,
+                                  ),
+                                ),
                               );
-                            },
-                            child: const Text(
-                              'Alarms',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ), // Add spacing between text and image
-                        ],
-                      ),
+                            }
+                          : null,
+                      iconSize: 21.13,
+                      color: Colors.white,
                     ),
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      // Handle the button press event here
-                      if (se == "T") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const CenterScreen()),
-                        );
-                      } else {
-                        showMyDialog(context);
-                      }
-                    },
-                    child: Container(
-                      width: 95,
-                      height: 95,
-                      decoration: BoxDecoration(
-                        color: se == "T"
-                            ? Colors.white.withOpacity(1)
-                            : Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 20,
-                              width: 33,
-                            ),
-                            Image.asset(
-                              'assets/logos/Acenter-circle.png', // Replace with your image path
-                              width: 29.5, // Adjust image width as needed
-                              height: 27, // Adjust image height as needed
-                            ),
-                            const Text(
-                              'Safety',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 13,
-                              ),
-                            ),
-                            const Text(
-                              'Escort',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 25),
-            const Positioned(
-              left: 30, // Adjust the position from the right
-              top: 364, // Center vertically
-              child: Text(
-                'INSIGHT',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
+                  ],
                 ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Positioned(
-              top: 383, // Adjust the position from the bottom
-              left: 30,
-              child: Row(
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      // Handle the button press event here
-                      if (bi == "T") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const DevelopmentScreen()),
-                        );
-                      } else {
-                        showMyDialog(context);
-                      }
-                    },
-                    child: Container(
-                      width: 95,
-                      height: 95,
-                      decoration: BoxDecoration(
-                        color: bi == "T"
-                            ? Colors.white.withOpacity(1)
-                            : Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 22, width: 38),
-                            Image.asset(
-                              'assets/logos/Adevelopment.png', // Replace with your image path
-                              width: 29.9, // Adjust image width as needed
-                              height: 29.9, // Adjust image height as needed
-                            ),
-                            const SizedBox(height: 8.1),
-
-                            const Text(
-                              'Business',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 13,
-                              ),
-                            ),
-                            const Text(
-                              'Intelligence',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 13,
-                              ),
-                            ), // Add spacing between text and image
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      // Handle the button press event here
-                      if (liveview == "T") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HdtvScreen()),
-                        );
-                      } else {
-                        showMyDialog(context);
-                      }
-                    },
-                    child: Container(
-                      width: 95,
-                      height: 95,
-                      decoration: BoxDecoration(
-                        color: ad == "T"
-                            ? Colors.white.withOpacity(1)
-                            : Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 23, width: 30),
-                            Image.asset(
-                              'assets/logos/Ahdtv.png', // Replace with your image path
-                              width: 35.96, // Adjust image width as needed
-                              height: 29.22, // Adjust image height as needed
-                            ),
-                            const SizedBox(height: 7.78),
-                            // Add spacing between text and image
-                            const Text(
-                              'Ads',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            const Positioned(
-              left: 30, // Adjust the position from the right
-              top: 518, // Center vertically
-              child: Text(
-                'HELPDESK',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
+                Divider(
+                  height: 1, // Set the height of the line
+                  thickness: 1, // Set the thickness of the line
+                  color: Colors.white, // Set the color of the line
                 ),
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Positioned(
-              top: 547, // Adjust the position from the bottom
-              left: 30,
-              child: Row(
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      // Handle the button press event here
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RequestScreen()),
-                      );
-                    },
-                    child: Container(
-                      width: 95,
-                      height: 95,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, left: 0), // Adjust the left padding
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 23, width: 30),
-                            Image.asset(
-                              'assets/logos/Aplus-square.png', // Replace with your image path
-                              width: 30.4, // Adjust image width as needed
-                              height: 30, // Adjust image height as needed
-                            ),
-                            const SizedBox(height: 7),
-                            const Text(
-                              'Service',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 13,
-                              ),
-                            ),
-                            const Text(
-                              'Request',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 13,
-                              ),
-                            ),
-                            // Service Request
-                          ],
-                        ),
+                SizedBox(
+                  height: Height * 0.05,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: Width * 0.1,
+                    ),
+                    Text(
+                      "GUARD",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+                SizedBox(
+                  height: Height * 0.01,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: Width * 0.1,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // Handle the button press event here
+                        if (liveview == "T") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CctvScreen(
+                                      i: currentIndex - 1,
+                                      siteId: siteId,
+                                      Sitename: sitename,
+                                    )),
+                          );
+                        } else {
+                          showMyDialog(context);
+                        }
+                      },
+                      child: CustomButton(
+                        imagePath: 'assets/logos/cctv.jpg',
+                        text1: 'live View',
+                        isEnabled: liveview == "T",
+                      ),
+                    ),
+                    SizedBox(
+                      width: Width * 0.03,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // Handle the button press event here
+                        if (alaram == "T") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AlarmScreen(
+                                      i: currentIndex - 1,
+                                      siteId: siteId,
+                                      Sitename: sitename,
+                                    )),
+                          );
+                        } else {
+                          showMyDialog(context);
+                        }
+                      },
+                      child: CustomButton(
+                        imagePath: 'assets/logos/alarm.jpg',
+                        text1: 'Alarm',
+                        isEnabled: alaram == "T",
+                      ),
+                    ),
+                    SizedBox(
+                      width: Width * 0.03,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // Handle the button press event here
+                        if (se == "T") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CenterScreen(
+                                      i: currentIndex - 1,
+                                      siteId: siteId,
+                                      Sitename: sitename,
+                                    )),
+                          );
+                        } else {
+                          showMyDialog(context);
+                        }
+                      },
+                      child: CustomButton(
+                        imagePath: 'assets/logos/Acenter-circle.png',
+                        text1: 'Safty \n Escord',
+                        isEnabled: se == "T",
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: Height * 0.05,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: Width * 0.1,
+                    ),
+                    Text(
+                      'INSIGHT',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: Height * 0.01,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: Width * 0.1,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // Handle the button press event here
+                        if (bi == "T") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DevelopmentScreen(
+                                      i: currentIndex - 1,
+                                      siteId: siteId,
+                                      Sitename: sitename,
+                                    )),
+                          );
+                        } else {
+                          showMyDialog(context);
+                        }
+                      },
+                      child: CustomButton(
+                        imagePath: 'assets/logos/Adevelopment.png',
+                        text1: 'Business \n Intelligence',
+                        isEnabled: bi == "T",
+                      ),
+                    ),
+                    SizedBox(
+                      width: Width * 0.03,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // Handle the button press event here
+                        if (ad == "T") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HdtvScreen(
+                                      i: currentIndex - 1,
+                                      siteId: siteId,
+                                      Sitename: sitename,
+                                    )),
+                          );
+                        } else {
+                          showMyDialog(context);
+                        }
+                      },
+                      child: CustomButton(
+                        imagePath: 'assets/logos/Ahdtv.png',
+                        text1: 'Ads',
+                        isEnabled: ad == "T",
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: Height * 0.05,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: Width * 0.1,
+                    ),
+                    Text(
+                      'HELPDESK',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: Height * 0.01,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: Width * 0.1,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // Handle the button press event here
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RequestScreen(
+                                    i: currentIndex - 1,
+                                    siteId: siteId,
+                                    Sitename: sitename,
+                                  )),
+                        );
+                      },
+                      child: CustomButton(
+                        imagePath: 'assets/logos/plus-square.jpg',
+                        text1: 'Service \nRequest',
+                        isEnabled: "T" == "T",
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -781,6 +600,55 @@ class _OneStopScreenState extends State<OneStopScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  final String imagePath;
+  final String text1;
+
+  final bool isEnabled;
+
+  CustomButton({
+    required this.imagePath,
+    required this.text1,
+    required this.isEnabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 95,
+      height: 95,
+      decoration: BoxDecoration(
+        color: isEnabled
+            ? Colors.white.withOpacity(1)
+            : Colors.white.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 0, left: 0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20, width: 33),
+            Image.asset(
+              imagePath,
+              width: 29.5, // Adjust image width as needed
+              height: 27, // Adjust image height as needed
+            ),
+            const SizedBox(height: 10),
+            Text(
+              text1,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

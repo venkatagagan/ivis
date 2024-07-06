@@ -1,22 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ivis_security/alarm.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
-//import 'package:ivis_security/apis/Monitoring.dart';
+import 'package:ivis_security/apis/Services.dart';
 import 'package:ivis_security/apis/fetchdata.dart';
 import 'package:ivis_security/cctv/camBigScreen.dart';
 import 'package:ivis_security/cctv/camList.dart';
 import 'package:ivis_security/cctv/screens.dart';
 import 'package:ivis_security/center.dart';
-import 'package:ivis_security/development.dart';
-import 'package:ivis_security/hdtv.dart';
 import 'package:ivis_security/home.dart';
+import 'package:ivis_security/navigation.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:ivis_security/apis/Bussiness_int_api.dart';
 
 bool shouldReloadContainers = false;
 
+// ignore: must_be_immutable
 class CctvScreen extends StatefulWidget {
   String siteId;
   String Sitename;
@@ -41,10 +39,16 @@ class _MyHomePageState extends State<CctvScreen> {
   int currentIndex = 0;
   List<TdpCamera> listOfCamera = [];
   int sitID = 36323;
+  // ignore: unused_field
   bool _isVisible = false;
   String visibilityScreenName = "";
   Set<String> monitoringNames = Set();
   List<dynamic> siteNames = [];
+  String S = "n";
+
+  late Map<String, dynamic> services;
+  String liveview = "F";
+  
 
   @override
   void initState() {
@@ -56,6 +60,24 @@ class _MyHomePageState extends State<CctvScreen> {
     sitID = int.parse(widget.siteId);
     fetchMonitoringNames(sitID);
     fetchSiteNames();
+    fetchData(sitID);
+  }
+  
+  Future<void> fetchData(int accountId) async {
+    try {
+      final Map<String, dynamic> response =
+          await ApiService.fetchClientServices(accountId);
+
+      setState(() {
+        services = response;
+
+        liveview = services['siteServicesList']['live'] ?? 'F';
+        
+      });
+    } catch (e) {
+      print('Error fetching client services: $e');
+      // Handle errors...
+    }
   }
 
   Future<void> fetchMonitoringNames(int accountId) async {
@@ -120,6 +142,7 @@ class _MyHomePageState extends State<CctvScreen> {
         child: Stack(
           alignment: Alignment.center,
           children: [
+            
             Column(
               children: [
                 const SizedBox(height: 50),
@@ -200,52 +223,52 @@ class _MyHomePageState extends State<CctvScreen> {
                 const SizedBox(
                   height: 32,
                 ),
-                Row(
-                  //49,24,34
-                  children: [
-                    const SizedBox(
-                      width: 49,
-                    ),
-                    TextButton(
-                      onPressed: () => onButtonPressed(0),
-                      child: const Text(
-                        'CAMERAS',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11, // Set the text color to black
-                          // Thickness of the underline
+                
+                  Row(
+                    //49,24,34
+                    children: [
+                      const SizedBox(
+                        width: 49,
+                      ),
+                      TextButton(
+                        onPressed: () => onButtonPressed(0),
+                        child: const Text(
+                          'CAMERAS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11, // Set the text color to black
+                            // Thickness of the underline
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 24,
-                    ),
-                    
-                    TextButton(
-                      onPressed: () => onButtonPressed(1),
-                      child: const Text(
-                        'MONITORING',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11, // Set the text color to black
+                      const SizedBox(
+                        width: 24,
+                      ),
+                      TextButton(
+                        onPressed: () => onButtonPressed(1),
+                        child: const Text(
+                          'MONITORING',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11, // Set the text color to black
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 34,
-                    ),
-                    TextButton(
-                      onPressed: () => onButtonPressed(2),
-                      child: const Text(
-                        'STATUS',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11, // Set the text color to black
+                      const SizedBox(
+                        width: 34,
+                      ),
+                      TextButton(
+                        onPressed: () => onButtonPressed(2),
+                        child: const Text(
+                          'STATUS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11, // Set the text color to black
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
                 const SizedBox(
                   height: 12,
                 ),
@@ -264,6 +287,7 @@ class _MyHomePageState extends State<CctvScreen> {
                 ),
               ],
             ),
+            
             Positioned(
               left: 29.87, // Adjust the position from the right
               top: 125, // Center vertically
@@ -291,6 +315,7 @@ class _MyHomePageState extends State<CctvScreen> {
                 color: Colors.white,
               ),
             ),
+            
             Positioned(
               right: 29.87, // Adjust the position from the right
               top: 125, // Center vertically
@@ -318,6 +343,7 @@ class _MyHomePageState extends State<CctvScreen> {
                 color: Colors.white,
               ),
             ),
+            
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
               const Positioned(
@@ -480,7 +506,11 @@ class _MyHomePageState extends State<CctvScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => CenterScreen()),
+                                      builder: (context) => CenterScreen(
+                                            i: currentIndex - 1,
+                                            siteId: siteId,
+                                            Sitename: sitename,
+                                          )),
                                 );
 
                                 // Add your desired action here
@@ -528,7 +558,11 @@ class _MyHomePageState extends State<CctvScreen> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      CenterScreen()),
+                                                      CenterScreen(
+                                                        i: currentIndex - 1,
+                                                        siteId: siteId,
+                                                        Sitename: sitename,
+                                                      )),
                                             );
                                             // Add your desired action here
                                           },
@@ -615,93 +649,28 @@ class _MyHomePageState extends State<CctvScreen> {
                 ),
               )
             ],
+            if(liveview == "F")
+            ...[
+            Column(children: [
+              SizedBox(height: MediaQuery.of(context).size.height *0.233,),
+              Container(
+                height: MediaQuery.of(context).size.height *0.7024,
+                width: MediaQuery.of(context).size.width *1,
+                color: Colors.black54
+                ,
+                child: Center(child:  Text("You have not availed this service.\n To subscribe please CONTACT",
+                style: TextStyle(color: Colors.white),),
+              )
+              ,)
+            ],),
+            ],
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Image.asset(
-                'assets/logos/cctv.jpg',
-                width: 19.93, // Adjust image width as needed
-                height: 19.67,
-              ),
-              onPressed: () {
-                // Handle home button press
-              },
-            ),
-            IconButton(
-              icon: Image.asset(
-                'assets/logos/alarm.png', // Replace with your image path
-                width: 19.93, // Adjust image width as needed
-                height: 19.67, // Adjust image height as needed
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AlarmScreen()),
-                ); // Handle settings button press
-              },
-            ),
-            IconButton(
-              icon: Image.asset(
-                'assets/logos/development.png', // Replace with your image path
-                width: 19.93, // Adjust image width as needed
-                height: 19.67, // Adjust image height as needed
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DevelopmentScreen()),
-                ); // Handle settings button press
-              },
-            ),
-            IconButton(
-              icon: Image.asset(
-                'assets/logos/center-circle.png', // Replace with your image path
-                width: 19.93, // Adjust image width as needed
-                height: 19.67, // Adjust image height as needed
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CenterScreen()),
-                );
-                // Handle search button press
-              },
-            ),
-            IconButton(
-              icon: Image.asset(
-                'assets/logos/hdtv.png', // Replace with your image path
-                width: 19.93, // Adjust image width as needed
-                height: 19.67, // Adjust image height as needed
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HdtvScreen()),
-                );
-                // Handle search button press
-              },
-            ),
-            IconButton(
-              icon: Image.asset(
-                'assets/logos/plus-square.png', // Replace with your image path
-                width: 19.93, // Adjust image width as needed
-                height: 19.67, // Adjust image height as needed
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CenterScreen()),
-                );
-                // Handle search button press
-              },
-            ),
-          ],
-        ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        siteId: siteId,
+        Sitename: sitename,
+        i: currentIndex,
       ),
     );
   }

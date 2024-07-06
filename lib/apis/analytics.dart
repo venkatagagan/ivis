@@ -2,18 +2,16 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 
 
-Future<Map<String, dynamic>> fetchData(
+Future<Map<String, dynamic>> fetchDatas(
     DateTime selectedDate, int siteId) async {
-  final String formattedDate = DateFormat('yyyy/MM/dd').format(selectedDate);
+  //final String formattedDate = DateFormat('yyyy/MM/dd').format(selectedDate);
 
-  final String apiUrl =
-      'http://usmgmt.iviscloud.net:777/businessInterface/insights/getAnalyticsListforSite_1_0';
-
+  
   final String fullUrl =
-      '$apiUrl?SiteId=$siteId&calling_System_Detail=IVISUSA&date=$formattedDate';
+      'http://rsmgmt.ivisecurity.com:951/insights/getAnalyticsListforSite_1_0?SiteId=36347&date=2024-05-22';
 
   try {
     final response = await http.get(Uri.parse(fullUrl));

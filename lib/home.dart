@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ivis_security/OneStop.dart';
-import 'package:ivis_security/contact.dart';
 import 'package:ivis_security/drawer.dart';
-import 'package:ivis_security/reset.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
-
-void main() {
-  runApp(const HomePage());
-}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -46,72 +40,73 @@ class _MyHomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        drawer: DrawerWidget(),
         body: Stack(
           children: [
             Image.asset(
               'assets/images/bg.png',
-              fit: BoxFit.cover,
+              height: double.infinity,
+              width: double.infinity,
               alignment: Alignment.center,
             ),
             Column(
               children: [
-                const SizedBox(height: 50),
+                SizedBox(height: Height * 0.06),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    SizedBox(width: Width * 0.1),
                     Builder(
                       builder: (context) => GestureDetector(
                         onTap: () {
                           Scaffold.of(context).openDrawer();
                         },
-                        child: const Row(
+                        child: Row(
                           children: [
                             Icon(
                               Icons.menu,
-                              size: 30,
+                              size: Height * 0.045,
                               color: Colors.white,
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                    SizedBox(width: Width * 0.05),
                     Image.asset(
                       'assets/logos/logo.png',
-                      height: 26.87,
-                      width: 218.25,
+                      height: Height * 0.05,
+                      width: Width * 0.61,
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 43.13,
+                SizedBox(
+                  height: Height * 0.05,
                 ),
-                const Divider(
-                  height: 1, // Set the height of the line
+                Divider(
+                  height: Height * 0.001, // Set the height of the line
                   thickness: 1, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
-                const SizedBox(
-                  height: 50,
+                SizedBox(
+                  height: Height * 0.065,
                 ),
-                const Divider(
-                  height: 1, // Set the height of the line
+                Divider(
+                  height: Height * 0.001, // Set the height of the line
                   thickness: 1, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
-                const SizedBox(
-                  height: 30,
+                SizedBox(
+                  height: Height * 0.03,
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(
-                      width: 84,
-                    ),
                     TextButton(
                       onPressed: () => onButtonPressed(0),
                       child: const Text(
@@ -121,8 +116,8 @@ class _MyHomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      width: 85,
+                    SizedBox(
+                      width: Width * 0.25,
                     ),
                     TextButton(
                       onPressed: () => onButtonPressed(1),
@@ -137,10 +132,10 @@ class _MyHomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            const Positioned(
-              top: 250, // Adjust the top position as needed
-              left: 30.5, // Adjust the left position as needed
-              right: 30.5, // Adjust the right position as needed
+            Positioned(
+              top: Height * 0.333, // Adjust the top position as needed
+              left: Width * 0.08, // Adjust the left position as needed
+              right: Width * 0.08, // Adjust the right position as needed
               child: Divider(
                 height: 1, // Set the height of the line
                 thickness: 1, // Set the thickness of the line
@@ -150,24 +145,20 @@ class _MyHomePageState extends State<HomePage> {
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
 
-              const Positioned(
-                top: 253, // Adjust the position from the bottom
-                left: 30.5,
-                right: 179.5,
+              Positioned(
+                top: Height * 0.335, // Adjust the position from the bottom
+                left: Width * 0.08,
+                right: Width * 0.5,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(children: [
-                    const SizedBox(
-                      height: 285,
-                    ),
-                    const SizedBox(height: 16.0),
+              Center(
+                child: Column(
+                  children: [
+                    SizedBox(height: Height * 0.4),
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -178,7 +169,6 @@ class _MyHomePageState extends State<HomePage> {
                                   // Navigate to another Dart file
                                   String siteId = site['siteId'].toString();
                                   String SiteName = site['siteName'].toString();
-                                  
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -191,9 +181,9 @@ class _MyHomePageState extends State<HomePage> {
                                   );
                                 },
                                 child: Container(
-                                  width: 300,
-                                  height: 60,
-                                  margin: const EdgeInsets.only(
+                                  width: Width * 0.85,
+                                  height: Height * 0.08,
+                                  margin: EdgeInsets.only(
                                       bottom: 16), // Add margin for space
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(1),
@@ -201,43 +191,42 @@ class _MyHomePageState extends State<HomePage> {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.only(
-                                        top: 0,
-                                        left: 0), // Adjust the left padding
+                                      top: 0,
+                                      left: 0,
+                                    ), // Adjust the left padding
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        const SizedBox(width: 15),
+                                        SizedBox(width: Width * 0.05),
                                         Image.asset(
                                           'assets/logos/eye.jpg', // Replace with your image path
-                                          width:
-                                              19.7, // Adjust image width as needed
-                                          height:
-                                              13.13, // Adjust image height as needed
+                                          width: Width *
+                                              0.07, // Adjust image width as needed
+                                          height: Height *
+                                              0.02, // Adjust image height as needed
                                         ),
-                                        const SizedBox(
-                                            width:
-                                                10.3), // Add spacing between text and image
-
                                         SizedBox(
-                                          height: 15,
-                                          width: 200,
+                                            width: Width *
+                                                0.05), // Add spacing between text and image
+                                        SizedBox(
+                                          height: Height * 0.02,
+                                          width: Width * 0.55,
                                           child: Text(
                                             site['siteName']
-                                                .toString(),
-                                            overflow: TextOverflow.ellipsis, // Access the 'siteName' field
+                                                .toString(), // Access the 'siteName' field
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                               color: Colors.black,
                                             ),
                                           ),
                                         ),
-                                        SizedBox(width: 10,),
+                                        SizedBox(width: Width * 0.02),
                                         Icon(
-                              Icons.arrow_forward_ios,
-                              size: 18,
-                              color: Colors.black,
-                            ),
-
+                                          Icons.arrow_forward_ios,
+                                          size: 18,
+                                          color: Colors.black,
+                                        ),
                                         // Add spacing between text and next image
                                       ],
                                     ),
@@ -248,17 +237,17 @@ class _MyHomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                  ]),
-                ],
-              ),
+                  ],
+                ),
+              )
 
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2
-              const Positioned(
-                top: 253, // Adjust the position from the bottom
-                left: 180.5,
-                right: 29.5,
+              Positioned(
+                top: Height * 0.335, // Adjust the position from the bottom
+                right: Width * 0.08,
+                left: Width * 0.5,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
@@ -267,23 +256,24 @@ class _MyHomePageState extends State<HomePage> {
               ),
               Column(
                 children: [
-                  const SizedBox(
-                    height: 285,
+                  SizedBox(
+                    height: Height * 0.4, // Adjusted height
                   ),
                   Center(
                     child: Container(
-                      width: 300,
-                      height: 450,
+                      width: Width * 0.75, // Adjusted width
+                      height: Height * 0.56, // Adjusted height
                       color: Colors.white,
-                      child: Center(child: Text("comming soon..."),),
+                      child: Center(
+                        child: Text("coming soon..."),
+                      ),
                     ),
                   ),
                 ],
-              ),
+              )
             ],
           ],
         ),
-        drawer: DrawerWidget()
       ),
     );
     //return Scaffold(
