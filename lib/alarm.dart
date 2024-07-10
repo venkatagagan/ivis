@@ -28,11 +28,11 @@ class AlarmScreen extends StatefulWidget {
 
 class _MyHomePageState extends State<AlarmScreen> {
   int selectedButtonIndex = 0; // Track the selected button
-  DateTime FromDate=DateTime.now().subtract(Duration(days: 1));
-  DateTime ToDate =DateTime.now().subtract(Duration(days: 2));
+  DateTime? FromDate;
+  DateTime? ToDate;
 
-  DateTime _selectedFromDate=DateTime.now().subtract(Duration(days: 2));
-  DateTime _selectedToDate= DateTime.now().subtract(Duration(days: 1));
+  DateTime? _selectedFromDate;
+  DateTime? _selectedToDate;
 
   String siteId = '';
   String sitename = '';
@@ -89,8 +89,8 @@ class _MyHomePageState extends State<AlarmScreen> {
     currentIndex = widget.i;
 
     sitID = int.parse(widget.siteId);
-    _selectedFromDate =  DateTime.now().subtract(Duration(days: 2));
-    _selectedToDate =  DateTime.now().subtract(Duration(days: 1));
+    _selectedFromDate = FromDate ?? DateTime.now().subtract(Duration(days: 2));
+    _selectedToDate = ToDate ?? DateTime.now().subtract(Duration(days: 1));
     _actionTagIncidents =
         fetchActionTagIncidents(sitID, _selectedFromDate!, _selectedToDate!);
     fetchData(sitID);
@@ -331,7 +331,7 @@ class _MyHomePageState extends State<AlarmScreen> {
                                 style: TextStyle(fontSize: 15),
                                 controller: toDateController,
                                 decoration: InputDecoration(
-                                  hintText: DateFormat('yyyy-MM-dd').format(_selectedToDate).toString(),
+                                  hintText: ' YYYY-MM-DD',
                                   border: InputBorder.none,
                                 ),
                               ),
@@ -349,7 +349,6 @@ class _MyHomePageState extends State<AlarmScreen> {
                                       this.ToDate = ToDate;
                                       toDateController.text =
                                           ToDate.toString().split(' ')[0];
-                                          FromDate = DateTime.now();
                                     });
                                   }
                                 });
@@ -388,41 +387,41 @@ class _MyHomePageState extends State<AlarmScreen> {
                                 style: TextStyle(fontSize: 15),
                                 controller: fromDateController,
                                 decoration: InputDecoration(
-                                  hintText: DateFormat('yyyy-MM-dd').format(_selectedFromDate).toString(),
+                                  hintText: ' YYYY-MM-DD',
                                   border: InputBorder.none,
                                 ),
                               ),
                             ),
                             IconButton(
-  onPressed: () {
-    showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-    ).then((selectedDate) {
-      if (selectedDate != null) {
-        setState(() {
-          this.FromDate = selectedDate;
-          fromDateController.text = selectedDate.toString().split(' ')[0];
-          fetchActionTagIncidents(sitID, ToDate, selectedDate); // Call fetchActionTagIncidents here
-        });
-      }
-    });
-  },
-  icon: Icon(
-    Icons.calendar_today,
-    size: 20,
-    color: Colors.grey,
-  ),
-),
+                              onPressed: () {
+                                showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime.now(),
+                                ).then((FromDate) {
+                                  if (ToDate != null) {
+                                    setState(() {
+                                      this.FromDate = FromDate;
+                                      fromDateController.text =
+                                          FromDate.toString().split(' ')[0];
+                                          
+                                    });
+                                  }
+                                });
+                              },
+                              icon: Icon(
+                                Icons.calendar_today,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: Height*0.02,),
                 FutureBuilder<Map<String, List>>(
                   future: _actionTagIncidents,
                   builder: (context, snapshot) {
@@ -554,7 +553,7 @@ class _MyHomePageState extends State<AlarmScreen> {
                                           Row(
                                             children: [
                                               SizedBox(
-                                                width: Width * 0.6,
+                                                width: Width * 0.675,
                                                 child: Text(
                                                     'End Time: ${incident['eventToTime']}',
                                                     style: TextStyle(
@@ -562,7 +561,7 @@ class _MyHomePageState extends State<AlarmScreen> {
                                                     )),
                                               ),
                                               SizedBox(
-                                                width: Width * 0.2,
+                                                width: Width * 0.15,
                                                 child: ElevatedButton(
                                                   onPressed: () {
                                                     showDialog(

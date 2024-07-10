@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:ivis_security/home.dart';
 import 'dart:convert';
-
+import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
 // Import your API service file
@@ -46,6 +46,14 @@ class _MyHomePageState extends State<DevelopmentScreen> {
   //DateTime? _selectedDay;
   List<String> disabledDates = [];
 
+  final _dateController = TextEditingController();
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  List<String> _notWorkingDays = [];
+  bool _isLoading = false;
+  int Year = DateTime.now().year;
+
+
   String sitename = '';
   int currentIndex = 0;
   int sitID = 36323;
@@ -69,21 +77,8 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     fetchData(sitID);
     fetchSiteNames();
 
-    // selected date
-    fetchLastWorkday(siteId).then((lastWorkday) {
-      setState(() {
-        // Use _lastWorkday if _selectedDay is null
-        selectedDate = lastWorkday ?? selectedDate;
-        dateController.text = selectedDate.toString().split(' ')[0];
-      });
-    });
-
     // Initialize selectedFromDate and selectedToDate here
-    fetchNotWorkingDates(int.parse(siteId)).then((dates) {
-      setState(() {
-        disabledDates = dates;
-      });
-    });
+    notWorkingDays(Year,widget.siteId);
   }
 
   Future<void> fetchData(int accountId) async {
@@ -124,6 +119,13 @@ class _MyHomePageState extends State<DevelopmentScreen> {
       selectedButtonIndex = index; // Update the selected button index
     });
   }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -360,21 +362,96 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                               ),
                               IconButton(
                                 onPressed: () {
-                                  showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2030),
-                                  ).then((selectedDate) {
-                                    if (selectedDate != null) {
-                                      setState(() {
-                                        this.selectedDate = selectedDate;
-                                        dateController.text = selectedDate
-                                            .toString()
-                                            .split(' ')[0];
-                                      });
-                                    }
-                                  });
+                                  showDialog(
+                      context: context,
+                      builder: (context) => Dialog(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _isLoading
+                                ? Center(child: CircularProgressIndicator())
+                                : TableCalendar(
+                                    locale: 'en_US',
+                                    firstDay: DateTime(2000),
+                                    lastDay: DateTime.now(),
+                                    focusedDay: _focusedDay,
+                                    selectedDayPredicate: (day) {
+                                      return isSameDay(_selectedDay, day);
+                                    },
+                                    onPageChanged: (DateTime focusedDay) {
+                                      final currentYear = focusedDay.year;
+                                      fetchData(currentYear);
+                                    },
+                                    onDaySelected: (selectedDay, focusedDay) {
+                                      if (!_notWorkingDays.contains(
+                                          DateFormat('yyyy-MM-dd')
+                                              .format(selectedDay))) {
+                                        setState(() {
+                                          _selectedDay = selectedDay;
+                                          _focusedDay = focusedDay;
+                                          fetchData(focusedDay.year);
+
+                                          _dateController.text =
+                                              DateFormat('yyyy-MM-dd')
+                                                  .format(selectedDay);
+                                          Navigator.pop(
+                                              context); // Close the dialog
+                                        });
+                                      }
+                                    },
+                                    calendarBuilders: CalendarBuilders(
+                                      disabledBuilder: (context, date, _) {
+                                        final dateFormat =
+                                            DateFormat('yyyy-MM-dd');
+                                        if (_notWorkingDays.contains(
+                                            dateFormat.format(date))) {
+                                          return Center(
+                                            child: Text(
+                                              DateFormat.d().format(date),
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            ),
+                                          );
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    enabledDayPredicate: (date) {
+                                      final dateFormat =
+                                          DateFormat('yyyy-MM-dd');
+                                      return !_notWorkingDays
+                                          .contains(dateFormat.format(date));
+                                    },
+                                    availableCalendarFormats: {
+                                      CalendarFormat.month: 'Month',
+                                    },
+                                    calendarStyle: CalendarStyle(
+                                      isTodayHighlighted: true,
+                                      selectedDecoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      todayDecoration: BoxDecoration(
+                                        color: Colors.orange,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      disabledTextStyle:
+                                          TextStyle(color: Colors.red),
+                                    ),
+                                    headerStyle: HeaderStyle(
+                                        formatButtonVisible: false,
+                                        titleCentered: true),
+                                  ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Close'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
                                 },
                                 icon: Icon(Icons.calendar_today),
                               ),
@@ -722,53 +799,30 @@ class _MyHomePageState extends State<DevelopmentScreen> {
 
   //disable not working dates
 
-  Future<List<String>> fetchNotWorkingDates(int site) async {
-    final apiUrl =
-        "http://rsmgmt.ivisecurity.com:951/insights/notWorkingDays_1_0?siteId=$siteId&year=2023";
+  Future<void> notWorkingDays(int year,String siteId) async {
+    setState(() {
+      _isLoading = true;
+    });
 
-    try {
-      final response = await http.get(Uri.parse(apiUrl));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        if (data['NotWorkingDaysList'] != null) {
-          List<String> notWorkingDates =
-              List<String>.from(data['NotWorkingDaysList']);
-          return notWorkingDates;
-        } else {
-          return [];
-        }
-      } else {
-        return [];
-      }
-    } catch (e) {
-      return [];
-    }
-  }
-
-//date data
-  // Add an async function to fetch the last workday from the API
-  Future<DateTime> fetchLastWorkday(siteId) async {
-    DateTime now = DateTime.now();
-
-    // Get the current year from the date
-    int currentYear = now.year;
-    final apiUrl =
-        "http://rsmgmt.ivisecurity.com:951/insights/notWorkingDays_1_0?siteId=$sitID&year=$currentYear";
-
-    // Make the HTTP request
-    final response = await http.get(Uri.parse(apiUrl));
+    final url =
+        'http://rsmgmt.ivisecurity.com:951/insights/notWorkingDays_1_0?siteId=$siteId&year=$year';
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      // Assuming the API response has a field 'lastWorkday'
-      final String lastWorkdayString = data['LastWorkingDay'];
-      // Parse the date from the string
-      final DateTime lastWorkday = DateTime.parse(lastWorkdayString);
-      return lastWorkday;
+      final data = json.decode(response.body);
+      List<String> notWorkingDaysList =
+          List<String>.from(data['NotWorkingDaysList']);
+      String lastWorkingDay = data['LastWorkingDay'];
+
+      setState(() {
+        _notWorkingDays = notWorkingDaysList;
+        _selectedDay = DateTime.parse(lastWorkingDay);
+        _focusedDay = _selectedDay!;
+        _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDay!);
+        _isLoading = false;
+      });
     } else {
-      // Handle error when the API request fails
-      throw Exception('Failed to load last workday');
+      throw Exception('Failed to load data');
     }
   }
 
@@ -841,27 +895,24 @@ class YourWidget extends StatelessWidget {
   }
 
   @override
-
   Widget build(BuildContext context) {
-    double Height=MediaQuery.of(context).size.height;
-    double Width = MediaQuery.of(context).size.width;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(height: Height*0.01),
+        SizedBox(height: 10),
 
         // Create a list of Container widgets for each item in analyticsList
         for (var analytics in analyticsList) ...[
           SizedBox(
-            height: Height*0.01,
+            height: 10,
           ),
 
           // ignore: unnecessary_null_comparison
           if (analytics != null && analytics['service'] is String)
             SingleChildScrollView(
               child: Container(
-                width: Width*0.72,
-                height: Height*0.12,
+                width: 300,
+                height: 100,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(1),
                   borderRadius: BorderRadius.circular(5),
@@ -873,14 +924,14 @@ class YourWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SizedBox(
-                          height: Height*0.01,
+                          height: 14,
                         ),
                         SizedBox(
-                            width: Width*0.72,
+                            width: 300,
                             child: Row(
                               children: [
                                 SizedBox(
-                                  width: Width*0.05,
+                                  width: 18,
                                 ),
                                 Flexible(
                                   flex: 2, // Adjust this flex value as needed
@@ -895,7 +946,7 @@ class YourWidget extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: Width*0.01,
+                                  width: 5,
                                 ),
                                 Flexible(
                                   flex: 2, // Adjust this flex value as needed
@@ -911,16 +962,16 @@ class YourWidget extends StatelessWidget {
                               ],
                             )),
                         SizedBox(
-                          height: Height*0.01,
+                          height: 8,
                         ),
                         Row(
                           children: [
                             SizedBox(
-                              width: Width*0.05,
+                              width: 18,
                             ),
                             Container(
-                              height: Height*0.06,
-                              width: Width*0.2,
+                              height: 50,
+                              width: 80,
                               decoration: BoxDecoration(
                                 color: getColorBasedOnCriteria(
                                     analytics['analytics'][0]['status']),
@@ -929,12 +980,12 @@ class YourWidget extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: Height*0.005,
+                                    height: 8,
                                   ),
                                   Row(
                                     children: [
                                       SizedBox(
-                                        width: Width*0.03,
+                                        width: 13,
                                       ),
                                       Text(
                                         '${analytics['analytics'][0]['type']}',
@@ -958,7 +1009,7 @@ class YourWidget extends StatelessWidget {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 2,
+                                    height: 5,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -1017,7 +1068,7 @@ class YourWidget extends StatelessWidget {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 2,
+                                    height: 5,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -1076,7 +1127,7 @@ class YourWidget extends StatelessWidget {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 2,
+                                    height: 5,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
