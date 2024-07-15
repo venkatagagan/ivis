@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const ForgotPasswordScreen());
-}
+import 'package:ivis_security/apis/ForgotApi.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
-  // ignore: use_key_in_widget_constructors
-  const ForgotPasswordScreen({Key? key});
+  const ForgotPasswordScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,25 +48,34 @@ class ForgotPasswordScreen extends StatelessWidget {
                 ],
               ),
             ),
-            _VersionTextVisibility(),
+            const VersionTextVisibility(),
           ],
         ),
       ),
     );
   }
 }
-class ForgotForm extends StatelessWidget {
-  const ForgotForm({super.key});
+
+class ForgotForm extends StatefulWidget {
+  const ForgotForm({Key? key}) : super(key: key);
+
+  @override
+  _ForgotFormState createState() => _ForgotFormState();
+}
+
+class _ForgotFormState extends State<ForgotForm> {
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [ 
+      children: [
         const SizedBox(height: 20),
-        const TextField(
-          decoration: InputDecoration(
-            labelText: ' Username or e-mail',
+        TextField(
+          controller: _emailController,
+          decoration: const InputDecoration(
+            labelText: 'Username or e-mail',
             border: OutlineInputBorder(),
             filled: true,
           ),
@@ -78,22 +83,68 @@ class ForgotForm extends StatelessWidget {
         const SizedBox(height: 40),
         ElevatedButton(
           onPressed: () {
-            // Handle login button press
+            final String email = _emailController.text.trim();
+            if (email.isNotEmpty) {
+              ApiService.sendResetLink(context, email);
+            } else {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              SizedBox(height: 40),
+                              Text(
+                                'Fill the mail ',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'mail',
+                                  filled: true,
+                                  fillColor: Colors.grey[200],
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                                enabled: false,
+                              ),
+                              SizedBox(height: 20),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IconButton(
+                            icon: Icon(Icons.close, color: Colors.red),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
           },
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(150, 50),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-            backgroundColor: Colors.blue,
-          ),
-          child: const Text(
-            'Confirm',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
-          ),
+          child: const Text('Send Reset Link'),
         ),
         const SizedBox(height: 20),
       ],
@@ -101,33 +152,35 @@ class ForgotForm extends StatelessWidget {
   }
 }
 
+class VersionTextVisibility extends StatefulWidget {
+  const VersionTextVisibility({Key? key}) : super(key: key);
 
-
-class _VersionTextVisibility extends StatefulWidget {
   @override
-  __VersionTextVisibilityState createState() => __VersionTextVisibilityState();
+  _VersionTextVisibilityState createState() => _VersionTextVisibilityState();
 }
 
-class __VersionTextVisibilityState extends State<_VersionTextVisibility> {
+class _VersionTextVisibilityState extends State<VersionTextVisibility>
+    with WidgetsBindingObserver {
   bool _isKeyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(KeyboardVisibilityObserver(
-      onKeyboardVisibilityChanged: (bool visible) {
-        setState(() {
-          _isKeyboardVisible = visible;
-        });
-      },
-    ));
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    // ignore: avoid_types_as_parameter_names
-    WidgetsBinding.instance.removeObserver(KeyboardVisibilityObserver(onKeyboardVisibilityChanged: (bool ) {  }));
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    setState(() {
+      _isKeyboardVisible = bottomInset > 0;
+    });
   }
 
   @override
@@ -147,18 +200,5 @@ class __VersionTextVisibilityState extends State<_VersionTextVisibility> {
         ),
       ),
     );
-  }
-}
-
-class KeyboardVisibilityObserver extends WidgetsBindingObserver {
-  final Function(bool) onKeyboardVisibilityChanged;
-
-  KeyboardVisibilityObserver({required this.onKeyboardVisibilityChanged});
-
-  @override
-  void didChangeMetrics() {
-    // ignore: deprecated_member_use
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
-    onKeyboardVisibilityChanged(bottomInset > 0);
   }
 }

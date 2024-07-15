@@ -37,8 +37,9 @@ class _MyHomePageState extends State<AlarmScreen> {
   String siteId = '';
   String sitename = '';
   int currentIndex = 0;
-  TextEditingController fromDateController = TextEditingController();
-  TextEditingController toDateController = TextEditingController();
+  TextEditingController _fromDateController = TextEditingController();
+  TextEditingController _toDateController = TextEditingController();
+  DateTime _fromDate = DateTime.now();
 
   List<TdpCamera> listOfCamera = [];
 
@@ -52,13 +53,41 @@ class _MyHomePageState extends State<AlarmScreen> {
   Future<Map<String, List>>? _actionTagIncidents;
   Map<String, bool> _expandedState = {};
 
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller,
+      {bool isFromDate = false}) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        if (isFromDate) {
+          _fromDate = pickedDate;
+          controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+        } else {
+          if (_fromDate != null && pickedDate.isBefore(_fromDate!)) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('To Date must not be earlier than From Date'),
+            ));
+          } else {
+            controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+             }
+        }
+      });
+    }
+  }
+
   Future<Map<String, List>> fetchActionTagIncidents(
       int siteId, DateTime fromDate, DateTime toDate) async {
-    final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-    final String fromDateString = dateFormat.format(fromDate);
-    final String toDateString = dateFormat.format(toDate);
-    final response = await http.get(Uri.parse(
-        'http://rsmgmt.ivisecurity.com:8945/incidents/ListIncidentsForMobileApp_1_0?siteId=$siteId&fromDate=$fromDateString&toDate=$toDateString'));
+    final FromDate = DateFormat('yyyy-MM-dd').format(fromDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 2)));
+    final ToDate = DateFormat('yyyy-MM-dd').format(toDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 1)));
+    final String url =
+        'http://rsmgmt.ivisecurity.com:8945/incidents/ListIncidentsForMobileApp_1_0?siteId=36337&fromDate=$FromDate&toDate=$ToDate';
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -91,8 +120,10 @@ class _MyHomePageState extends State<AlarmScreen> {
     sitID = int.parse(widget.siteId);
     _selectedFromDate = FromDate ?? DateTime.now().subtract(Duration(days: 2));
     _selectedToDate = ToDate ?? DateTime.now().subtract(Duration(days: 1));
-    _actionTagIncidents =
-        fetchActionTagIncidents(sitID, _selectedFromDate!, _selectedToDate!);
+     fetchActionTagIncidents(
+        sitID,
+        DateTime.now().subtract(Duration(days: 80)),
+        DateTime.now().subtract(Duration(days: 1)));
     fetchData(sitID);
     fetchSiteNames();
   }
@@ -263,19 +294,18 @@ class _MyHomePageState extends State<AlarmScreen> {
               left: MediaQuery.of(context).size.width / 2 -
                   75, // Adjust the position from the left
               top: 135, // Center vertically
-              child:SizedBox(width: MediaQuery.of(context).size.width*0.5, child: 
-               Center(child:  Text(
-                widget.Sitename,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Center(
+                  child: Text(
+                    widget.Sitename,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-               ),
               ),
-              ),
-              
-              
-
             ),
             Column(
               children: [
@@ -329,29 +359,18 @@ class _MyHomePageState extends State<AlarmScreen> {
                             Expanded(
                               child: TextField(
                                 style: TextStyle(fontSize: 15),
-                                controller: toDateController,
+                                controller: _fromDateController,
                                 decoration: InputDecoration(
-                                  hintText: ' YYYY-MM-DD',
+                                  hintText:
+                                      ' ${DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 2)))}',
                                   border: InputBorder.none,
                                 ),
                               ),
                             ),
                             IconButton(
                               onPressed: () {
-                                showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime.now(),
-                                ).then((ToDate) {
-                                  if (ToDate != null) {
-                                    setState(() {
-                                      this.ToDate = ToDate;
-                                      toDateController.text =
-                                          ToDate.toString().split(' ')[0];
-                                    });
-                                  }
-                                });
+                                _selectDate(context, _fromDateController,
+                                    isFromDate: true);
                               },
                               icon: Icon(
                                 Icons.calendar_today,
@@ -385,30 +404,17 @@ class _MyHomePageState extends State<AlarmScreen> {
                             Expanded(
                               child: TextField(
                                 style: TextStyle(fontSize: 15),
-                                controller: fromDateController,
+                                controller: _toDateController,
                                 decoration: InputDecoration(
-                                  hintText: ' YYYY-MM-DD',
+                                  hintText:
+                                      '${DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 1)))}',
                                   border: InputBorder.none,
                                 ),
                               ),
                             ),
                             IconButton(
                               onPressed: () {
-                                showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime.now(),
-                                ).then((FromDate) {
-                                  if (ToDate != null) {
-                                    setState(() {
-                                      this.FromDate = FromDate;
-                                      fromDateController.text =
-                                          FromDate.toString().split(' ')[0];
-                                          
-                                    });
-                                  }
-                                });
+                                _selectDate(context, _toDateController);
                               },
                               icon: Icon(
                                 Icons.calendar_today,
@@ -422,8 +428,30 @@ class _MyHomePageState extends State<AlarmScreen> {
                     ),
                   ],
                 ),
+                SizedBox(
+                  height: Height * 0.05,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      fetchActionTagIncidents(
+                          sitID,DateTime.parse(_fromDateController.text),DateTime.parse(_toDateController.text));
+                    });
+                  },
+                  child: Text('Submit'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.blue, // background color
+                    onPrimary: Colors.white, // text color
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15), // size
+                  ),
+                ),
                 FutureBuilder<Map<String, List>>(
-                  future: _actionTagIncidents,
+                  future:  fetchActionTagIncidents(
+        sitID,
+        DateTime.now().subtract(Duration(days: 80)),
+        DateTime.now().subtract(Duration(days: 1)))
+    ,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());

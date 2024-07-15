@@ -1,3 +1,70 @@
+Stack(
+              children: [
+                // Positioned user avatar
+                Positioned(
+                  top: 40,
+                  left: 20,
+                  child: CircleAvatar(
+                    radius: 30, // Adjust the radius as needed
+                    backgroundColor:
+                        Colors.grey.shade200, // Background color while loading
+                    child: ClipOval(
+                      child: Image.network(
+                        img,
+                        fit: BoxFit.cover,
+                        errorBuilder: (BuildContext context, Object exception,
+                            StackTrace? stackTrace) {
+                          return Icon(
+                            Icons.person,
+                            size:
+                                50, // Adjust the size to fit the CircleAvatar radius
+                            color: Colors.grey,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                // Positioned account name
+                Positioned(
+                  top: 50,
+                  left: 100,
+                  right: 73,
+                  child: Text(
+                    '$Name \n$phno \n$mail',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 108,
+                  left: 100,
+                  right: 86,
+                  child: Text(
+                    "$add1\n$add2\n$dist\ $city $state,\n$country $pincode",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 207,
+                  left: 100,
+                  child: Text(
+                    contact,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                // Positioned account email
+              ],
+            ),
+****************************
 @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -48,7 +48,6 @@ class _MyHomePageState extends State<CctvScreen> {
 
   late Map<String, dynamic> services;
   String liveview = "F";
-  
 
   @override
   void initState() {
@@ -62,7 +61,7 @@ class _MyHomePageState extends State<CctvScreen> {
     fetchSiteNames();
     fetchData(sitID);
   }
-  
+
   Future<void> fetchData(int accountId) async {
     try {
       final Map<String, dynamic> response =
@@ -72,7 +71,6 @@ class _MyHomePageState extends State<CctvScreen> {
         services = response;
 
         liveview = services['siteServicesList']['live'] ?? 'F';
-        
       });
     } catch (e) {
       print('Error fetching client services: $e');
@@ -129,6 +127,8 @@ class _MyHomePageState extends State<CctvScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -142,13 +142,12 @@ class _MyHomePageState extends State<CctvScreen> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            
             Column(
               children: [
-                const SizedBox(height: 50),
+                SizedBox(height: Height * 0.08),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    SizedBox(width: Width * 0.1),
                     Builder(
                       builder: (context) => GestureDetector(
                         onTap: () {
@@ -165,8 +164,8 @@ class _MyHomePageState extends State<CctvScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
+                    SizedBox(
+                      width: Width * 0.05,
                     ),
                     GestureDetector(
                       onTap: () {
@@ -179,14 +178,14 @@ class _MyHomePageState extends State<CctvScreen> {
                       },
                       child: Image.asset(
                         'assets/logos/logo.png',
-                        height: 26.87,
-                        width: 218.25,
+                        height: Height * 0.04,
+                        width: Width * 0.6,
                       ),
                     )
                   ],
                 ),
-                const SizedBox(
-                  height: 43.13,
+                SizedBox(
+                  height: Height * 0.04,
                 ),
                 const Divider(
                   height: 1, // Set the height of the line
@@ -194,23 +193,78 @@ class _MyHomePageState extends State<CctvScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
                 SizedBox(
-                  height: 50,
+                  height: Height * 0.07,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 200,
-                        height: 15,
-                        child: Center(
-                          child: Text(
-                            sitename,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
+                        width: Width * 0.05,
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.arrow_back_ios),
+                        onPressed: currentIndex > 0
+                            ? () {
+                                String siteId = siteNames[currentIndex - 1]
+                                        ['siteId']
+                                    .toString();
+                                String sitename = siteNames[currentIndex - 1]
+                                        ['siteName']
+                                    .toString();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CctvScreen(
+                                      i: currentIndex - 1,
+                                      siteId: siteId,
+                                      Sitename: sitename,
+                                    ),
+                                  ),
+                                );
+                              }
+                            : null,
+                        iconSize: 21.13,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                          height: Height * 0.05,
+                          width: Width * 0.6,
+                          child: Center(
+                            child: Text(
+                              sitename,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        ),
+                          )),
+                      SizedBox(
+                        width: Width * 0.01,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_forward_ios),
+                        onPressed: currentIndex < siteNames.length - 1
+                            ? () {
+                                String siteId = siteNames[currentIndex + 1]
+                                        ['siteId']
+                                    .toString();
+                                String sitename = siteNames[currentIndex + 1]
+                                        ['siteName']
+                                    .toString();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CctvScreen(
+                                      i: currentIndex + 1,
+                                      siteId: siteId,
+                                      Sitename: sitename,
+                                    ),
+                                  ),
+                                );
+                              }
+                            : null,
+                        iconSize: 21.13,
+                        color: Colors.white,
                       ),
                     ],
                   ),
@@ -220,146 +274,82 @@ class _MyHomePageState extends State<CctvScreen> {
                   thickness: 1, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
-                const SizedBox(
-                  height: 32,
+                 SizedBox(
+                  height: Height*0.03,
+                ),
+                Row(
+                  //49,24,34
+                  children: [
+                     SizedBox(
+                      width: Width*0.13,
+                    ),
+                    TextButton(
+                      onPressed: () => onButtonPressed(0),
+                      child: const Text(
+                        'CAMERAS',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11, // Set the text color to black
+                          // Thickness of the underline
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: Width*0.06,
+                    ),
+                    TextButton(
+                      onPressed: () => onButtonPressed(1),
+                      child: const Text(
+                        'MONITORING',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11, // Set the text color to black
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: Width*0.06,
+                    ),
+                    TextButton(
+                      onPressed: () => onButtonPressed(2),
+                      child: const Text(
+                        'STATUS',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11, // Set the text color to black
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 
-                  Row(
-                    //49,24,34
-                    children: [
-                      const SizedBox(
-                        width: 49,
-                      ),
-                      TextButton(
-                        onPressed: () => onButtonPressed(0),
-                        child: const Text(
-                          'CAMERAS',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11, // Set the text color to black
-                            // Thickness of the underline
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 24,
-                      ),
-                      TextButton(
-                        onPressed: () => onButtonPressed(1),
-                        child: const Text(
-                          'MONITORING',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11, // Set the text color to black
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 34,
-                      ),
-                      TextButton(
-                        onPressed: () => onButtonPressed(2),
-                        child: const Text(
-                          'STATUS',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11, // Set the text color to black
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                const SizedBox(
-                  height: 12,
-                ),
-                const Row(
-                  children: [
-                    SizedBox(
-                      width: 30.5,
-                    ),
+                SizedBox(width: Width*0.85,child:
                     Divider(
                       height: 1,
                       // Set the height of the line
                       thickness: 1, // Set the thickness of the line
                       color: Colors.white, // Set the color of the line
                     ),
-                  ],
                 ),
               ],
             ),
-            
-            Positioned(
-              left: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: currentIndex > 0
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex - 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex - 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CctvScreen(
-                              i: currentIndex - 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            
-            Positioned(
-              right: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: currentIndex < siteNames.length - 1
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex + 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex + 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CctvScreen(
-                              i: currentIndex + 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
-              const Positioned(
-                top: 250, // Adjust the position from the bottom
-                right: 230.5,
-                left: 29.5,
+               Positioned(
+                top: Height*0.33, // Adjust the position from the bottom
+                right: Width*0.65,
+                left: Width*0.075,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
               ),
+              
               Column(
                 children: [
-                  const SizedBox(
-                    height: 300,
+                  SizedBox(
+                    height: Height*0.4,
                   ),
                   if (listOfCamera.isNotEmpty)
                     Expanded(
@@ -388,8 +378,8 @@ class _MyHomePageState extends State<CctvScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
-                                        height: 260,
-                                        width: 300,
+                                        height: Height*0.35,
+                                        width: Width*0.85,
                                         decoration: ShapeDecoration(
                                           color: Colors.white,
                                           shape: RoundedRectangleBorder(
@@ -449,34 +439,25 @@ class _MyHomePageState extends State<CctvScreen> {
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2
-              const Positioned(
-                top: 250, // Adjust the position from the bottom
-                left: 130.5,
-                right: 129.5,
+               Positioned(
+                top: Height*0.33, // Adjust the position from the bottom
+                left: Width*0.35,
+                right: Width*0.35,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
               ),
-              const Positioned(
-                top: 250, // Adjust the position from the bottom
-                left: 130.5,
-                right: 129.5,
-                child: Divider(
-                  height: 1, // Set the height of the line
-                  thickness: 6, // Set the thickness of the line
-                  color: Colors.white, // Set the color of the line
-                ),
-              ),
+              
               Positioned(
                 top: 272, // Adjust the position from the bottom
                 left: 30,
                 child: Column(
                   children: [
                     Container(
-                      width: 300,
-                      height: 50,
+                      width: Width*0.85,
+                      height: Height*0.07,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(1),
                         borderRadius: BorderRadius.circular(5),
@@ -487,9 +468,9 @@ class _MyHomePageState extends State<CctvScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const SizedBox(
+                            SizedBox(
                                 width:
-                                    25), // Add spacing between text and image
+                                    Width*0.1), // Add spacing between text and image
                             const Text(
                               'Hours',
                               style: TextStyle(
@@ -498,9 +479,9 @@ class _MyHomePageState extends State<CctvScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(
+                            SizedBox(
                                 width:
-                                    176), // Add spacing between text and next image
+                                    Width*0.45), // Add spacing between text and next image
                             InkWell(
                               onTap: () {
                                 Navigator.push(
@@ -517,19 +498,19 @@ class _MyHomePageState extends State<CctvScreen> {
                               },
                               child: Image.asset(
                                 'assets/logos/Rectangle.png',
-                                height: 25,
-                                width: 45,
+                                height: Height*0.05,
+                                width: Width*0.2,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
+                    SizedBox(
+                      height:Height*0.03,
                     ),
                     Container(
-                      width: 300,
+                      width: Width*0.85,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(1),
                         borderRadius: BorderRadius.circular(5),
@@ -540,17 +521,15 @@ class _MyHomePageState extends State<CctvScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Column(
-                              children: [
                                 Column(
                                   children: [
                                     SizedBox(
-                                      height: 23,
+                                      height: Height*0.03,
                                     ),
                                     Row(
                                       children: [
                                         SizedBox(
-                                          width: 266,
+                                          width: Width*0.75,
                                         ),
                                         InkWell(
                                           onTap: () {
@@ -575,7 +554,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                       ],
                                     ),
                                     SizedBox(
-                                      height: 22,
+                                      height: Height*0.03,
                                     ),
                                     // ignore: unused_local_variable
                                     for (String site in monitoringNames)
@@ -585,7 +564,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                           Row(
                                             children: [
                                               SizedBox(
-                                                width: 25,
+                                                width: 0.05,
                                               ),
                                               Text(
                                                 site,
@@ -599,7 +578,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                             ],
                                           ),
                                           SizedBox(
-                                            height: 16,
+                                            height: Height*0.05,
                                           ),
                                           Divider(
                                             color: Colors.black,
@@ -609,29 +588,28 @@ class _MyHomePageState extends State<CctvScreen> {
                                             // Thickness of the divider
                                           ),
                                           SizedBox(
-                                            height: 16,
+                                            height: Height*0.05,
                                           ),
                                         ],
                                       )),
                                   ],
                                 ),
-                              ],
-                            ),
+                             
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
+                    SizedBox(
+                      height: Height*0.05,
                     ),
                   ],
                 ),
               ),
             ] else if (selectedButtonIndex == 2) ...[
-              const Positioned(
-                top: 250, // Adjust the position from the bottom
-                left: 230.5,
-                right: 29.5,
+              Positioned(
+                top: Height*0.33, // Adjust the position from the bottom
+                left: Width*0.65,
+                right: Width*0.075,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
@@ -649,20 +627,25 @@ class _MyHomePageState extends State<CctvScreen> {
                 ),
               )
             ],
-            if(liveview == "F")
-            ...[
-            Column(children: [
-              SizedBox(height: MediaQuery.of(context).size.height *0.233,),
-              Container(
-                height: MediaQuery.of(context).size.height *0.7024,
-                width: MediaQuery.of(context).size.width *1,
-                color: Colors.black54
-                ,
-                child: Center(child:  Text("You have not availed this service.\n To subscribe please CONTACT",
-                style: TextStyle(color: Colors.white),),
-              )
-              ,)
-            ],),
+            if (liveview == "F") ...[
+              Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.233,
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.7024,
+                    width: MediaQuery.of(context).size.width * 1,
+                    color: Colors.black54,
+                    child: Center(
+                      child: Text(
+                        "You have not availed this service.\n To subscribe please CONTACT",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ],
           ],
         ),

@@ -33,7 +33,7 @@ class _OneStopScreenState extends State<DrawerWidget> {
   @override
   void initState() {
     super.initState();
-    userId = LoginApiService.UserName;
+    userId = LoginApiService.UserId.toString();
     fetchUserData(userId);
   }
 

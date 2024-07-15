@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/login_api_service.dart';
 import 'package:ivis_security/forgot_Pass.dart';
 
-void main() {
-  runApp(const LoginScreen());
-}
 
 class LoginScreen extends StatelessWidget {
   // ignore: use_key_in_widget_constructors
@@ -16,6 +13,19 @@ class LoginScreen extends StatelessWidget {
     double Width = MediaQuery.of(context).size.width;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        textTheme: TextTheme(
+          bodyText1: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
+          bodyText2: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
+          headline1: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w700),
+          headline2: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w700),
+          headline3: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w500),
+          headline4: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w500),
+          headline5: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
+          headline6: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
+        ),
+      ),
       home: Scaffold(
         body: Stack(
           children: [
@@ -32,8 +42,8 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(height: Height * 0.1),
                   Image.asset(
                     'assets/logos/logo.png',
-                    height: Height * 0.05,
-                    width: Width * 0.8,
+                    height: Height * 0.035,
+                    width: Width * 0.65,
                   ),
                   SizedBox(height: Height * 0.1),
                   const Text(
@@ -128,7 +138,7 @@ class _LoginFormState extends State<LoginForm> {
         SizedBox(height: Height * 0.025),
         Row(
           children: [
-            SizedBox(width: Width * 0.45),
+            SizedBox(width: Width * 0.4),
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -167,6 +177,7 @@ class _LoginFormState extends State<LoginForm> {
           onPressed: () {
             // Handle login button press
             _handleLogin(context);
+            
           },
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(150, 50),
