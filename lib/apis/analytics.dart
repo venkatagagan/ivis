@@ -6,12 +6,11 @@ import 'package:intl/intl.dart';
 
 
 Future<Map<String, dynamic>> fetchDatas(
-    DateTime selectedDate, int siteId) async {
-  final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-
+    String selectedDate, int siteId) async {
+  
   
   final String fullUrl =
-      'http://rsmgmt.ivisecurity.com:951/insights/getAnalyticsListforSite_1_0?SiteId=$siteId&date=$formattedDate';
+      'http://rsmgmt.ivisecurity.com:951/insights/getAnalyticsListforSite_1_0?SiteId=36347&date=2024-05-22';
 
   try {
     final response = await http.get(Uri.parse(fullUrl));

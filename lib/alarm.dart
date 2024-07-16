@@ -8,6 +8,7 @@ import 'package:ivis_security/home.dart';
 import 'package:ivis_security/drawer.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:video_player/video_player.dart';
 
 // ignore: must_be_immutable
 class AlarmScreen extends StatefulWidget {
@@ -28,18 +29,10 @@ class AlarmScreen extends StatefulWidget {
 
 class _MyHomePageState extends State<AlarmScreen> {
   int selectedButtonIndex = 0; // Track the selected button
-  DateTime? FromDate;
-  DateTime? ToDate;
-
-  DateTime? _selectedFromDate;
-  DateTime? _selectedToDate;
 
   String siteId = '';
   String sitename = '';
   int currentIndex = 0;
-  TextEditingController _fromDateController = TextEditingController();
-  TextEditingController _toDateController = TextEditingController();
-  DateTime _fromDate = DateTime.now();
 
   List<TdpCamera> listOfCamera = [];
 
@@ -50,65 +43,10 @@ class _MyHomePageState extends State<AlarmScreen> {
   //site names
   List<dynamic> siteNames = [];
 
-  Future<Map<String, List>>? _actionTagIncidents;
-  Map<String, bool> _expandedState = {};
-
-  Future<void> _selectDate(
-      BuildContext context, TextEditingController controller,
-      {bool isFromDate = false}) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        if (isFromDate) {
-          _fromDate = pickedDate;
-          controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-        } else {
-          if (_fromDate != null && pickedDate.isBefore(_fromDate!)) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('To Date must not be earlier than From Date'),
-            ));
-          } else {
-            controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-             }
-        }
-      });
-    }
-  }
-
-  Future<Map<String, List>> fetchActionTagIncidents(
-      int siteId, DateTime fromDate, DateTime toDate) async {
-    final FromDate = DateFormat('yyyy-MM-dd').format(fromDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 2)));
-    final ToDate = DateFormat('yyyy-MM-dd').format(toDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 1)));
-    final String url =
-        'http://rsmgmt.ivisecurity.com:8945/incidents/ListIncidentsForMobileApp_1_0?siteId=36337&fromDate=$FromDate&toDate=$ToDate';
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      List incidents = data['IncidentList'];
-
-      Map<String, List> actionTagIncidents = {};
-
-      for (var incident in incidents) {
-        String actionTag = incident['actionTag'];
-        if (actionTagIncidents.containsKey(actionTag)) {
-          actionTagIncidents[actionTag]!.add(incident);
-        } else {
-          actionTagIncidents[actionTag] = [incident];
-        }
-      }
-
-      return actionTagIncidents;
-    } else {
-      throw Exception('Failed to load incident list');
-    }
-  }
+  //date
+  late TextEditingController _dateController1;
+  late TextEditingController _dateController2;
+  final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
 
   @override
   void initState() {
@@ -118,14 +56,62 @@ class _MyHomePageState extends State<AlarmScreen> {
     currentIndex = widget.i;
 
     sitID = int.parse(widget.siteId);
-    _selectedFromDate = FromDate ?? DateTime.now().subtract(Duration(days: 2));
-    _selectedToDate = ToDate ?? DateTime.now().subtract(Duration(days: 1));
-     fetchActionTagIncidents(
-        sitID,
-        DateTime.now().subtract(Duration(days: 80)),
-        DateTime.now().subtract(Duration(days: 1)));
+    DateTime now = DateTime.now();
+    DateTime yesterday = now.subtract(const Duration(days: 1));
+    _dateController1 =
+        TextEditingController(text: _dateFormat.format(yesterday));
+    _dateController2 = TextEditingController(text: _dateFormat.format(now));
+
     fetchData(sitID);
     fetchSiteNames();
+  }
+
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        controller.text = _dateFormat.format(pickedDate);
+      });
+    }
+  }
+
+  Map<String, List<Incident>> groupIncidentsByActionTag(
+      List<Incident> incidents) {
+    Map<String, List<Incident>> groupedIncidents = {};
+    for (var incident in incidents) {
+      if (!groupedIncidents.containsKey(incident.actionTag)) {
+        groupedIncidents[incident.actionTag] = [];
+      }
+      groupedIncidents[incident.actionTag]!.add(incident);
+    }
+    return groupedIncidents;
+  }
+
+  @override
+  void dispose() {
+    _dateController1.dispose();
+    _dateController2.dispose();
+    super.dispose();
+  }
+
+  Future<List<Incident>> fetchIncidents(String fromDate, String toDate,String siteId) async {
+    final response = await http.get(
+      Uri.parse(
+          'http://rsmgmt.ivisecurity.com:8945/incidents/ListIncidentsForMobileApp_1_0?siteId=$siteId&fromDate=$fromDate&toDate=$toDate'),
+    );
+
+    if (response.statusCode == 200) {
+      final List incidentsJson = json.decode(response.body)['IncidentList'];
+      return incidentsJson.map((json) => Incident.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load incidents');
+    }
   }
 
   Future<void> fetchSiteNames() async {
@@ -332,354 +318,75 @@ class _MyHomePageState extends State<AlarmScreen> {
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: Height * 0.02,
-                ),
+                SizedBox(height: Height*0.01,),
                 Row(
+                  
                   children: [
-                    SizedBox(
-                      width: Width * 0.05,
+                    SizedBox(width: Width*0.05,),
+                     Container(
+                        width: Width*0.4,
+                        decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(1),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+            
+                        child: TextFormField(
+                        controller: _dateController1,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.calendar_today,),
+                            onPressed: () =>
+                                _selectDate(context, _dateController1),
+                          ),
+                        ),
+                        readOnly: true,
+                      ),
                     ),
+                    SizedBox(width: Width*0.08,),
                     Container(
-                      width: Width * 0.4,
-                      height: Height * 0.05,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1,
+                        width: Width*0.4,
+                        decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(1),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+            
+                        
+                        child: TextFormField(
+                        controller: _dateController2,
+                        decoration: InputDecoration(
+                          
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.calendar_today),
+                            onPressed: () =>
+                                _selectDate(context, _dateController2),
+                          ),
                         ),
+                        readOnly: true,
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 0, top: 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                style: TextStyle(fontSize: 15),
-                                controller: _fromDateController,
-                                decoration: InputDecoration(
-                                  hintText:
-                                      ' ${DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 2)))}',
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                _selectDate(context, _fromDateController,
-                                    isFromDate: true);
-                              },
-                              icon: Icon(
-                                Icons.calendar_today,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: Width * 0.08,
-                    ),
-                    Container(
-                      width: Width * 0.4,
-                      height: Height * 0.05,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 0, top: 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                style: TextStyle(fontSize: 15),
-                                controller: _toDateController,
-                                decoration: InputDecoration(
-                                  hintText:
-                                      '${DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 1)))}',
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                _selectDate(context, _toDateController);
-                              },
-                              icon: Icon(
-                                Icons.calendar_today,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    
+                    )
                   ],
                 ),
-                SizedBox(
-                  height: Height * 0.05,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      fetchActionTagIncidents(
-                          sitID,DateTime.parse(_fromDateController.text),DateTime.parse(_toDateController.text));
-                    });
-                  },
-                  child: Text('Submit'),
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.blue, // background color
-                    onPrimary: Colors.white, // text color
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15), // size
+                
+                Expanded(
+                  child: FutureBuilder<List<Incident>>(
+                    future: fetchIncidents(
+                        _dateController1.text, _dateController2.text,siteId),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('No incidents found'));
+                      } else {
+                        Map<String, List<Incident>> groupedIncidents =
+                            groupIncidentsByActionTag(snapshot.data!);
+                        return IncidentGroupWidget(
+                            groupedIncidents: groupedIncidents);
+                      }
+                    },
                   ),
-                ),
-                FutureBuilder<Map<String, List>>(
-                  future:  fetchActionTagIncidents(
-        sitID,
-        DateTime.now().subtract(Duration(days: 80)),
-        DateTime.now().subtract(Duration(days: 1)))
-    ,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text('No incidents found.'));
-                    } else {
-                      final actionTagIncidents = snapshot.data!;
-                      return Expanded(
-                        child: ListView.builder(
-                          itemCount: actionTagIncidents.length,
-                          itemBuilder: (context, index) {
-                            String actionTag =
-                                actionTagIncidents.keys.elementAt(index);
-                            int count = actionTagIncidents[actionTag]!.length;
-                            bool isExpanded =
-                                _expandedState[actionTag] ?? false;
-
-                            return Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _expandedState[actionTag] = !isExpanded;
-                                    });
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        bottom: Height *
-                                            0.03), // Add space between containers
-                                    height: Height * 0.05,
-                                    width: Width * 0.9,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: Width * 0.05,
-                                        ),
-                                        Image.asset(
-                                          'assets/logos/eye.jpg', // Replace with your image path
-                                          width: Width *
-                                              0.07, // Adjust image width as needed
-                                          height: Height *
-                                              0.02, // Adjust image height as needed
-                                        ),
-                                        SizedBox(
-                                          width: Width * 0.03,
-                                        ),
-                                        SizedBox(
-                                          width: Width * 0.6,
-                                          child: Text(actionTag),
-                                        ),
-                                        Text(count.toString()),
-                                        SizedBox(
-                                          width: Width * 0.03,
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios,
-                                          size: 18,
-                                          color: Colors.black,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                if (isExpanded)
-                                  ...actionTagIncidents[actionTag]!
-                                      .map((incident) {
-                                    DateTime startDateTime = DateTime.parse(
-                                        incident['eventFromTime']);
-                                    DateTime endDateTime =
-                                        DateTime.parse(incident['eventToTime']);
-                                    Duration duration =
-                                        endDateTime.difference(startDateTime);
-                                    String durationString =
-                                        "${duration.inHours}${duration.inMinutes.remainder(60)}";
-
-                                    return Container(
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 20),
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(5),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 1,
-                                            blurRadius: 5,
-                                            offset: Offset(0, 3),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              SizedBox(
-                                                width: Width * 0.67,
-                                                child: Text(incident['name'],
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                              ),
-                                              SizedBox(
-                                                width: Width * 0.15,
-                                                child: Text(
-                                                    incident['objectName'],
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                              )
-                                            ],
-                                          ),
-                                          Text(
-                                              "Start Time: ${incident['eventFromTime']}",
-                                              style: TextStyle(fontSize: 14)),
-                                          Row(
-                                            children: [
-                                              SizedBox(
-                                                width: Width * 0.675,
-                                                child: Text(
-                                                    'End Time: ${incident['eventToTime']}',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                    )),
-                                              ),
-                                              SizedBox(
-                                                width: Width * 0.15,
-                                                child: ElevatedButton(
-                                                  onPressed: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return Dialog(
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20.0),
-                                                          ),
-                                                          child: Container(
-                                                            height: 400,
-                                                            child: Column(
-                                                              children: <Widget>[
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(
-                                                                          8.0),
-                                                                  child: Text(
-                                                                    'Files',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                Expanded(
-                                                                  child: ListView
-                                                                      .builder(
-                                                                    itemCount: incident[
-                                                                            'files']
-                                                                        .length,
-                                                                    itemBuilder:
-                                                                        (BuildContext
-                                                                                context,
-                                                                            int index) {
-                                                                      return Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .all(
-                                                                            8.0),
-                                                                        child: Image
-                                                                            .network(
-                                                                          '${incident['files'][index]}',
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                          errorBuilder: (context,
-                                                                              error,
-                                                                              stackTrace) {
-                                                                            return Icon(Icons.error);
-                                                                          },
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                  child: Text('View'),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          Text(
-                                              "Duration: ${duration.inHours.toString().padLeft(2, '0')}:${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${duration.inSeconds.remainder(60).toString().padLeft(2, '0')}",
-                                              style: TextStyle(fontSize: 14)),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                              ],
-                            );
-                          },
-                        ),
-                      );
-                    }
-                  },
                 ),
               ],
             )
@@ -696,5 +403,232 @@ class _MyHomePageState extends State<AlarmScreen> {
     //return Scaffold(
 
     //);
+  }
+}
+
+class Incident {
+  final String eventId;
+  final String siteName;
+  final int siteId;
+  final String objectName;
+  final String name;
+  final String cameraId;
+  final String eventTag;
+  final DateTime eventFromTime;
+  final DateTime eventToTime;
+  final String actionTag;
+  final List<String> files;
+
+  Incident({
+    required this.eventId,
+    required this.siteName,
+    required this.siteId,
+    required this.objectName,
+    required this.name,
+    required this.cameraId,
+    required this.eventTag,
+    required this.eventFromTime,
+    required this.eventToTime,
+    required this.actionTag,
+    required this.files,
+  });
+
+  factory Incident.fromJson(Map<String, dynamic> json) {
+    return Incident(
+      eventId: json['eventId'],
+      siteName: json['siteName'],
+      siteId: json['siteId'],
+      objectName: json['objectName'],
+      name: json['name'],
+      cameraId: json['cameraId'],
+      eventTag: json['eventTag'],
+      eventFromTime: DateTime.parse(json['eventFromTime']),
+      eventToTime: DateTime.parse(json['eventToTime']),
+      actionTag: json['actionTag'],
+      files: List<String>.from(json['files']),
+    );
+  }
+}
+
+class IncidentDetailPage extends StatelessWidget {
+  final String actionTag;
+  final List<Incident> incidents;
+
+  const IncidentDetailPage(
+      {required this.actionTag, required this.incidents, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(actionTag),
+      ),
+      body: ListView.builder(
+        itemCount: incidents.length,
+        itemBuilder: (context, index) {
+          Incident incident = incidents[index];
+          Duration duration =
+              incident.eventToTime.difference(incident.eventFromTime);
+          return Card(
+            margin: const EdgeInsets.all(8.0),
+            child: ListTile(
+              title: Text('${incident.name} (${incident.objectName})'),
+              subtitle: Text(
+                'From: ${incident.eventFromTime}\nTo: ${incident.eventToTime}\nDuration: ${duration.inMinutes} minutes',
+              ),
+              trailing: ElevatedButton(
+                child: const Text('View'),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      content: SizedBox(
+                        height: 400,
+                        child: Expanded(
+                          child: ListView.builder(
+                            itemCount: incident.files.length,
+                            itemBuilder: (context, index) {
+                              String file = incident.files[index];
+                              if (file.contains('.mp4')) {
+                                return VideoPlayerWidget(videoUrl: file);
+                              } else if (file.contains('.png'))
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Image.network(
+                                    '${file}',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(Icons.error);
+                                    },
+                                  ),
+                                );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  const VideoPlayerWidget({required this.videoUrl, Key? key}) : super(key: key);
+
+  @override
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+  bool _isError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(widget.videoUrl)
+      ..initialize().then((_) {
+        setState(() {});
+        _controller.play();
+      }).catchError((error) {
+        setState(() {
+          _isError = true;
+        });
+        print('Error initializing video player: $error');
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _isError
+        ? Center(
+            child: Text('Error loading video'),
+          )
+        : _controller.value.isInitialized
+            ? AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
+              )
+            : const Center(child: CircularProgressIndicator());
+  }
+}
+
+class IncidentGroupWidget extends StatelessWidget {
+  final Map<String, List<Incident>> groupedIncidents;
+
+  const IncidentGroupWidget({required this.groupedIncidents, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1,
+      ),
+      itemCount: groupedIncidents.length,
+      itemBuilder: (context, index) {
+        String actionTag = groupedIncidents.keys.elementAt(index);
+        int count = groupedIncidents[actionTag]!.length;
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => IncidentDetailPage(
+                  actionTag: actionTag,
+                  incidents: groupedIncidents[actionTag]!,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(1),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+            
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 90,
+                        child: Text(
+                          actionTag,
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 16),
+                        ),
+                      )
+                    ],
+                  ),
+                  Text(
+                    count.toString(),
+                    style: const TextStyle(color: Colors.black, fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

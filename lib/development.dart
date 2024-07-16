@@ -48,11 +48,10 @@ class _MyHomePageState extends State<DevelopmentScreen> {
 
   final _dateController = TextEditingController();
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  DateTime _selectedDay= DateTime.now();
   List<String> _notWorkingDays = [];
   bool _isLoading = false;
   int Year = DateTime.now().year;
-
 
   String sitename = '';
   int currentIndex = 0;
@@ -76,9 +75,9 @@ class _MyHomePageState extends State<DevelopmentScreen> {
 
     fetchData(sitID);
     fetchSiteNames();
-
+    selectedDate = DateTime.parse(dateController.text);
     // Initialize selectedFromDate and selectedToDate here
-    notWorkingDays(Year,widget.siteId);
+    notWorkingDays(Year, widget.siteId);
   }
 
   Future<void> fetchData(int accountId) async {
@@ -125,7 +124,6 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     _dateController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -363,95 +361,122 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                               IconButton(
                                 onPressed: () {
                                   showDialog(
-                      context: context,
-                      builder: (context) => Dialog(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _isLoading
-                                ? Center(child: CircularProgressIndicator())
-                                : TableCalendar(
-                                    locale: 'en_US',
-                                    firstDay: DateTime(2000),
-                                    lastDay: DateTime.now(),
-                                    focusedDay: _focusedDay,
-                                    selectedDayPredicate: (day) {
-                                      return isSameDay(_selectedDay, day);
-                                    },
-                                    onPageChanged: (DateTime focusedDay) {
-                                      final currentYear = focusedDay.year;
-                                      fetchData(currentYear);
-                                    },
-                                    onDaySelected: (selectedDay, focusedDay) {
-                                      if (!_notWorkingDays.contains(
-                                          DateFormat('yyyy-MM-dd')
-                                              .format(selectedDay))) {
-                                        setState(() {
-                                          _selectedDay = selectedDay;
-                                          _focusedDay = focusedDay;
-                                          fetchData(focusedDay.year);
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          _isLoading
+                                              ? Center(
+                                                  child:
+                                                      CircularProgressIndicator())
+                                              : TableCalendar(
+                                                  locale: 'en_US',
+                                                  firstDay: DateTime(2000),
+                                                  lastDay: DateTime.now(),
+                                                  focusedDay: _focusedDay,
+                                                  selectedDayPredicate: (day) {
+                                                    return isSameDay(
+                                                        _selectedDay, day);
+                                                  },
+                                                  onPageChanged:
+                                                      (DateTime focusedDay) {
+                                                    final currentYear =
+                                                        focusedDay.year;
+                                                    notWorkingDays(currentYear,
+                                                        widget.siteId);
+                                                    ;
+                                                  },
+                                                  onDaySelected: (selectedDay,
+                                                      focusedDay) {
+                                                    if (!_notWorkingDays
+                                                        .contains(DateFormat(
+                                                                'yyyy-MM-dd')
+                                                            .format(
+                                                                selectedDay))) {
+                                                      setState(() {
+                                                        _selectedDay =
+                                                            selectedDay;
+                                                        _focusedDay =
+                                                            focusedDay;
+                                                        
 
-                                          _dateController.text =
-                                              DateFormat('yyyy-MM-dd')
-                                                  .format(selectedDay);
-                                          Navigator.pop(
-                                              context); // Close the dialog
-                                        });
-                                      }
-                                    },
-                                    calendarBuilders: CalendarBuilders(
-                                      disabledBuilder: (context, date, _) {
-                                        final dateFormat =
-                                            DateFormat('yyyy-MM-dd');
-                                        if (_notWorkingDays.contains(
-                                            dateFormat.format(date))) {
-                                          return Center(
-                                            child: Text(
-                                              DateFormat.d().format(date),
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            ),
-                                          );
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    enabledDayPredicate: (date) {
-                                      final dateFormat =
-                                          DateFormat('yyyy-MM-dd');
-                                      return !_notWorkingDays
-                                          .contains(dateFormat.format(date));
-                                    },
-                                    availableCalendarFormats: {
-                                      CalendarFormat.month: 'Month',
-                                    },
-                                    calendarStyle: CalendarStyle(
-                                      isTodayHighlighted: true,
-                                      selectedDecoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        shape: BoxShape.circle,
+                                                        _dateController
+                                                            .text = DateFormat(
+                                                                'yyyy-MM-dd')
+                                                            .format(
+                                                                selectedDay);
+                                                        Navigator.pop(
+                                                            context); // Close the dialog
+                                                      });
+                                                    }
+                                                  },
+                                                  calendarBuilders:
+                                                      CalendarBuilders(
+                                                    disabledBuilder:
+                                                        (context, date, _) {
+                                                      final dateFormat =
+                                                          DateFormat(
+                                                              'yyyy-MM-dd');
+                                                      if (_notWorkingDays
+                                                          .contains(dateFormat
+                                                              .format(date))) {
+                                                        return Center(
+                                                          child: Text(
+                                                            DateFormat.d()
+                                                                .format(date),
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.red),
+                                                          ),
+                                                        );
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                  enabledDayPredicate: (date) {
+                                                    final dateFormat =
+                                                        DateFormat(
+                                                            'yyyy-MM-dd');
+                                                    return !_notWorkingDays
+                                                        .contains(dateFormat
+                                                            .format(date));
+                                                  },
+                                                  availableCalendarFormats: {
+                                                    CalendarFormat.month:
+                                                        'Month',
+                                                  },
+                                                  calendarStyle: CalendarStyle(
+                                                    isTodayHighlighted: true,
+                                                    selectedDecoration:
+                                                        BoxDecoration(
+                                                      color: Colors.blue,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    todayDecoration:
+                                                        BoxDecoration(
+                                                      color: Colors.orange,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    disabledTextStyle:
+                                                        TextStyle(
+                                                            color: Colors.red),
+                                                  ),
+                                                  headerStyle: HeaderStyle(
+                                                      formatButtonVisible:
+                                                          false,
+                                                      titleCentered: true),
+                                                ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text('Close'),
+                                          ),
+                                        ],
                                       ),
-                                      todayDecoration: BoxDecoration(
-                                        color: Colors.orange,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      disabledTextStyle:
-                                          TextStyle(color: Colors.red),
                                     ),
-                                    headerStyle: HeaderStyle(
-                                        formatButtonVisible: false,
-                                        titleCentered: true),
-                                  ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text('Close'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                                  );
                                 },
                                 icon: Icon(Icons.calendar_today),
                               ),
@@ -466,7 +491,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                       Expanded(
                         child: SingleChildScrollView(
                           child: FutureBuilder(
-                            future: fetchDatas(selectedDate, int.parse(siteId)),
+                            future: fetchDatas(dateController.text, int.parse(siteId)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                       ConnectionState.done &&
@@ -799,7 +824,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
 
   //disable not working dates
 
-  Future<void> notWorkingDays(int year,String siteId) async {
+  Future<void> notWorkingDays(int year, String siteId) async {
     setState(() {
       _isLoading = true;
     });
