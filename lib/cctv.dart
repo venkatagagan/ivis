@@ -36,7 +36,7 @@ class _MyHomePageState extends State<CctvScreen> {
   int endIndex = 1;
   String sitename = "";
   String siteId = "";
-  int currentIndex = 0;
+  int currentIndex = 1;
   List<TdpCamera> listOfCamera = [];
   int sitID = 36323;
   // ignore: unused_field
@@ -242,30 +242,30 @@ class _MyHomePageState extends State<CctvScreen> {
                         width: Width * 0.01,
                       ),
                       IconButton(
-                        icon: const Icon(Icons.arrow_forward_ios),
-                        onPressed: currentIndex < siteNames.length - 1
-                            ? () {
-                                String siteId = siteNames[currentIndex + 1]
-                                        ['siteId']
-                                    .toString();
-                                String sitename = siteNames[currentIndex + 1]
-                                        ['siteName']
-                                    .toString();
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CctvScreen(
-                                      i: currentIndex + 1,
-                                      siteId: siteId,
-                                      Sitename: sitename,
-                                    ),
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      onPressed: currentIndex < siteNames.length - 1
+                          ? () {
+                              String siteId = siteNames[currentIndex + 1]
+                                      ['siteId']
+                                  .toString();
+                              String sitename = siteNames[currentIndex + 1]
+                                      ['siteName']
+                                  .toString();
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CctvScreen(
+                                    i: currentIndex + 1,
+                                    siteId: siteId,
+                                    Sitename: sitename,
                                   ),
-                                );
-                              }
-                            : null,
-                        iconSize: 21.13,
-                        color: Colors.white,
-                      ),
+                                ),
+                              );
+                            }
+                          : null,
+                      iconSize: 21.13,
+                      color: Colors.white,
+                    ),
                     ],
                   ),
                 ),
@@ -654,6 +654,7 @@ class _MyHomePageState extends State<CctvScreen> {
         siteId: siteId,
         Sitename: sitename,
         i: currentIndex,
+        selected: 0,
       ),
     );
   }

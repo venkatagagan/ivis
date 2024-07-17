@@ -260,9 +260,10 @@ class _OneStopScreenState extends State<OneStopScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => CctvScreen(
-                                      i: currentIndex - 1,
+                                      i: currentIndex ,
                                       siteId: siteId,
                                       Sitename: sitename,
+                                      
                                     )),
                           );
                         } else {
@@ -286,7 +287,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => AlarmScreen(
-                                      i: currentIndex - 1,
+                                      i: currentIndex ,
                                       siteId: siteId,
                                       Sitename: sitename,
                                     )),
@@ -312,7 +313,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => CenterScreen(
-                                      i: currentIndex - 1,
+                                      i: currentIndex ,
                                       siteId: siteId,
                                       Sitename: sitename,
                                     )),
@@ -362,7 +363,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => DevelopmentScreen(
-                                      i: currentIndex - 1,
+                                      i: currentIndex ,
                                       siteId: siteId,
                                       Sitename: sitename,
                                     )),
@@ -388,7 +389,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => HdtvScreen(
-                                      i: currentIndex - 1,
+                                      i: currentIndex ,
                                       siteId: siteId,
                                       Sitename: sitename,
                                     )),
@@ -437,7 +438,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => RequestScreen(
-                                    i: currentIndex - 1,
+                                    i: currentIndex ,
                                     siteId: siteId,
                                     Sitename: sitename,
                                   )),

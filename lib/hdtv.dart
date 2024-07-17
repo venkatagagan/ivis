@@ -405,6 +405,7 @@ class _MyHomePageState extends State<HdtvScreen> {
           siteId: siteId,
           Sitename: sitename,
           i: currentIndex,
+          selected: 4,
         ),
         drawer: DrawerWidget(),
       ),

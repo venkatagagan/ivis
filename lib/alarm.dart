@@ -8,8 +8,8 @@ import 'package:ivis_security/home.dart';
 import 'package:ivis_security/drawer.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'package:video_player/video_player.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 // ignore: must_be_immutable
 class AlarmScreen extends StatefulWidget {
   String siteId;
@@ -100,7 +100,8 @@ class _MyHomePageState extends State<AlarmScreen> {
     super.dispose();
   }
 
-  Future<List<Incident>> fetchIncidents(String fromDate, String toDate,String siteId) async {
+  Future<List<Incident>> fetchIncidents(
+      String fromDate, String toDate, String siteId) async {
     final response = await http.get(
       Uri.parse(
           'http://rsmgmt.ivisecurity.com:8945/incidents/ListIncidentsForMobileApp_1_0?siteId=$siteId&fromDate=$fromDate&toDate=$toDate'),
@@ -318,23 +319,27 @@ class _MyHomePageState extends State<AlarmScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: Height*0.01,),
+                SizedBox(
+                  height: Height * 0.01,
+                ),
                 Row(
-                  
                   children: [
-                    SizedBox(width: Width*0.05,),
-                     Container(
-                        width: Width*0.4,
-                        decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(1),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-            
-                        child: TextFormField(
+                    SizedBox(
+                      width: Width * 0.05,
+                    ),
+                    Container(
+                      width: Width * 0.4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(1),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: TextFormField(
                         controller: _dateController1,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today,),
+                            icon: const Icon(
+                              Icons.calendar_today,
+                            ),
                             onPressed: () =>
                                 _selectDate(context, _dateController1),
                           ),
@@ -342,19 +347,18 @@ class _MyHomePageState extends State<AlarmScreen> {
                         readOnly: true,
                       ),
                     ),
-                    SizedBox(width: Width*0.08,),
+                    SizedBox(
+                      width: Width * 0.08,
+                    ),
                     Container(
-                        width: Width*0.4,
-                        decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(1),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-            
-                        
-                        child: TextFormField(
+                      width: Width * 0.4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(1),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: TextFormField(
                         controller: _dateController2,
                         decoration: InputDecoration(
-                          
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.calendar_today),
                             onPressed: () =>
@@ -363,18 +367,21 @@ class _MyHomePageState extends State<AlarmScreen> {
                         ),
                         readOnly: true,
                       ),
-                    
                     )
                   ],
                 ),
-                
                 Expanded(
                   child: FutureBuilder<List<Incident>>(
                     future: fetchIncidents(
-                        _dateController1.text, _dateController2.text,siteId),
+                        _dateController1.text, _dateController2.text, siteId),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
+                      } else if (!snapshot.hasData ||
+                          snapshot.data == null ||
+                          snapshot.data!.isEmpty) {
+                        return const Center(
+                            child: Text('No alerts in selected days',style: TextStyle(color: Colors.white),));
                       } else if (snapshot.hasError) {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -396,6 +403,7 @@ class _MyHomePageState extends State<AlarmScreen> {
           siteId: siteId,
           Sitename: sitename,
           i: currentIndex,
+          selected: 1,
         ),
         drawer: DrawerWidget(),
       ),
@@ -484,27 +492,43 @@ class IncidentDetailPage extends StatelessWidget {
                     builder: (context) => AlertDialog(
                       content: SizedBox(
                         height: 400,
-                        child: Expanded(
-                          child: ListView.builder(
-                            itemCount: incident.files.length,
-                            itemBuilder: (context, index) {
-                              String file = incident.files[index];
-                              if (file.contains('.mp4')) {
-                                return VideoPlayerWidget(videoUrl: file);
-                              } else if (file.contains('.png'))
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Image.network(
-                                    '${file}',
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.error);
-                                    },
-                                  ),
-                                );
-                            },
-                          ),
-                        ),
+                        child: incident.files.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'No files available',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: incident.files.length,
+                                itemBuilder: (context, index) {
+                                  String file = incident.files[index];
+                                  if (file.contains('.mp4') ||
+                                      file.contains('.3gp')) {
+                                    return VlcPlayerWidget(
+                                        videoUrl: file);
+                                  } else if (file.contains('.png') ||
+                                      file.contains('.jpg') ||
+                                      file.contains('.JPG') ||
+                                      file.contains('.jpeg')) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: CachedNetworkImage(
+                                        imageUrl: file,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => SizedBox(
+                                          width:
+                                              30, // Adjust the width as needed
+                                          height:
+                                              30, // Adjust the height as needed
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  return SizedBox();
+                                },
+                              ),
                       ),
                     ),
                   );
@@ -518,32 +542,28 @@ class IncidentDetailPage extends StatelessWidget {
   }
 }
 
-class VideoPlayerWidget extends StatefulWidget {
+class VlcPlayerWidget extends StatefulWidget {
   final String videoUrl;
 
-  const VideoPlayerWidget({required this.videoUrl, Key? key}) : super(key: key);
+  const VlcPlayerWidget({required this.videoUrl, Key? key}) : super(key: key);
 
   @override
-  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+  _VlcPlayerWidgetState createState() => _VlcPlayerWidgetState();
 }
 
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late VideoPlayerController _controller;
-  bool _isError = false;
+class _VlcPlayerWidgetState extends State<VlcPlayerWidget> {
+  late VlcPlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((_) {
-        setState(() {});
-        _controller.play();
-      }).catchError((error) {
-        setState(() {
-          _isError = true;
-        });
-        print('Error initializing video player: $error');
-      });
+    _controller = _controller = VlcPlayerController.network(
+      widget.videoUrl,
+      hwAcc: HwAcc.full,
+      autoPlay: true,
+      
+      
+    );
   }
 
   @override
@@ -554,18 +574,14 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _isError
-        ? Center(
-            child: Text('Error loading video'),
-          )
-        : _controller.value.isInitialized
-            ? AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
-              )
-            : const Center(child: CircularProgressIndicator());
+    return VlcPlayer(
+      controller: _controller,
+      aspectRatio: 16 / 9,
+      placeholder: Center(child: CircularProgressIndicator()),
+    );
   }
 }
+
 
 class IncidentGroupWidget extends StatelessWidget {
   final Map<String, List<Incident>> groupedIncidents;
@@ -598,10 +614,9 @@ class IncidentGroupWidget extends StatelessWidget {
           child: Container(
             margin: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(1),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-            
+              color: Colors.white.withOpacity(1),
+              borderRadius: BorderRadius.circular(5),
+            ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

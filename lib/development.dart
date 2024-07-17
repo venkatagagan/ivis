@@ -810,6 +810,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
           ],
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
+          selected: 2,
           siteId: siteId,
           Sitename: sitename,
           i: currentIndex,

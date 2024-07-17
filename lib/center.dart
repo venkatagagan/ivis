@@ -317,6 +317,7 @@ class _MyHomePageState extends State<CenterScreen> {
           siteId: siteId,
           Sitename: sitename,
           i: currentIndex,
+          selected: 3,
         ),
         drawer: DrawerWidget(),
       ),

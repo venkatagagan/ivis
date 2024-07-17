@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/login_api_service.dart';
 import 'package:ivis_security/forgot_Pass.dart';
 
-
 class LoginScreen extends StatelessWidget {
   // ignore: use_key_in_widget_constructors
   const LoginScreen({Key? key});
@@ -15,16 +14,7 @@ class LoginScreen extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        textTheme: TextTheme(
-          bodyText1: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
-          bodyText2: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
-          headline1: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w700),
-          headline2: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w700),
-          headline3: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w500),
-          headline4: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w500),
-          headline5: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
-          headline6: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
-        ),
+        
       ),
       home: Scaffold(
         body: Stack(
@@ -177,7 +167,6 @@ class _LoginFormState extends State<LoginForm> {
           onPressed: () {
             // Handle login button press
             _handleLogin(context);
-            
           },
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(150, 50),
