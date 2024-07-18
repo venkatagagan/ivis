@@ -12,7 +12,7 @@ class TdpCamera {
   final int noOfActiveCameras;
   final String httpUrl;
   final String siteName;
-  final String requestName;
+  final String snapshot;
 
   TdpCamera({
     required this.cameraId,
@@ -28,7 +28,7 @@ class TdpCamera {
     required this.noOfActiveCameras,
     required this.httpUrl,
     required this.siteName,
-    required this.requestName,
+    required this.snapshot,
   });
 
   factory TdpCamera.fromJson(Map<String, dynamic> json) {
@@ -46,7 +46,7 @@ class TdpCamera {
       noOfActiveCameras: json['noOfActiveCameras'],
       httpUrl: json['httpUrl'],
       siteName: json['siteName'],
-      requestName: json['requestName'],
+      snapshot: json['snapshotUrl'],
     );
   }
 }

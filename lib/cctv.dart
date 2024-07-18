@@ -10,9 +10,7 @@ import 'package:ivis_security/cctv/screens.dart';
 import 'package:ivis_security/center.dart';
 import 'package:ivis_security/home.dart';
 import 'package:ivis_security/navigation.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
-bool shouldReloadContainers = false;
 
 // ignore: must_be_immutable
 class CctvScreen extends StatefulWidget {
@@ -49,18 +47,32 @@ class _MyHomePageState extends State<CctvScreen> {
   late Map<String, dynamic> services;
   String liveview = "F";
 
+  late Future<List<Camera>> _camerasFuture;
+
+
   @override
   void initState() {
     super.initState();
     sitename = widget.Sitename;
     siteId = widget.siteId;
     currentIndex = widget.i;
-
+    _camerasFuture = fetchCameras();
     sitID = int.parse(widget.siteId);
     fetchMonitoringNames(sitID);
     fetchSiteNames();
     fetchData(sitID);
   }
+
+  Future<List<Camera>> fetchCameras() async {
+  final response = await http.get(Uri.parse('http://54.92.215.87:943/getCamerasForSiteId_1_0/36350'));
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response.body);
+    return data.map((json) => Camera.fromJson(json)).toList();
+  } else {
+    throw Exception('Failed to load cameras');
+  }
+}
 
   Future<void> fetchData(int accountId) async {
     try {
@@ -144,7 +156,8 @@ class _MyHomePageState extends State<CctvScreen> {
           children: [
             Column(
               children: [
-                SizedBox(height: Height * 0.08),
+                SizedBox(height: Height * 0.2,child:Column(children: [
+                  SizedBox(height: Height * 0.05),
                 Row(
                   children: [
                     SizedBox(width: Width * 0.1),
@@ -185,7 +198,7 @@ class _MyHomePageState extends State<CctvScreen> {
                   ],
                 ),
                 SizedBox(
-                  height: Height * 0.04,
+                  height: Height * 0.02,
                 ),
                 const Divider(
                   height: 1, // Set the height of the line
@@ -193,7 +206,7 @@ class _MyHomePageState extends State<CctvScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
                 SizedBox(
-                  height: Height * 0.07,
+                  height: Height * 0.05,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -233,7 +246,7 @@ class _MyHomePageState extends State<CctvScreen> {
                               sitename,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 16,
                                 color: Colors.white,
                               ),
                             ),
@@ -277,6 +290,8 @@ class _MyHomePageState extends State<CctvScreen> {
                  SizedBox(
                   height: Height*0.03,
                 ),
+                ],)),
+                
                 Row(
                   //49,24,34
                   children: [
@@ -336,7 +351,7 @@ class _MyHomePageState extends State<CctvScreen> {
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
                Positioned(
-                top: Height*0.33, // Adjust the position from the bottom
+                top: Height*0.258, // Adjust the position from the bottom
                 right: Width*0.65,
                 left: Width*0.075,
                 child: Divider(
@@ -345,97 +360,100 @@ class _MyHomePageState extends State<CctvScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
               ),
-              
-              Column(
-                children: [
-                  SizedBox(
-                    height: Height*0.4,
-                  ),
-                  if (listOfCamera.isNotEmpty)
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            ...listOfCamera.map(
-                              (e) {
-                                // GetData();
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (ctx) => BigScreen(
-                                                httpUrl: e.httpUrl,
-                                                cameraId: e.status,
-                                                cameraName: e.name)));
-                                  },
-                                  // child: VideoPlayerScreen(
-                                  //     rtspLInk: e.rtspUrl,
-                                  //     status: e.status,
-                                  //     cameraName: e.name),
-                                  child: Expanded(
-                                      child: VisibilityDetector(
-                                    key: Key(e.name.toString()),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        height: Height*0.35,
-                                        width: Width*0.85,
-                                        decoration: ShapeDecoration(
-                                          color: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        child: Center(
-                                            child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            if (visibilityScreenName == e.name)
-                                              VideoPlayerScreen(
-                                                  httpUrl: e.httpUrl,
-                                                  status: e.status,
-                                                  cameraName: e.name)
-                                            else
-                                              Text(e.name),
-                                          ],
-                                        )),
-                                      ),
-                                    ),
-                                    onVisibilityChanged: (visibilityInfo) {
-                                      setState(() {
-                                        // Change the flag value of _isVisible
-                                        // If it is greater than 0 means it is visible
-                                        _isVisible =
-                                            visibilityInfo.visibleFraction > 0;
-
-                                        // It will show how much percentage the widget is visible
-                                        var visiblePercentage =
-                                            visibilityInfo.visibleFraction *
-                                                100;
-                                        if (visibilityScreenName != e.name &&
-                                            visiblePercentage == 100) {
-                                          visibilityScreenName = e.name;
-
-                                          print(visibilityScreenName);
-                                        } else {
-                                          print("Hello");
-                                        }
-                                        print(
-                                            '${e.name} is ${visiblePercentage}% visible');
-                                      });
-                                    },
-                                  )),
-                                );
-                              },
-                            )
-                          ],
+               Padding(
+        padding: const EdgeInsets.only(top: 230), // Add top padding here
+        child:
+               FutureBuilder<List<Camera>>(
+        future: _camerasFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List<Camera> cameras = snapshot.data!;
+            return ListView.builder(
+              itemCount: cameras.length,
+              itemBuilder: (context, index) {
+                Camera camera = cameras[index];
+                return GestureDetector(
+                    onTap: () {
+                      // Navigate to the next screen here
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BigScreen(httpUrl:camera.httpUrl ,cameraId: camera.cameraId,cameraName: camera.name,),
                         ),
+                      );
+                    },
+                    child:Container(
+                  margin: EdgeInsets.all(Width*0.03),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        SizedBox(width: Width*0.5,child: Text(
+                        camera.name,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),),
+                      SizedBox(width: Width*0.1,child:
+                        Image.asset(
+                       camera.snapshotUrl.isNotEmpty ? 'assets/images/geye.jpg' : 'assets/images/reye.jpg',
+                    ) ,
+                        
                       ),
-                    ),
-                  if (listOfCamera.isEmpty) const CircularProgressIndicator()
-                ],
-              ),
+                      SizedBox(width: Width*0.25,child: Text(
+                        camera.snapshotUrl.isNotEmpty
+                            ? 'Connected'
+                            : 'Disconnected' ,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: camera.snapshotUrl.isNotEmpty ? Colors.green : Colors.red,
+                        ),
+                      ),)
+                      ],),
+                      
+                      SizedBox(height: 10),
+                      SizedBox(height: Height*0.3,child:Center(child: camera.snapshotUrl.isNotEmpty
+                            ? Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Image.network(camera.snapshotUrl),
+                                  Icon(Icons.play_circle_filled, size: 50, color: Colors.white),
+                                ],
+                              )
+                            : Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  
+                                  Image.asset('assets/logos/eye.png.png'),
+                                ],
+                              ),),
+                      ),
+                            
+                      
+                    ],
+                  ),
+                ),);
+              },
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+               ),
+              
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2
@@ -656,6 +674,34 @@ class _MyHomePageState extends State<CctvScreen> {
         i: currentIndex,
         selected: 0,
       ),
+    );
+  }
+}
+
+
+
+class Camera {
+  final String cameraId;
+  final String name;
+  final String snapshotUrl;
+  final String status;
+  final String httpUrl;
+
+  Camera({
+    required this.cameraId,
+    required this.name,
+    required this.snapshotUrl,
+    required this.status,
+    required this.httpUrl,
+  });
+
+  factory Camera.fromJson(Map<String, dynamic> json) {
+    return Camera(
+      cameraId: json['cameraId'],
+      name: json['name'],
+      snapshotUrl: json['snapshotUrl'],
+      status: json['status'],
+      httpUrl: json['httpUrl'],
     );
   }
 }

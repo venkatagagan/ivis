@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   const VideoPlayerScreen({
@@ -38,7 +38,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String httpsUrl = convertHttpToHttps(widget.httpUrl);
+    //String httpsUrl = convertHttpToHttps(widget.httpUrl);
 
     return Container(
       child: Column(
@@ -92,12 +92,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     right: 0,
                     child: AspectRatio(
                       aspectRatio: 16 / 12,
-                      child: WebView(
-                        initialUrl: httpsUrl,
-                        javascriptMode: JavascriptMode.unrestricted,
-                        gestureNavigationEnabled: true,
-                      ),
-                    )),
+                      child: CachedNetworkImage(
+                                        imageUrl: widget.httpUrl,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => SizedBox(
+                                          width:
+                                              30, // Adjust the width as needed
+                                          height:
+                                              30, // Adjust the height as needed
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),),),
               ],
             ),
           ),

@@ -107,48 +107,27 @@ class _MyHomePageState extends State<HomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextButton(
-                      onPressed: () => onButtonPressed(0),
-                      child: const Text(
+                     const Text(
                         'S I T E S',
                         style: TextStyle(
-                          color: Colors.white, // Set the text color to black
+                          color: Colors.white,
+                          fontSize: 20, // Set the text color to black
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: Width * 0.25,
-                    ),
-                    TextButton(
-                      onPressed: () => onButtonPressed(1),
-                      child: const Text(
-                        'M A P',
-                        style: TextStyle(
-                          color: Colors.white, // Set the text color to black
-                        ),
-                      ),
-                    ),
+                    
+                   
                   ],
                 ),
               ],
             ),
-            Positioned(
-              top: Height * 0.333, // Adjust the top position as needed
-              left: Width * 0.08, // Adjust the left position as needed
-              right: Width * 0.08, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
+            
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
 
               Positioned(
                 top: Height * 0.335, // Adjust the position from the bottom
                 left: Width * 0.08,
-                right: Width * 0.5,
+                right: Width * 0.08,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
