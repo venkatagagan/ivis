@@ -7,17 +7,18 @@
 
 package io.flutter.app;
 
-import android.app.Application;
-import android.content.Context;
-import androidx.annotation.CallSuper;
 import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
+import android.content.Context;
+import io.flutter.app.FlutterApplication;
+import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.plugins.GeneratedPluginRegistrant;
 
 /**
  * Extension of {@link android.app.Application}, adding multidex support.
  */
-public class FlutterMultiDexApplication extends Application {
+public class FlutterMultiDexApplication extends MultiDexApplication {
   @Override
-  @CallSuper
   protected void attachBaseContext(Context base) {
     super.attachBaseContext(base);
     MultiDex.install(this);
