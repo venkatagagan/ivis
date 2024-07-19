@@ -48,7 +48,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
 
   final _dateController = TextEditingController();
   DateTime _focusedDay = DateTime.now();
-  DateTime _selectedDay= DateTime.now();
+  DateTime _selectedDay = DateTime.now();
   List<String> _notWorkingDays = [];
   bool _isLoading = false;
   int Year = DateTime.now().year;
@@ -70,12 +70,11 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     sitename = widget.Sitename;
     siteId = widget.siteId;
     currentIndex = widget.i;
-
+    selectedDate = _selectedDay;
     sitID = int.parse(widget.siteId);
 
     fetchData(sitID);
     fetchSiteNames();
-    selectedDate = DateTime.parse(dateController.text);
     // Initialize selectedFromDate and selectedToDate here
     notWorkingDays(Year, widget.siteId);
   }
@@ -273,27 +272,14 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextButton(
-                      onPressed: () => onButtonPressed(0),
-                      child: const Text(
+                    Text(
                         'ANALYTICS',
                         style: TextStyle(
                           color: Colors.white, // Set the text color to black
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.25,
-                    ),
-                    TextButton(
-                      onPressed: () => onButtonPressed(1),
-                      child: const Text(
-                        'REPORTS',
-                        style: TextStyle(
-                          color: Colors.white, // Set the text color to black
-                        ),
-                      ),
-                    ),
+                    
+                   
                   ],
                 ),
                 SizedBox(
@@ -318,7 +304,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
               const Positioned(
                 top: 253, // Adjust the position from the bottom
                 left: 30.5,
-                right: 179.5,
+                right: 30.5,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
@@ -350,7 +336,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                 child: Padding(
                                   padding: EdgeInsets.only(left: 10),
                                   child: TextField(
-                                    controller: dateController,
+                                    controller: _dateController,
                                     decoration: InputDecoration(
                                       hintText: 'yyyy-mm-dd',
                                       border: InputBorder.none,
@@ -399,7 +385,6 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                                             selectedDay;
                                                         _focusedDay =
                                                             focusedDay;
-                                                        
 
                                                         _dateController
                                                             .text = DateFormat(
@@ -491,13 +476,13 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                       Expanded(
                         child: SingleChildScrollView(
                           child: FutureBuilder(
-                            future: fetchDatas(dateController.text, int.parse(siteId)),
+                            future: fetchDatas(_selectedDay, int.parse(siteId)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                       ConnectionState.done &&
                                   !snapshot.hasError) {
                                 if (snapshot.data != null &&
-                                    snapshot.data!['AnalyticsList'] != null) {
+                                    snapshot.data!['AnalyticsList'] != []) {
                                   return SingleChildScrollView(
                                     child: Column(
                                       crossAxisAlignment:
@@ -512,9 +497,13 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                                       ],
                                     ),
                                   );
-                                } else {
+                                }
+                                 else {
                                   return Center(
-                                    child: Text('No data available'),
+                                    child: Text(
+                                      'No data available',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   );
                                 }
                               } else {
@@ -843,8 +832,8 @@ class _MyHomePageState extends State<DevelopmentScreen> {
       setState(() {
         _notWorkingDays = notWorkingDaysList;
         _selectedDay = DateTime.parse(lastWorkingDay);
-        _focusedDay = _selectedDay!;
-        _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDay!);
+        _focusedDay = _selectedDay;
+        _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDay);
         _isLoading = false;
       });
     } else {
@@ -922,23 +911,24 @@ class YourWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(height: 10),
 
         // Create a list of Container widgets for each item in analyticsList
         for (var analytics in analyticsList) ...[
           SizedBox(
-            height: 10,
+            height: Height*0.01,
           ),
 
           // ignore: unnecessary_null_comparison
           if (analytics != null && analytics['service'] is String)
             SingleChildScrollView(
               child: Container(
-                width: 300,
-                height: 100,
+                width: Width*0.8,
+                height: Height*0.14,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(1),
                   borderRadius: BorderRadius.circular(5),
@@ -950,14 +940,14 @@ class YourWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SizedBox(
-                          height: 14,
+                          height: Height*0.02,
                         ),
                         SizedBox(
-                            width: 300,
+                            width: Width*0.8,
                             child: Row(
                               children: [
                                 SizedBox(
-                                  width: 18,
+                                  width: Width*0.05,
                                 ),
                                 Flexible(
                                   flex: 2, // Adjust this flex value as needed
@@ -972,7 +962,7 @@ class YourWidget extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: 5,
+                                  width: Width*0.02,
                                 ),
                                 Flexible(
                                   flex: 2, // Adjust this flex value as needed
@@ -988,16 +978,16 @@ class YourWidget extends StatelessWidget {
                               ],
                             )),
                         SizedBox(
-                          height: 8,
+                          height: Height*0.01,
                         ),
                         Row(
                           children: [
                             SizedBox(
-                              width: 18,
-                            ),
+                                  width: Width*0.05,
+                                ),
                             Container(
-                              height: 50,
-                              width: 80,
+                              height: Height*0.066,
+                              width: Width*0.22,
                               decoration: BoxDecoration(
                                 color: getColorBasedOnCriteria(
                                     analytics['analytics'][0]['status']),
@@ -1006,13 +996,11 @@ class YourWidget extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: 8,
+                                    height: Height*0.01,
                                   ),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      SizedBox(
-                                        width: 13,
-                                      ),
                                       Text(
                                         '${analytics['analytics'][0]['type']}',
                                         style: TextStyle(
@@ -1023,7 +1011,8 @@ class YourWidget extends StatelessWidget {
                                         width: 3,
                                       ),
                                       SizedBox(
-                                        width: 35,
+                                        width: Width*0.1,
+                                        height: Height*0.011,
                                         child: Text(
                                           '(${analytics['analytics'][0]['percentage']}%)',
                                           style: TextStyle(
@@ -1034,9 +1023,7 @@ class YourWidget extends StatelessWidget {
                                       )
                                     ],
                                   ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
+                                  
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -1052,11 +1039,11 @@ class YourWidget extends StatelessWidget {
                               ),
                             ),
                             SizedBox(
-                              width: 12,
+                              width: Width*0.03,
                             ),
                             Container(
-                              height: 50,
-                              width: 80,
+                              height: Height*0.066,
+                              width: Width*0.22,
                               decoration: BoxDecoration(
                                 color: getColorBasedOnCriteria(
                                     analytics['analytics'][1]['status']),
@@ -1065,13 +1052,12 @@ class YourWidget extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: 8,
+                                    height: Height*0.01,
                                   ),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      SizedBox(
-                                        width: 5,
-                                      ),
+                                      
                                       Text(
                                         '${analytics['analytics'][1]['type']}',
                                         style: TextStyle(
@@ -1082,7 +1068,8 @@ class YourWidget extends StatelessWidget {
                                         width: 3,
                                       ),
                                       SizedBox(
-                                        width: 32,
+                                        width: Width*0.1,
+                                        height: Height*0.011,
                                         child: Text(
                                           '(${analytics['analytics'][1]['percentage']}%)',
                                           style: TextStyle(
@@ -1092,9 +1079,6 @@ class YourWidget extends StatelessWidget {
                                         ),
                                       )
                                     ],
-                                  ),
-                                  SizedBox(
-                                    height: 5,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -1111,11 +1095,11 @@ class YourWidget extends StatelessWidget {
                               ),
                             ),
                             SizedBox(
-                              width: 12,
+                              width: Width*0.03,
                             ),
                             Container(
-                              height: 50,
-                              width: 80,
+                              height: Height*0.066,
+                              width: Width*0.22,
                               decoration: BoxDecoration(
                                 color: getColorBasedOnCriteria(
                                     analytics['analytics'][3]['status']),
@@ -1124,13 +1108,12 @@ class YourWidget extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: 8,
+                                    height: Height*0.01,
                                   ),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      SizedBox(
-                                        width: 13,
-                                      ),
+                                     
                                       Text(
                                         'QTR',
                                         style: TextStyle(
@@ -1141,7 +1124,8 @@ class YourWidget extends StatelessWidget {
                                         width: 3,
                                       ),
                                       SizedBox(
-                                        width: 33,
+                                        width: Width*0.1,
+                                        height: Height*0.011,
                                         child: Text(
                                           '(${analytics['analytics'][3]['percentage']}%)',
                                           style: TextStyle(
@@ -1151,9 +1135,6 @@ class YourWidget extends StatelessWidget {
                                         ),
                                       )
                                     ],
-                                  ),
-                                  SizedBox(
-                                    height: 5,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

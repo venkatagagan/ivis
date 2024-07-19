@@ -102,6 +102,7 @@ class _LoginFormState extends State<LoginForm> {
             labelText: 'Email ID Or UserName',
             border: OutlineInputBorder(),
             filled: true,
+            fillColor: Colors.white
           ),
         ),
         SizedBox(height: Height * 0.02),
@@ -112,6 +113,7 @@ class _LoginFormState extends State<LoginForm> {
             labelText: 'Password',
             border: const OutlineInputBorder(),
             filled: true,
+            fillColor: Colors.white,
             suffixIcon: GestureDetector(
               onTap: () {
                 setState(() {

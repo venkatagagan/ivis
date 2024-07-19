@@ -154,7 +154,7 @@ class _MyHomePageState extends State<AlarmScreen> {
     double Width = MediaQuery.of(context).size.width;
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false ,
       home: Scaffold(
         body: Stack(
           children: [
@@ -396,8 +396,11 @@ class _MyHomePageState extends State<AlarmScreen> {
                   ),
                 ),
               ],
+              
             )
+            
           ],
+          
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
           siteId: siteId,
