@@ -53,7 +53,7 @@ class ResetScreen extends StatelessWidget {
             left: 30,
             child: Container(
               width: 300,
-              height: 250,
+              height: 450,
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -98,40 +98,83 @@ class ResetForm extends StatefulWidget {
 }
 
 class _PasswordValidatorState extends State<ResetForm> {
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _reenterPasswordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  String _password = '';
+  bool _showPassword = false;
+  
 
   @override
   void dispose() {
-    _passwordController.dispose();
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
+    _reenterPasswordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
+    return Container(
+      height: Height*0.5,
       child: Column(
         children: [
-          const SizedBox(height: 40),
+          SizedBox(height: Height * 0.04),
           TextFormField(
-            controller: _passwordController,
+            controller: _oldPasswordController,
             decoration: const InputDecoration(
-              labelText: 'Enter Password',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a password';
-              }
-              if (!_isPasswordValid(value)) {
-                return 'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character';
-              }
-              return null;
-            },
-            obscureText: true,
+                labelText: 'Email ID Or UserName',
+                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.white),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: Height * 0.02),
+          TextFormField(
+            obscureText: !_showPassword,
+            controller: _newPasswordController,
+            decoration: InputDecoration(
+              labelText: 'New Password',
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+              suffixIcon: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showPassword = !_showPassword;
+                  });
+                },
+                child: Icon(
+                  _showPassword ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: Height * 0.02),
+          TextFormField(
+            obscureText: !_showPassword,
+            controller: _reenterPasswordController,
+            decoration: InputDecoration(
+              labelText: 'Enter New Password',
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+              suffixIcon: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showPassword = !_showPassword;
+                  });
+                },
+                child: Icon(
+                  _showPassword ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: Height * 0.025),
           ElevatedButton(
             onPressed: () {
               if (_formKey.currentState!.validate()) {
@@ -192,15 +235,5 @@ class _PasswordValidatorState extends State<ResetForm> {
     );
   }
 
-  bool _isPasswordValid(String password) {
-    // Regular expressions for criteria
-    final hasUppercase = RegExp(r'[A-Z]').hasMatch(password);
-    final hasLowercase = RegExp(r'[a-z]').hasMatch(password);
-    final hasDigit = RegExp(r'\d').hasMatch(password);
-    final hasSpecialCharacters =
-        RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password);
-
-    // Check if all criteria are met
-    return hasUppercase && hasLowercase && hasDigit && hasSpecialCharacters;
-  }
+  
 }

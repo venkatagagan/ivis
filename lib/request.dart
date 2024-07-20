@@ -182,7 +182,17 @@ class _MyHomePageState extends State<RequestScreen> {
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
       setState(() {
-        helpDeskList = data['serviceHelpDeskList'];
+        helpDeskList = List.from(data['serviceHelpDeskList'].reversed);
+
+        helpDeskList.sort((a, b) {
+          if (a['status'] == 'Deleted' && b['status'] != 'Deleted') {
+            return 1;
+          } else if (a['status'] != 'Deleted' && b['status'] == 'Deleted') {
+            return -1;
+          } else {
+            return 0;
+          }
+        });
       });
     } else {
       throw Exception('Failed to load service requests');
@@ -842,6 +852,10 @@ class _MyHomePageState extends State<RequestScreen> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return Edit(
+                                            sitename: widget.Sitename,
+                                            index: widget.i,
+                                            rnum: item['serviceReqId'],
+                                            siteId: widget.siteId,
                                             catId: item['service_cat_id']
                                                     ?.toString() ??
                                                 'Not Available',
@@ -975,6 +989,10 @@ class Edit extends StatefulWidget {
   final String subCatName;
   final String Desc;
   final String PrefTimeToCall;
+  final String siteId;
+  final int rnum;
+  final int index;
+  final String sitename;
 
   Edit({
     Key? key,
@@ -985,6 +1003,10 @@ class Edit extends StatefulWidget {
     required this.subCatName,
     required this.Desc,
     required this.PrefTimeToCall,
+    required this.siteId,
+    required this.rnum,
+    required this.index,
+    required this.sitename,
   }) : super(key: key);
 
   @override
@@ -996,8 +1018,8 @@ class _CustomFormDialogState extends State<Edit> {
   String? subCatName;
   int? selectedOption;
   List<dynamic> subCategoryList = [];
-  int? catId;
-  int? subCatId;
+  int catId=0;
+  int subCatId=0;
   String priority = 'low';
   bool isChecked = false;
   DateTime date = DateTime.now();
@@ -1009,6 +1031,9 @@ class _CustomFormDialogState extends State<Edit> {
     super.initState();
     fetchCategories();
     catName = widget.catname;
+    catId = int.parse(widget.catId);
+    subCatId = int.parse(widget.subCatId);
+
     subCatName = widget.subCatName;
     selectedOption = _getPriorityValue(widget.Priority);
     _descriptionController.text = widget.Desc;
@@ -1032,13 +1057,88 @@ class _CustomFormDialogState extends State<Edit> {
     }
   }
 
-  void submitData() {
-    // Implement your submit logic here
-    print("Category ID: $catId");
-    print("Subcategory ID: $subCatId");
-    print("Priority: $priority");
-    print("Description: ${_descriptionController.text}");
-    print("Preferred Time to Call Back: $date");
+  String _getPriorityLabel(int? option) {
+    switch (option) {
+      case 1:
+        return 'Low';
+      case 2:
+        return 'Medium';
+      case 3:
+        return 'High';
+      default:
+        return 'Unknown'; // Handle default case
+    }
+  }
+
+  Future<void> submitData(int rnum,String siteid,String siteName,int index) async {
+    final String apiUrl =
+        'http://rsmgmt.ivisecurity.com:8949/serviceHelpDesk/updateService_1_0/$rnum';
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: {
+        'siteId': widget.siteId,
+        'calling_system': 'mobile',
+        'service_cat_id': catId.toString(),
+        'service_subcat_id': subCatId.toString(),
+        'editedBy': LoginApiService.UserId.toString(),
+        'description': _descriptionController.text,
+        'PrefTimeToCall': isChecked ? date.toString() : "",
+        'priority': _getPriorityLabel(selectedOption),
+        'remarks': 'undefined',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Data submitted successfully');
+      // Handle successful submission
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Success'),
+            content: Text('Data submitted successfully'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => RequestScreen(
+                  i: index,
+                  siteId: siteid,
+                  Sitename: siteName,
+                )),
+      );
+    } else {
+      print('Failed to submit data');
+      // Handle failed submission
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to submit data'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   int _getPriorityValue(String priority) {
@@ -1094,10 +1194,10 @@ class _CustomFormDialogState extends State<Edit> {
                                 selectedCategory['subCategoryList'] ?? [];
                             catId = selectedCategory['catId'];
                             subCatName = null; // Reset subcategory selection
-                            subCatId = null;
+                            
                           } else {
                             subCategoryList = [];
-                            catId = null;
+                            
                           }
                         });
                       },
@@ -1131,7 +1231,7 @@ class _CustomFormDialogState extends State<Edit> {
                             );
                             subCatId = selectedSubCategory['serviceSubcatId'];
                           } else {
-                            subCatId = null;
+                            
                           }
                         });
                       },
@@ -1287,7 +1387,7 @@ class _CustomFormDialogState extends State<Edit> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          submitData();
+                          submitData(widget.rnum,widget.siteId,widget.sitename,widget.index);
                         },
                         style: ButtonStyle(
                           shape:
