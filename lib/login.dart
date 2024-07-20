@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/login_api_service.dart';
 import 'package:ivis_security/forgot_Pass.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   // ignore: use_key_in_widget_constructors
@@ -87,6 +88,49 @@ class _LoginFormState extends State<LoginForm> {
 
     // Navigate to the next screen
   }
+  @override
+  void initState() {
+    super.initState();
+    loadSavedCredentials(); // Load saved credentials when widget initializes
+  }
+
+  bool isChecked = false;
+ 
+
+  Future<void> loadSavedCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isChecked = prefs.getBool('isChecked') ?? false;
+      if (isChecked) {
+        userController.text = prefs.getString('username') ?? '';
+        passwordController.text = prefs.getString('password') ?? '';
+      }
+    });
+  }
+
+  Future<void> saveCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isChecked', isChecked);
+    if (isChecked) {
+      await prefs.setString('username', userController.text);
+      await prefs.setString('password', passwordController.text);
+    } else {
+      await prefs.remove('username');
+      await prefs.remove('password');
+    }
+  }
+
+  void handleCheckbox(bool? value) {
+    setState(() {
+      isChecked = value ?? false;
+      if (!isChecked) {
+        // Clear username and password if checkbox is unchecked
+        userController.text = '';
+        passwordController.text = '';
+      }
+    });
+    saveCredentials(); // Save credentials whenever checkbox state changes
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,10 +194,8 @@ class _LoginFormState extends State<LoginForm> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Checkbox(
-              value: false,
-              onChanged: (bool? value) {
-                // Handle checkbox state change
-              },
+              value: isChecked,
+              onChanged: handleCheckbox,
             ),
             const Text(
               'Remember Me',

@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:ivis_security/apis/login_api_service.dart';
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -53,7 +57,7 @@ class ResetScreen extends StatelessWidget {
             left: 30,
             child: Container(
               width: 300,
-              height: 450,
+              height: 550,
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -101,10 +105,121 @@ class _PasswordValidatorState extends State<ResetForm> {
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _reenterPasswordController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+ // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _showPassword = false;
+  bool _matched = false;
   
+   bool _isPasswordValid = false;
+  bool _hasUppercase = false;
+  bool _hasLowercase = false;
+  bool _hasNumber = false;
+  bool _hasSpecialChar = false;
 
+  void _updatePassword() async {
+    // Endpoint URL
+    var url = Uri.parse('http://34.206.37.237/userDetails/updatePassword_1_0');
+
+    // JSON payload
+    var payload = {
+      "userName": LoginApiService.UserName,
+      "oldPassword": _oldPasswordController.text,
+      "newPassword": _newPasswordController.text,
+      "firstTime": "F",
+    };
+
+    // Encode payload to JSON
+    var body = jsonEncode(payload);
+
+    try {
+      // Make PUT request
+      var response = await http.put(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: body,
+      );
+
+      // Check response status code
+      if (response.statusCode == 200) {
+        showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                    content: Container(
+                      height: 140,
+                      width: 340,
+                      padding: const EdgeInsets.all(16),
+                      child: const Text(
+                        "updated ",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    actions: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 16),
+                      ),
+                    ],
+                  );
+                },
+              );
+        print('Password update successful');
+        print('Response body: ${response.body}');
+      } else {
+        showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                    content: Container(
+                      height: 140,
+                      width: 340,
+                      padding: const EdgeInsets.all(16),
+                      child: const Text(
+                        "invalid old password ",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    actions: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 16),
+                      ),
+                    ],
+                  );
+                },
+              );
+        print('Failed to update password. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
   @override
   void dispose() {
     _oldPasswordController.dispose();
@@ -116,7 +231,7 @@ class _PasswordValidatorState extends State<ResetForm> {
   @override
   Widget build(BuildContext context) {
     double Height = MediaQuery.of(context).size.height;
-    double Width = MediaQuery.of(context).size.width;
+    //double Width = MediaQuery.of(context).size.width;
     return Container(
       height: Height*0.5,
       child: Column(
@@ -125,7 +240,7 @@ class _PasswordValidatorState extends State<ResetForm> {
           TextFormField(
             controller: _oldPasswordController,
             decoration: const InputDecoration(
-                labelText: 'Email ID Or UserName',
+                labelText: 'Old Password',
                 border: OutlineInputBorder(),
                 filled: true,
                 fillColor: Colors.white),
@@ -151,13 +266,23 @@ class _PasswordValidatorState extends State<ResetForm> {
                 ),
               ),
             ),
+            onChanged: (value) {
+                setState(() {
+                  _isPasswordValid = value.length >= 6 ;
+
+                  _hasUppercase = _containsUppercase(value);
+                  _hasLowercase = _containsLowercase(value);
+                  _hasNumber = _containsNumber(value);
+                  _hasSpecialChar = _containsSpecialChar(value);
+                });
+              },
           ),
           SizedBox(height: Height * 0.02),
           TextFormField(
             obscureText: !_showPassword,
             controller: _reenterPasswordController,
             decoration: InputDecoration(
-              labelText: 'Enter New Password',
+              labelText: _matched ? 'Enter New Password': "invalid",labelStyle: TextStyle(color:_matched ? Colors.grey : Colors.red ),
               border: const OutlineInputBorder(),
               filled: true,
               fillColor: Colors.white,
@@ -169,23 +294,31 @@ class _PasswordValidatorState extends State<ResetForm> {
                 },
                 child: Icon(
                   _showPassword ? Icons.visibility : Icons.visibility_off,
-                  color: Colors.grey,
+                  color:  Colors.grey,
                 ),
               ),
             ),
+            onChanged: (value) {
+                setState(() {
+                   _matched = _newPasswordController.text == value;
+                });
+              },
           ),
+          SizedBox(height: Height * 0.005),
+           _buildPasswordCriteriaText('At least 6 characters', _isPasswordValid),
+            _buildPasswordCriteriaText('At least one uppercase letter', _hasUppercase),
+            _buildPasswordCriteriaText('At least one lowercase letter', _hasLowercase),
+            _buildPasswordCriteriaText('At least one digit', _hasNumber),
+            _buildPasswordCriteriaText('At least one special character', _hasSpecialChar),
           SizedBox(height: Height * 0.025),
           ElevatedButton(
             onPressed: () {
-              if (_formKey.currentState!.validate()) {
+              if (LoginApiService.Password==_oldPasswordController.text && _matched && _hasLowercase && _hasNumber && _hasUppercase && _isPasswordValid && _hasSpecialChar) {
                 // Password meets all criteria
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Password is valid'),
-                  ),
-                );
+                _updatePassword();
               }
-              showDialog(
+              else {
+                showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
@@ -205,7 +338,7 @@ class _PasswordValidatorState extends State<ResetForm> {
                       width: 340,
                       padding: const EdgeInsets.all(16),
                       child: const Text(
-                        "Reset password link has been sent to your registered e-mail id",
+                        "invalid old password ",
                         style: TextStyle(
                           fontSize: 16,
                         ),
@@ -219,6 +352,9 @@ class _PasswordValidatorState extends State<ResetForm> {
                   );
                 },
               );
+        
+              }
+              
             },
             style: ButtonStyle(
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -235,5 +371,41 @@ class _PasswordValidatorState extends State<ResetForm> {
     );
   }
 
-  
+  bool _containsUppercase(String value) {
+    return value.contains(new RegExp(r'[A-Z]'));
+  }
+
+  bool _containsLowercase(String value) {
+    return value.contains(new RegExp(r'[a-z]'));
+  }
+
+  bool _containsNumber(String value) {
+    return value.contains(new RegExp(r'[0-9]'));
+  }
+
+  bool _containsSpecialChar(String value) {
+    return value.contains(new RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+  }
+
+  Widget _buildPasswordCriteriaText(String text, bool isSatisfied) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: <Widget>[
+          Icon(
+            isSatisfied ? Icons.check_circle : Icons.cancel,
+            color: isSatisfied ? Colors.green : Colors.red,
+          ),
+          SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 16,
+              color: isSatisfied ? Colors.green : Colors.red,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

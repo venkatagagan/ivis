@@ -67,7 +67,7 @@ class _OneStopScreenState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
     double Height = MediaQuery.of(context).size.height;
-    double Width = MediaQuery.of(context).size.width;
+    //double Width = MediaQuery.of(context).size.width;
     return Drawer(
       child: Column(
         children: [

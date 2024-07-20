@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:ivis_security/alarm.dart';
 import 'package:ivis_security/cctv.dart';
 import 'package:ivis_security/development.dart';
+import 'package:ivis_security/drawer.dart';
 import 'package:ivis_security/hdtv.dart';
 import 'package:ivis_security/request.dart';
 import 'package:ivis_security/center.dart';
-import 'package:ivis_security/contact.dart';
-import 'package:ivis_security/reset.dart';
 import 'package:ivis_security/apis/Services.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
 
@@ -106,12 +105,15 @@ class _OneStopScreenState extends State<OneStopScreen> {
               width: double.infinity,
               alignment: Alignment.center,
             ),
+            
             Column(
               children: [
-                SizedBox(height: Height * 0.08),
+                SizedBox(height: Height * 0.05),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    SizedBox(width: Width * 0.1),
+                              
                     Builder(
                       builder: (context) => GestureDetector(
                         onTap: () {
@@ -139,7 +141,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                   ],
                 ),
                 SizedBox(
-                  height: Height * 0.04,
+                  height: Height * 0.02,
                 ),
                 const Divider(
                   height: 1, // Set the height of the line
@@ -187,7 +189,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                             sitename,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 16,
                               color: Colors.white,
                             ),
                           ),
@@ -228,7 +230,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
                 SizedBox(
-                  height: Height * 0.05,
+                  height: Height * 0.1,
                 ),
                 Row(
                   children: [
@@ -271,7 +273,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                         }
                       },
                       child: CustomButton(
-                        imagePath: 'assets/logos/cctv.jpg',
+                        imagePath: 'assets/logos/Acctv.png',
                         text1: 'live View',
                         isEnabled: liveview == "T",
                       ),
@@ -297,7 +299,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                         }
                       },
                       child: CustomButton(
-                        imagePath: 'assets/logos/alarm.jpg',
+                        imagePath: 'assets/logos/Aalarm.png',
                         text1: 'Alarm',
                         isEnabled: alaram == "T",
                       ),
@@ -456,114 +458,12 @@ class _OneStopScreenState extends State<OneStopScreen> {
             ),
           ],
         ),
-        drawer: Drawer(
-          child: Column(
-            children: [
-              Container(
-                color: const Color.fromARGB(
-                    255, 120, 63, 59), // Background color for the custom header
-                height: 230, // Height of the custom header
-                child: const Stack(
-                  children: [
-                    // Positioned user avatar
-                    Positioned(
-                      top: 20,
-                      left: 20,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.blue,
-                          size: 50,
-                        ),
-                      ),
-                    ),
-                    // Positioned account name
-                    Positioned(
-                      top: 44,
-                      left: 100,
-                      right: 73,
-                      child: Text(
-                        "NAME              +91XXXXXXXXXX name@email.com",
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 108,
-                      left: 100,
-                      right: 86,
-                      child: Text(
-                        "Address Line 1 Address Line 2 District/City State, Country Pincode",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 207,
-                      left: 100,
-                      child: Text(
-                        "+91 1234512345",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    // Positioned account email
-                  ],
-                ),
-              ),
-              //
-              const SizedBox(
-                height: 25,
-              ),
-              ListTile(
-                title: const Text("RESET PASSWORD"),
-                onTap: () {
-                  // Handle home item tap
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ResetScreen()),
-                  ); // Close the drawer
-                },
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              ListTile(
-                title: const Text("CONTACT"),
-                onTap: () {
-                  // Handle settings item tap
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ContactScreen()),
-                  ); // Close the drawer
-                },
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              ListTile(
-                minLeadingWidth: 25,
-                title: const Text("TERMS & CONDITIONS"),
-                onTap: () {
-                  // Handle settings item tap
-                  Navigator.pop(context); // Close the drawer
-                },
-              ),
-            ],
-          ),
-        ),
+        drawer: DrawerWidget(),
       ),
     );
   }
+
+  
 
   void showMyDialog(BuildContext context) {
     showDialog(

@@ -9,10 +9,12 @@ class LoginApiService {
   // ignore: non_constant_identifier_names
   static String UserName = '';
   static int UserId = 0;
+  static String Password='';
   
 
   static Future<void> login(BuildContext context, String user, String password) async {
     try {
+      
       final Map<String, dynamic> requestBody = {
         "userName": user,
         "password": password,
@@ -27,7 +29,7 @@ class LoginApiService {
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        
+        Password=password;
         String Status = jsonResponse['Status'];
         UserId = jsonResponse['UserId'];
         UserName = jsonResponse['UserName'];

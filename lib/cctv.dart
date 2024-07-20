@@ -6,7 +6,6 @@ import 'package:ivis_security/apis/Services.dart';
 import 'package:ivis_security/apis/fetchdata.dart';
 import 'package:ivis_security/cctv/camBigScreen.dart';
 import 'package:ivis_security/cctv/camList.dart';
-import 'package:ivis_security/cctv/screens.dart';
 import 'package:ivis_security/center.dart';
 import 'package:ivis_security/drawer.dart';
 import 'package:ivis_security/home.dart';
@@ -35,7 +34,7 @@ class _MyHomePageState extends State<CctvScreen> {
   String sitename = "";
   String siteId = "";
   int currentIndex = 1;
-  List<TdpCamera> listOfCamera = [];
+  List<CameraList> listOfCamera = [];
   int sitID = 36323;
   // ignore: unused_field
   bool _isVisible = false;
@@ -57,7 +56,7 @@ class _MyHomePageState extends State<CctvScreen> {
     currentIndex = widget.i;
     _camerasFuture = fetchCameras(siteId);
     sitID = int.parse(widget.siteId);
-    fetchMonitoringNames(sitID);
+    
     fetchSiteNames();
     fetchData(sitID);
   }
@@ -360,6 +359,7 @@ class _MyHomePageState extends State<CctvScreen> {
               ),
               if (selectedButtonIndex == 0) ...[
                 // Display content for Button 1
+                
                 Positioned(
                   top: Height * 0.265, // Adjust the position from the bottom
                   right: Width * 0.65,

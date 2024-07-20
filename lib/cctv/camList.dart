@@ -1,7 +1,7 @@
-class TdpCamera {
+class CameraList {
   final String cameraId;
   final String name;
-  final String rtspUrl;
+  
   final String userName;
   final String password;
   final String? fps; // You can replace this with the actual data type
@@ -14,10 +14,9 @@ class TdpCamera {
   final String siteName;
   final String snapshot;
 
-  TdpCamera({
+  CameraList({
     required this.cameraId,
     required this.name,
-    required this.rtspUrl,
     required this.userName,
     required this.password,
     this.fps,
@@ -31,11 +30,10 @@ class TdpCamera {
     required this.snapshot,
   });
 
-  factory TdpCamera.fromJson(Map<String, dynamic> json) {
-    return TdpCamera(
+  factory CameraList.fromJson(Map<String, dynamic> json) {
+    return CameraList(
       cameraId: json['cameraId'],
       name: json['name'],
-      rtspUrl: json['rtspUrl'],
       userName: json['userName'],
       password: json['password'],
       fps: json['fps'],

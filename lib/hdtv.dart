@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
 import 'package:ivis_security/apis/Services.dart';
-import 'package:ivis_security/apis/fetchdata.dart';
-import 'package:ivis_security/cctv/camList.dart';
 import 'package:ivis_security/navigation.dart';
 import 'package:ivis_security/home.dart';
 import 'package:ivis_security/drawer.dart';
@@ -31,7 +29,6 @@ class _MyHomePageState extends State<HdtvScreen> {
   String sitename = '';
   int currentIndex = 0;
 
-  List<TdpCamera> listOfCamera = [];
 
   int sitID = 36323;
 
@@ -58,20 +55,14 @@ class _MyHomePageState extends State<HdtvScreen> {
       List<dynamic> sites = await BussinessInterface.fetchSiteNames();
       setState(() {
         siteNames = sites;
-        retrieveTheCamerasData();
+        
       });
     } catch (e) {
       print('Error fetching site names: $e');
     }
   }
 
-  void retrieveTheCamerasData() async {
-    await getCameras(sitID).then((value) {
-      setState(() {
-        listOfCamera = value;
-      });
-    });
-  }
+  
 
   Future<void> fetchData(int accountId) async {
     try {
@@ -88,15 +79,12 @@ class _MyHomePageState extends State<HdtvScreen> {
       // Handle errors...
     }
   }
-
-  void onButtonPressed(int index) {
-    setState(() {
-      selectedButtonIndex = index; // Update the selected button index
-    });
-  }
-
+  
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -109,284 +97,158 @@ class _MyHomePageState extends State<HdtvScreen> {
               width: double.infinity,
               alignment: Alignment.center,
             ),
-            Positioned(
-                top: 50, // Adjust the position from the bottom
-                left: 71,
-                child: GestureDetector(
-                  onTap: () {
-                    // Your action when the image is tapped
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
-                    // Add your logic here, such as navigating to a new screen or performing some action.
-                  },
-                  child: Image.asset(
-                    'assets/logos/logo.png',
-                    height: 26.87,
-                    width: 218.25,
-                  ),
-                )),
-            Positioned(
-              top: 47,
-              left: 30,
-              child: Builder(
-                builder: (context) => GestureDetector(
-                  onTap: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.menu,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: currentIndex > 0
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex - 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex - 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HdtvScreen(
-                              i: currentIndex - 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
+            SizedBox(
+                      height: Height * 0.18,
+                      child: Column(
+                        children: [
+                          SizedBox(height: Height * 0.05),
+                          Row(
+                            children: [
+                              SizedBox(width: Width * 0.1),
+                              Builder(
+                                builder: (context) => GestureDetector(
+                                  onTap: () {
+                                    Scaffold.of(context).openDrawer();
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.menu,
+                                        size: 30,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: Width * 0.05,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  // Your action when the image is tapped
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => HomePage()),
+                                  );
+                                  // Add your logic here, such as navigating to a new screen or performing some action.
+                                },
+                                child: Image.asset(
+                                  'assets/logos/logo.png',
+                                  height: Height * 0.04,
+                                  width: Width * 0.6,
+                                ),
+                              )
+                            ],
                           ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            Positioned(
-              right: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: currentIndex < siteNames.length - 1
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex + 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex + 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HdtvScreen(
-                              i: currentIndex + 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
+                          SizedBox(
+                            height: Height * 0.02,
                           ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            const Positioned(
-              top: 120, // Adjust the top position as needed
-              left: 0.5, // Adjust the left position as needed
-              right: 0.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            const Positioned(
-              top: 175, // Adjust the top position as needed
-              left: 0.5, // Adjust the left position as needed
-              right: 0.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            
-            Positioned(
-              left: MediaQuery.of(context).size.width * 0.2,
-              top: 135, // Center vertically
-              child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  height: MediaQuery.of(context).size.height*0.03,
-                  child: Center(child:  Text(
-                    widget.Sitename,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                    )
-                  )),
-            ),
-            Positioned(
-                top: 202, // Adjust the position from the bottom
-                left: 51, // Adjust the position from the left
-                child: TextButton(
-                  onPressed: () => onButtonPressed(0),
-                  child: const Text(
-                    'SCREENS',
-                    style: TextStyle(
-                      color: Colors.white, // Set the text color to black
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 202, // Adjust the position from the bottom
-                left: 151, // Adjust the position from the left
-                child: TextButton(
-                  onPressed: () => onButtonPressed(1),
-                  child: const Text(
-                    'PLAYLIST',
-                    style: TextStyle(
-                      color: Colors.white, // Set the text color to black
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 202, // Adjust the position from the bottom
-                left: 256, // Adjust the position from the left
-                child: TextButton(
-                  onPressed: () => onButtonPressed(2),
-                  child: const Text(
-                    'AD LIST',
-                    style: TextStyle(
-                      color: Colors.white, // Set the text color to black
-                    ),
-                  ),
-                ),
-              ),
-              if (selectedButtonIndex == 0) ...[
-                // Display content for Button 1
-                const Positioned(
-                  top: 253, // Adjust the position from the bottom
-                  left: 30.5,
-                  right: 229.5,
-                  child: Divider(
-                    height: 1, // Set the height of the line
-                    thickness: 6, // Set the thickness of the line
-                    color: Colors.white, // Set the color of the line
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 285,
-                        ),
-                        Container(
-                          width: 300,
-                          height: 310,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(1),
-                            borderRadius: BorderRadius.circular(5),
+                          const Divider(
+                            height: 1, // Set the height of the line
+                            thickness: 1, // Set the thickness of the line
+                            color: Colors.white, // Set the color of the line
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.only(
-                                top: 0, left: 0), // Adjust the left padding
+                          SizedBox(
+                            height: Height * 0.05,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [],
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: Width * 0.05,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.arrow_back_ios),
+                                  onPressed: currentIndex > 0
+                                      ? () {
+                                          String siteId =
+                                              siteNames[currentIndex - 1]
+                                                      ['siteId']
+                                                  .toString();
+                                          String sitename =
+                                              siteNames[currentIndex - 1]
+                                                      ['siteName']
+                                                  .toString();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => HdtvScreen(
+                                                i: currentIndex - 1,
+                                                siteId: siteId,
+                                                Sitename: sitename,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                  iconSize: 21.13,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                    height: Height * 0.05,
+                                    width: Width * 0.6,
+                                    child: Center(
+                                      child: Text(
+                                        sitename,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )),
+                                SizedBox(
+                                  width: Width * 0.01,
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_forward_ios),
+                                  onPressed: currentIndex < siteNames.length - 1
+                                      ? () {
+                                          String siteId =
+                                              siteNames[currentIndex + 1]
+                                                      ['siteId']
+                                                  .toString();
+                                          String sitename =
+                                              siteNames[currentIndex + 1]
+                                                      ['siteName']
+                                                  .toString();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => HdtvScreen(
+                                                i: currentIndex + 1,
+                                                siteId: siteId,
+                                                Sitename: sitename,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                  iconSize: 21.13,
+                                  color: Colors.white,
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                // Add rows and columns specific to Button 1
-              ] else if (selectedButtonIndex == 1) ...[
-                // Display content for Button 2
-                const Positioned(
-                  top: 253, // Adjust the position from the bottom
-                  left: 130.5,
-                  right: 129.5,
-                  child: Divider(
-                    height: 1, // Set the height of the line
-                    thickness: 6, // Set the thickness of the line
-                    color: Colors.white, // Set the color of the line
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 285,
-                        ),
-                        Container(
-                          width: 300,
-                          height: 300,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ] else if (selectedButtonIndex == 2) ...[
-                // Display content for Button 2
-                const Positioned(
-                  top: 253, // Adjust the position from the bottom
-                  left: 230.5,
-                  right: 29.5,
-                  child: Divider(
-                    height: 1, // Set the height of the line
-                    thickness: 6, // Set the thickness of the line
-                    color: Colors.white, // Set the color of the line
-                  ),
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 285,
-                        ),
-                        Container(
-                          width: 300,
-                          height: 300,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            if (ad == "F") // change logic as alarm == "F"
+                          const Divider(
+                            height: 1, // Set the height of the line
+                            thickness: 1, // Set the thickness of the line
+                            color: Colors.white, // Set the color of the line
+                          ),
+                          
+                        ],
+                      )),
+                    
+            if ("F" == "F") // change logic as ae == "F"
               ...[
               Column(
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.233,
+                    height: MediaQuery.of(context).size.height * 0.163,
                   ),
                   Container(
-                    height: MediaQuery.of(context).size.height * 0.7024,
+                    height: MediaQuery.of(context).size.height * 0.766,
                     width: MediaQuery.of(context).size.width * 1,
                     color: Colors.black54,
                     child: Center(
@@ -398,8 +260,7 @@ class _MyHomePageState extends State<HdtvScreen> {
                   )
                 ],
               ),
-            ],
-          ],
+            ],          ],
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
           siteId: siteId,

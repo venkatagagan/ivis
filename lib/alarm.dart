@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
 import 'package:ivis_security/apis/Services.dart';
 import 'package:http/http.dart' as http;
-import 'package:ivis_security/cctv/camList.dart';
 import 'package:ivis_security/navigation.dart';
 import 'package:ivis_security/home.dart';
 import 'package:ivis_security/drawer.dart';
@@ -34,7 +33,6 @@ class _MyHomePageState extends State<AlarmScreen> {
   String sitename = '';
   int currentIndex = 0;
 
-  List<TdpCamera> listOfCamera = [];
 
   int sitID = 36323;
 
@@ -165,140 +163,157 @@ class _MyHomePageState extends State<AlarmScreen> {
               width: double.infinity,
               alignment: Alignment.center,
             ),
-            Positioned(
-                top: 50, // Adjust the position from the bottom
-                left: 71,
-                child: GestureDetector(
-                  onTap: () {
-                    // Your action when the image is tapped
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
-                    // Add your logic here, such as navigating to a new screen or performing some action.
-                  },
-                  child: Image.asset(
-                    'assets/logos/logo.png',
-                    height: 26.87,
-                    width: 218.25,
-                  ),
-                )),
-            Positioned(
-              top: 47,
-              left: 30,
-              child: Builder(
-                builder: (context) => GestureDetector(
-                  onTap: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.menu,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: currentIndex > 0
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex - 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex - 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AlarmScreen(
-                              i: currentIndex - 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            Positioned(
-              right: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: currentIndex < siteNames.length - 1
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex + 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex + 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AlarmScreen(
-                              i: currentIndex + 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            const Positioned(
-              top: 120, // Adjust the top position as needed
-              left: 0.5, // Adjust the left position as needed
-              right: 0.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            const Positioned(
-              top: 170, // Adjust the top position as needed
-              left: 0.5, // Adjust the left position as needed
-              right: 0.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            Positioned(
-              left: MediaQuery.of(context).size.width / 2 -
-                  75, // Adjust the position from the left
-              top: 135, // Center vertically
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Center(
-                  child: Text(
-                    widget.Sitename,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
             Column(
-              children: [
-                SizedBox(
-                  height: Height * 0.25,
-                ),
+                children: [
+                  SizedBox(
+                      height: Height * 0.2,
+                      child: Column(
+                        children: [
+                          SizedBox(height: Height * 0.05),
+                          Row(
+                            children: [
+                              SizedBox(width: Width * 0.1),
+                              Builder(
+                                builder: (context) => GestureDetector(
+                                  onTap: () {
+                                    Scaffold.of(context).openDrawer();
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.menu,
+                                        size: 30,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: Width * 0.05,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  // Your action when the image is tapped
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => HomePage()),
+                                  );
+                                  // Add your logic here, such as navigating to a new screen or performing some action.
+                                },
+                                child: Image.asset(
+                                  'assets/logos/logo.png',
+                                  height: Height * 0.04,
+                                  width: Width * 0.6,
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: Height * 0.02,
+                          ),
+                          const Divider(
+                            height: 1, // Set the height of the line
+                            thickness: 1, // Set the thickness of the line
+                            color: Colors.white, // Set the color of the line
+                          ),
+                          SizedBox(
+                            height: Height * 0.05,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: Width * 0.05,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.arrow_back_ios),
+                                  onPressed: currentIndex > 0
+                                      ? () {
+                                          String siteId =
+                                              siteNames[currentIndex - 1]
+                                                      ['siteId']
+                                                  .toString();
+                                          String sitename =
+                                              siteNames[currentIndex - 1]
+                                                      ['siteName']
+                                                  .toString();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AlarmScreen(
+                                                i: currentIndex - 1,
+                                                siteId: siteId,
+                                                Sitename: sitename,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                  iconSize: 21.13,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                    height: Height * 0.05,
+                                    width: Width * 0.6,
+                                    child: Center(
+                                      child: Text(
+                                        sitename,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )),
+                                SizedBox(
+                                  width: Width * 0.01,
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_forward_ios),
+                                  onPressed: currentIndex < siteNames.length - 1
+                                      ? () {
+                                          String siteId =
+                                              siteNames[currentIndex + 1]
+                                                      ['siteId']
+                                                  .toString();
+                                          String sitename =
+                                              siteNames[currentIndex + 1]
+                                                      ['siteName']
+                                                  .toString();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AlarmScreen(
+                                                i: currentIndex + 1,
+                                                siteId: siteId,
+                                                Sitename: sitename,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                  iconSize: 21.13,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(
+                            height: 1, // Set the height of the line
+                            thickness: 1, // Set the thickness of the line
+                            color: Colors.white, // Set the color of the line
+                          ),
+                          SizedBox(
+                            height: Height * 0.03,
+                          ),
+                        ],
+                      )),
+              
+                 SizedBox(
+                      height: Height * 0.7,
+                      child: Column(
+                        children: [
                 Row(
                   children: [
                     SizedBox(
@@ -395,6 +410,9 @@ class _MyHomePageState extends State<AlarmScreen> {
                     },
                   ),
                 ),
+                        ],
+                      )
+                 )
               ],
               
             )
@@ -472,9 +490,20 @@ class IncidentDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(actionTag),
+        title: Text(actionTag,style: TextStyle(color:Colors.white),),
+        backgroundColor: Colors.red,
+        centerTitle: true,
       ),
-      body: ListView.builder(
+      body:Stack(children: [ 
+        
+            Image.asset(
+              'assets/images/bg.png',
+              fit: BoxFit.cover,
+              height: double.infinity,
+              width: double.infinity,
+              alignment: Alignment.center,
+            ),
+        ListView.builder(
         itemCount: incidents.length,
         itemBuilder: (context, index) {
           Incident incident = incidents[index];
@@ -489,6 +518,9 @@ class IncidentDetailPage extends StatelessWidget {
               ),
               trailing: ElevatedButton(
                 child: const Text('View'),
+                style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.blue, // Background color of the button
+    ),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -538,9 +570,11 @@ class IncidentDetailPage extends StatelessWidget {
                 },
               ),
             ),
+            
           );
         },
       ),
+      ],)
     );
   }
 }

@@ -8,7 +8,6 @@ import 'package:ivis_security/home.dart';
 import 'package:ivis_security/navigation.dart';
 import 'package:intl/intl.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
-import 'package:ivis_security/cctv/camList.dart';
 
 // ignore: must_be_immutable
 class RequestScreen extends StatefulWidget {
@@ -28,7 +27,7 @@ class RequestScreen extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<RequestScreen> {
-  final _formKey = GlobalKey<FormState>();
+  //final _formKey = GlobalKey<FormState>();
   int selectedButtonIndex = 0; // used for changing new request & request status
 
   //to locate current values (imported)
@@ -41,7 +40,6 @@ class _MyHomePageState extends State<RequestScreen> {
   DateTime? date; //set date
   String priority = 'low';
 
-  List<TdpCamera> listOfCamera = [];
 
   int sitID = 36323;
 
@@ -226,6 +224,9 @@ class _MyHomePageState extends State<RequestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -238,148 +239,149 @@ class _MyHomePageState extends State<RequestScreen> {
               width: double.infinity,
               alignment: Alignment.center,
             ),
-            Positioned(
-                top: 50, // Adjust the position from the bottom
-                left: 71,
-                child: GestureDetector(
-                  onTap: () {
-                    // Your action when the image is tapped
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
-                    // Add your logic here, such as navigating to a new screen or performing some action.
-                  },
-                  child: Image.asset(
-                    'assets/logos/logo.png',
-                    height: 26.87,
-                    width: 218.25,
-                  ),
-                )),
-            Positioned(
-              top: 47,
-              left: 30,
-              child: Builder(
-                builder: (context) => GestureDetector(
-                  onTap: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.menu,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: currentIndex > 0
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex - 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex - 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RequestScreen(
-                              i: currentIndex - 1,
-                              siteId: siteId,
-                              Sitename: sitename,
+            SizedBox(
+                      height: Height * 0.25,
+                      child: Column(
+                        children: [
+                          SizedBox(height: Height * 0.05),
+                          Row(
+                            children: [
+                              SizedBox(width: Width * 0.1),
+                              Builder(
+                                builder: (context) => GestureDetector(
+                                  onTap: () {
+                                    Scaffold.of(context).openDrawer();
+                                  },
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.menu,
+                                        size: 30,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: Width * 0.05,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  // Your action when the image is tapped
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => HomePage()),
+                                  );
+                                  // Add your logic here, such as navigating to a new screen or performing some action.
+                                },
+                                child: Image.asset(
+                                  'assets/logos/logo.png',
+                                  height: Height * 0.04,
+                                  width: Width * 0.6,
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: Height * 0.02,
+                          ),
+                          const Divider(
+                            height: 1, // Set the height of the line
+                            thickness: 1, // Set the thickness of the line
+                            color: Colors.white, // Set the color of the line
+                          ),
+                          SizedBox(
+                            height: Height * 0.05,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: Width * 0.05,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.arrow_back_ios),
+                                  onPressed: currentIndex > 0
+                                      ? () {
+                                          String siteId =
+                                              siteNames[currentIndex - 1]
+                                                      ['siteId']
+                                                  .toString();
+                                          String sitename =
+                                              siteNames[currentIndex - 1]
+                                                      ['siteName']
+                                                  .toString();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => RequestScreen(
+                                                i: currentIndex - 1,
+                                                siteId: siteId,
+                                                Sitename: sitename,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                  iconSize: 21.13,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                    height: Height * 0.05,
+                                    width: Width * 0.6,
+                                    child: Center(
+                                      child: Text(
+                                        sitename,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )),
+                                SizedBox(
+                                  width: Width * 0.01,
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_forward_ios),
+                                  onPressed: currentIndex < siteNames.length - 1
+                                      ? () {
+                                          String siteId =
+                                              siteNames[currentIndex + 1]
+                                                      ['siteId']
+                                                  .toString();
+                                          String sitename =
+                                              siteNames[currentIndex + 1]
+                                                      ['siteName']
+                                                  .toString();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => RequestScreen(
+                                                i: currentIndex + 1,
+                                                siteId: siteId,
+                                                Sitename: sitename,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                  iconSize: 21.13,
+                                  color: Colors.white,
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            Positioned(
-              right: 29.87, // Adjust the position from the right
-              top: 125, // Center vertically
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: currentIndex < siteNames.length - 1
-                    ? () {
-                        String siteId =
-                            siteNames[currentIndex + 1]['siteId'].toString();
-                        String sitename =
-                            siteNames[currentIndex + 1]['siteName'].toString();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RequestScreen(
-                              i: currentIndex + 1,
-                              siteId: siteId,
-                              Sitename: sitename,
-                            ),
+                          const Divider(
+                            height: 1, // Set the height of the line
+                            thickness: 1, // Set the thickness of the line
+                            color: Colors.white, // Set the color of the line
                           ),
-                        );
-                      }
-                    : null,
-                iconSize: 21.13,
-                color: Colors.white,
-              ),
-            ),
-            const Positioned(
-              top: 120, // Adjust the top position as needed
-              left: 0.5, // Adjust the left position as needed
-              right: 0.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            const Positioned(
-              top: 175, // Adjust the top position as needed
-              left: 0.5, // Adjust the left position as needed
-              right: 0.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            Positioned(
-              left: MediaQuery.of(context).size.width * 0.2,
-              top: 135, // Center vertically
-              child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  height: MediaQuery.of(context).size.height * 0.03,
-                  child: Center(
-                      child: Text(
-                    widget.Sitename,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ))),
-            ),
-            const Positioned(
-              top: 250, // Adjust the top position as needed
-              left: 30.5, // Adjust the left position as needed
-              right: 30.5, // Adjust the right position as needed
-              child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),
-            ),
-            Positioned(
-              top: 202, // Adjust the position from the bottom
-              left: 58, // Adjust the position from the left
-              child: TextButton(
+                          SizedBox(height: Height*0.01,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [TextButton(
                 onPressed: () => onButtonPressed(0),
                 child: const Text(
                   'NEW REQUEST',
@@ -387,12 +389,9 @@ class _MyHomePageState extends State<RequestScreen> {
                     color: Colors.white, // Set the text color to black
                   ),
                 ),
-              ),
-            ),
-            Positioned(
-              top: 202, // Adjust the position from the bottom
-              left: 199, // Adjust the position from the left
-              child: TextButton(
+                          ),
+                          SizedBox(width: Width*0.05,),
+                          TextButton(
                 onPressed: () => onButtonPressed(1),
                 child: const Text(
                   'REQUEST STATUS',
@@ -401,13 +400,26 @@ class _MyHomePageState extends State<RequestScreen> {
                   ),
                 ),
               ),
-            ),
+                          ],),
+                          SizedBox(height: Height*0.01,),
+                          SizedBox(width: Width*0.8,child: Divider(
+                height: 1, // Set the height of the line
+                thickness: 1, // Set the thickness of the line
+                color: Colors.white, // Set the color of the line
+              ),)
+                        ],
+                      )),
+                     
+            
+            
+            
+            
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
-              const Positioned(
-                top: 253, // Adjust the position from the bottom
-                left: 30.5,
-                right: 179.5,
+               Positioned(
+                top: Height*0.24, // Adjust the position from the bottom
+                left: Width*0.1,
+                right: Width*0.5,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
@@ -419,13 +431,14 @@ class _MyHomePageState extends State<RequestScreen> {
                 children: [
                   Column(
                     children: [
-                      const SizedBox(
-                        height: 285,
+                      SizedBox(
+                        height: Height*0.27,
                       ),
+                      
                       Expanded(
                         child: SingleChildScrollView(
                           child: Container(
-                              width: 300,
+                              width: Width*0.8,
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(1),
                                 borderRadius: BorderRadius.circular(5),
@@ -434,11 +447,11 @@ class _MyHomePageState extends State<RequestScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: 18,
+                                    height: Height*0.02,
                                   ),
                                   SizedBox(
-                                    width: 260,
-                                    height: 60,
+                                    width: Width*0.7,
+                                    height: Height*0.08,
                                     child: DropdownButtonFormField<String>(
                                       value: catName,
                                       items: categoryList.map((item) {
@@ -478,10 +491,10 @@ class _MyHomePageState extends State<RequestScreen> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(height: 20),
+                                  SizedBox(height: Height*0.01,),
                                   SizedBox(
-                                    width: 260,
-                                    height: 60,
+                                    width: Width*0.7,
+                                    height: Height*0.08,
                                     child: DropdownButtonFormField<String>(
                                       value: subCatName,
                                       items: subCategoryList.map((item) {
@@ -516,23 +529,21 @@ class _MyHomePageState extends State<RequestScreen> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 30,
-                                  ),
+                                  SizedBox(height: Height*0.01,),
                                   Row(children: [
                                     SizedBox(
-                                      width: 25,
+                                      width: Width*0.05,
                                     ),
                                     Text(
                                       "Priority:",
                                     ),
                                   ]),
                                   SizedBox(
-                                    height: 15,
+                                    height: Height*0.01,
                                   ),
                                   Row(children: [
                                     SizedBox(
-                                      width: 10,
+                                      width: Width*0.01,
                                     ),
                                     Radio<int>(
                                       value: 1,
@@ -572,7 +583,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                     Text('high'),
                                   ]),
                                   SizedBox(
-                                    height: 10,
+                                    height: Height*0.01,
                                   ),
                                   Row(
                                     children: [
@@ -580,8 +591,8 @@ class _MyHomePageState extends State<RequestScreen> {
                                         width: 20,
                                       ),
                                       Container(
-                                        width: 260,
-                                        height: 150,
+                                        width: Width*0.7,
+                                        height: Height*0.15,
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           border: Border.all(
@@ -603,11 +614,11 @@ class _MyHomePageState extends State<RequestScreen> {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 17,
+                                    height: Height*0.02,
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(width: 12),
+                                      SizedBox(width: Width*0.04),
                                       Checkbox(
                                         value: isChecked,
                                         onChanged: (value) {
@@ -620,7 +631,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                       Text("Preferred Time to Call Back"),
                                     ],
                                   ),
-                                  SizedBox(height: 17),
+                                  SizedBox(height: Height*0.01),
                                   if (isChecked)
                                     Row(
                                       children: [
@@ -632,7 +643,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                                 builder:
                                                     (BuildContext builder) {
                                                   return Container(
-                                                      height: 300,
+                                                      height: Height*0.3,
                                                       child:
                                                           CupertinoDatePicker(
                                                         onDateTimeChanged:
@@ -661,31 +672,25 @@ class _MyHomePageState extends State<RequestScreen> {
                                         ),
                                       ],
                                     ),
-                                  SizedBox(
-                                    height: 30,
-                                  ),
+                                    SizedBox(height: Height*0.01),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      SizedBox(
-                                        width: 75,
-                                      ),
+                                     
                                       ElevatedButton(
                                         onPressed: () {
                                           submitData();
                                         },
                                         style: ButtonStyle(
-                                          shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                  25.0), // Adjust the radius as needed
-                                            ),
-                                          ),
-                                          minimumSize:
-                                              MaterialStateProperty.all(
-                                                  const Size(150,
-                                                      50)), // Set the size here
-                                        ),
+    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25.0), // Adjust the radius as needed
+      ),
+    ),
+    minimumSize: MaterialStateProperty.all(const Size(150, 50)), // Set the size here
+    backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // Set background color
+  ),
+                                        
                                         child: const Text('SUBMIT'),
                                       ),
                                     ],
@@ -708,30 +713,31 @@ class _MyHomePageState extends State<RequestScreen> {
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2
-              const Positioned(
-                top: 253, // Adjust the position from the bottom
-                left: 180.5,
-                right: 29.5,
+               Positioned(
+                top: Height*0.24, // Adjust the position from the bottom
+                left: Width*0.5,
+                right: Width*0.1,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
                   color: Colors.white, // Set the color of the line
                 ),
               ),
+              // ignore: unnecessary_null_comparison
               if (helpDeskList != null)
                 Padding(
-                  padding: EdgeInsets.fromLTRB(50, 270, 50, 0),
+                  padding: EdgeInsets.fromLTRB(Width*0.1, Height*0.24, Width*0.1, Height*0.03),
                   child: ListView.separated(
                     itemCount: helpDeskList.length,
                     separatorBuilder: (BuildContext context, int index) {
                       // Add the space between containers here
                       return SizedBox(
-                          height: 20); // Adjust the height as needed
+                          height: Height*0.02); // Adjust the height as needed
                     },
                     itemBuilder: (BuildContext context, int index) {
                       final item = helpDeskList[index];
                       return Container(
-                        width: 200,
+                        width: Width*0.8,
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(8.0),
@@ -740,30 +746,25 @@ class _MyHomePageState extends State<RequestScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              width: 260,
-                              height: 38,
+                              width: Width*0.8,
+                              height: Height*0.05,
                               color: Color.fromARGB(255, 220, 222, 222),
                               // Replace with the desired color
-                              child: Stack(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Positioned(
-                                    top: 10,
-                                    left: 13,
-                                    child: Text(
+                                
+                                  Row(
+                                    children: [
+                                    SizedBox(width: Width*0.03,),
+                                    SizedBox(width: Width*0.535,child:Text(
                                       '${item['serviceReqId']}',
                                       style: const TextStyle(
                                         fontSize: 13,
                                         color: Colors.black,
                                       ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 10,
-                                    left: 170,
-                                    child: Text(
+                                    ),),
+                                    SizedBox(width: Width*0.22,child:Text(
                                       '${item['status']}',
                                       style: TextStyle(
                                         fontSize: 13,
@@ -771,32 +772,27 @@ class _MyHomePageState extends State<RequestScreen> {
                                             ? Colors.red
                                             : Colors.green,
                                       ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 10,
-                                    left: 235,
-                                    child: Icon(
-                                      Icons
-                                          .chevron_right, // Replace with the desired icon
-                                      size: 20,
-                                      color: Colors.black,
-                                    ),
-                                  ),
+                                    ),),
+                                    
+                                    
+                                  ],),
+                                  
+                                 
+                                 
                                 ],
                               ),
                             ),
                             SizedBox(
-                              height: 5,
+                              height: Height*0.005,
                             ),
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 13,
+                                  width: Width*0.03,
                                 ),
                                 SizedBox(
-                                  width: 156,
-                                  height: 18,
+                                  width: Width*0.53,
+                                  height: Height*0.02,
                                   child: Text(
                                     '${item['service_cat_name']}',
                                     style: const TextStyle(
@@ -807,7 +803,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: 5,
+                                  width: Width*0.005,
                                 ),
                                 Text(
                                   formatDate('${item['createdTime']}'),
@@ -819,16 +815,16 @@ class _MyHomePageState extends State<RequestScreen> {
                               ],
                             ),
                             SizedBox(
-                              height: 9,
+                              height: Height*0.02,
                             ),
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 13,
+                                  width: Width*0.03,
                                 ),
                                 SizedBox(
-                                  width: 100,
-                                  height: 15,
+                                  width: Width*0.4,
+                                  height: Height*0.03,
                                   child: Text(
                                     '${item['description']}',
                                     style: const TextStyle(
