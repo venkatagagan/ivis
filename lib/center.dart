@@ -89,7 +89,8 @@ class _MyHomePageState extends State<CenterScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Stack(
+        body:SafeArea(child:  
+        Stack(
           children: [
             Image.asset(
               'assets/images/bg.png',
@@ -102,7 +103,7 @@ class _MyHomePageState extends State<CenterScreen> {
                       height: Height * 0.18,
                       child: Column(
                         children: [
-                          SizedBox(height: Height * 0.05),
+                          SizedBox(height: Height * 0.03),
                           Row(
                             children: [
                               SizedBox(width: Width * 0.1),
@@ -246,10 +247,10 @@ class _MyHomePageState extends State<CenterScreen> {
               Column(
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.163,
+                    height: MediaQuery.of(context).size.height * 0.143,
                   ),
                   Container(
-                    height: MediaQuery.of(context).size.height * 0.766,
+                    height: MediaQuery.of(context).size.height * 0.726,
                     width: MediaQuery.of(context).size.width * 1,
                     color: Colors.black54,
                     child: Center(
@@ -263,6 +264,7 @@ class _MyHomePageState extends State<CenterScreen> {
               ),
             ],
           ],
+        ),
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
           siteId: siteId,

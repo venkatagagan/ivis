@@ -50,13 +50,14 @@ class _MyHomePageState extends State<HomePage> {
           children: [
             Image.asset(
               'assets/images/bg.png',
+              fit: BoxFit.cover,
               height: double.infinity,
               width: double.infinity,
               alignment: Alignment.center,
             ),
             Column(
               children: [
-                SizedBox(height: Height * 0.06),
+                SizedBox(height: Height * 0.05),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -71,7 +72,7 @@ class _MyHomePageState extends State<HomePage> {
                             Icon(
                               Icons.menu,
                               size: Height * 0.045,
-                              color: Colors.white,
+                              color: Color(0xFFFFFFFF),
                             ),
                           ],
                         ),
@@ -86,7 +87,7 @@ class _MyHomePageState extends State<HomePage> {
                   ],
                 ),
                 SizedBox(
-                  height: Height * 0.05,
+                  height: Height * 0.02,
                 ),
                 Divider(
                   height: Height * 0.001, // Set the height of the line
@@ -102,30 +103,27 @@ class _MyHomePageState extends State<HomePage> {
                   color: Colors.white, // Set the color of the line
                 ),
                 SizedBox(
-                  height: Height * 0.03,
+                  height: Height * 0.02,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                     const Text(
-                        'S I T E S',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20, // Set the text color to black
-                        ),
+                    const Text(
+                      'S I T E S',
+                      style: TextStyle(
+                        color: Color(0xFFFFFFFF),
+                        fontSize: 20, // Set the text color to black
                       ),
-                    
-                   
+                    ),
                   ],
                 ),
               ],
             ),
-            
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
 
               Positioned(
-                top: Height * 0.335, // Adjust the position from the bottom
+                top: Height * 0.28, // Adjust the position from the bottom
                 left: Width * 0.08,
                 right: Width * 0.08,
                 child: Divider(
@@ -137,7 +135,7 @@ class _MyHomePageState extends State<HomePage> {
               Center(
                 child: Column(
                   children: [
-                    SizedBox(height: Height * 0.4),
+                    SizedBox(height: Height * 0.3),
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -178,12 +176,23 @@ class _MyHomePageState extends State<HomePage> {
                                           MainAxisAlignment.start,
                                       children: [
                                         SizedBox(width: Width * 0.05),
-                                        Image.asset(
-                                          'assets/logos/eye.jpg', // Replace with your image path
-                                          width: Width *
-                                              0.07, // Adjust image width as needed
-                                          height: Height *
-                                              0.02, // Adjust image height as needed
+                                        ShaderMask(
+                                          shaderCallback: (Rect bounds) {
+                                            return LinearGradient(
+                                              colors: [
+                                                Color(0xFFD34124),
+                                                Color(0xFF084982)
+                                              ],
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                            ).createShader(bounds);
+                                          },
+                                          child: Icon(
+                                            Icons.visibility,
+                                            size: 25,
+                                            color: Colors
+                                                .white, // This color is ignored but should be set to something that contrasts with the gradient
+                                          ),
                                         ),
                                         SizedBox(
                                             width: Width *
@@ -196,15 +205,29 @@ class _MyHomePageState extends State<HomePage> {
                                                 .toString(), // Access the 'siteName' field
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
-                                              color: Colors.black,
+                                              color:
+                                                  Color(0xFF000000), //#000000
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: Width * 0.02),
-                                        Icon(
-                                          Icons.arrow_forward_ios,
-                                          size: 18,
-                                          color: Colors.black,
+                                        ShaderMask(
+                                          shaderCallback: (Rect bounds) {
+                                            return LinearGradient(
+                                              colors: [
+                                                Color(0xFFD34124),
+                                                Color(0xFF084982)
+                                              ],
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                            ).createShader(bounds);
+                                          },
+                                          child: Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 20,
+                                            color: Colors
+                                                .white, // This color is ignored but should be set to something that contrasts with the gradient
+                                          ),
                                         ),
                                         // Add spacing between text and next image
                                       ],
@@ -260,4 +283,3 @@ class _MyHomePageState extends State<HomePage> {
     //);
   }
 }
-

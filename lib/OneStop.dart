@@ -101,6 +101,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
           children: [
             Image.asset(
               'assets/images/bg.png',
+              fit: BoxFit.cover,
               height: double.infinity,
               width: double.infinity,
               alignment: Alignment.center,
@@ -190,7 +191,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white,
+                              color: Color(0xFFFFFFFF),
                             ),
                           ),
                         )),
@@ -230,17 +231,17 @@ class _OneStopScreenState extends State<OneStopScreen> {
                   color: Colors.white, // Set the color of the line
                 ),
                 SizedBox(
-                  height: Height * 0.1,
+                  height: Height * 0.05,
                 ),
                 Row(
                   children: [
                     SizedBox(
-                      width: Width * 0.1,
+                      width: Width * 0.08,
                     ),
                     Text(
                       "GUARD",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
                         color: Colors.white,
                       ),
                     ),
@@ -250,10 +251,8 @@ class _OneStopScreenState extends State<OneStopScreen> {
                   height: Height * 0.01,
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      width: Width * 0.1,
-                    ),
                     InkWell(
                       onTap: () {
                         // Handle the button press event here
@@ -274,7 +273,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                       },
                       child: CustomButton(
                         imagePath: 'assets/logos/Acctv.png',
-                        text1: 'live View',
+                        text1: 'Live View',
                         isEnabled: liveview == "T",
                       ),
                     ),
@@ -326,7 +325,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                       },
                       child: CustomButton(
                         imagePath: 'assets/logos/Acenter-circle.png',
-                        text1: 'Safty \n Escord',
+                        text1: 'Safety \n Escord',
                         isEnabled: se == "T",
                       ),
                     ),
@@ -338,12 +337,12 @@ class _OneStopScreenState extends State<OneStopScreen> {
                 Row(
                   children: [
                     SizedBox(
-                      width: Width * 0.1,
+                      width: Width * 0.08,
                     ),
                     Text(
                       'INSIGHT',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
                         color: Colors.white,
                       ),
                     ),
@@ -355,7 +354,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                 Row(
                   children: [
                     SizedBox(
-                      width: Width * 0.1,
+                      width: Width * 0.08,
                     ),
                     InkWell(
                       onTap: () {
@@ -414,12 +413,12 @@ class _OneStopScreenState extends State<OneStopScreen> {
                 Row(
                   children: [
                     SizedBox(
-                      width: Width * 0.1,
+                      width: Width * 0.08,
                     ),
                     Text(
                       'HELPDESK',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
                         color: Colors.white,
                       ),
                     ),
@@ -431,7 +430,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                 Row(
                   children: [
                     SizedBox(
-                      width: Width * 0.1,
+                      width: Width * 0.08,
                     ),
                     InkWell(
                       onTap: () {

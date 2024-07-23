@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
+
 // ignore: must_be_immutable
 class AlarmScreen extends StatefulWidget {
   String siteId;
@@ -32,7 +33,6 @@ class _MyHomePageState extends State<AlarmScreen> {
   String siteId = '';
   String sitename = '';
   int currentIndex = 0;
-
 
   int sitID = 36323;
 
@@ -152,24 +152,26 @@ class _MyHomePageState extends State<AlarmScreen> {
     double Width = MediaQuery.of(context).size.width;
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false ,
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Stack(
-          children: [
-            Image.asset(
-              'assets/images/bg.png',
-              fit: BoxFit.cover,
-              height: double.infinity,
-              width: double.infinity,
-              alignment: Alignment.center,
-            ),
-            Column(
+        body: SafeArea(
+          child: 
+          Stack(
+            children: [
+              Image.asset(
+                'assets/images/bg.png',
+                fit: BoxFit.cover,
+                height: double.infinity,
+                width: double.infinity,
+                alignment: Alignment.center,
+              ),
+              Column(
                 children: [
                   SizedBox(
                       height: Height * 0.2,
                       child: Column(
                         children: [
-                          SizedBox(height: Height * 0.05),
+                          SizedBox(height: Height * 0.03),
                           Row(
                             children: [
                               SizedBox(width: Width * 0.1),
@@ -309,116 +311,144 @@ class _MyHomePageState extends State<AlarmScreen> {
                           ),
                         ],
                       )),
-              
-                 SizedBox(
-                      height: Height * 0.7,
+                  SizedBox(
+                      height: Height * 0.65,
                       child: Column(
                         children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      width: Width * 0.05,
-                    ),
-                    Text(
-                      'Start Date',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      width: Width * 0.3,
-                    ),
-                    Text(
-                      'End Date',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: Height * 0.01,
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: Width * 0.05,
-                    ),
-                    Container(
-                      width: Width * 0.4,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: TextFormField(
-                        controller: _dateController1,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.calendar_today,
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: Width * 0.05,
+                              ),
+                              Text(
+                                'Start Date',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                width: Width * 0.3,
+                              ),
+                              Text(
+                                'End Date',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: Height * 0.01,
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: Width * 0.05,
+                              ),
+                              Container(
+                                width: Width * 0.4,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(1),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: TextFormField(
+                                  controller: _dateController1,
+                                  decoration: InputDecoration(
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(
+                                        Icons.calendar_month_outlined,
+                                      ),
+                                      onPressed: () => _selectDate(
+                                          context, _dateController1),
+                                    ),
+                                  ),
+                                  readOnly: true,
+                                ),
+                              ),
+                              SizedBox(
+                                width: Width * 0.08,
+                              ),
+                              Container(
+                                width: Width * 0.4,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(1),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: TextFormField(
+                                  controller: _dateController2,
+                                  decoration: InputDecoration(
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(Icons.calendar_month_outlined),
+                                      onPressed: () => _selectDate(
+                                          context, _dateController2),
+                                    ),
+                                  ),
+                                  readOnly: true,
+                                ),
+                              )
+                            ],
+                          ),
+                          Expanded(
+                            child: FutureBuilder<List<Incident>>(
+                              future: fetchIncidents(_dateController1.text,
+                                  _dateController2.text, siteId),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                } else if (!snapshot.hasData ||
+                                    snapshot.data == null ||
+                                    snapshot.data!.isEmpty) {
+                                  return const Center(
+                                      child: Text(
+                                    'No alerts in selected days',
+                                    style: TextStyle(color: Colors.white),
+                                  ));
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text('Error: ${snapshot.error}'));
+                                } else if (!snapshot.hasData ||
+                                    snapshot.data!.isEmpty) {
+                                  return const Center(
+                                      child: Text('No incidents found'));
+                                } else {
+                                  Map<String, List<Incident>> groupedIncidents =
+                                      groupIncidentsByActionTag(snapshot.data!);
+                                  return IncidentGroupWidget(
+                                      groupedIncidents: groupedIncidents);
+                                }
+                              },
                             ),
-                            onPressed: () =>
-                                _selectDate(context, _dateController1),
                           ),
-                        ),
-                        readOnly: true,
-                      ),
-                    ),
-                    SizedBox(
-                      width: Width * 0.08,
-                    ),
-                    Container(
-                      width: Width * 0.4,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(1),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: TextFormField(
-                        controller: _dateController2,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: () =>
-                                _selectDate(context, _dateController2),
-                          ),
-                        ),
-                        readOnly: true,
-                      ),
-                    )
-                  ],
-                ),
-                Expanded(
-                  child: FutureBuilder<List<Incident>>(
-                    future: fetchIncidents(
-                        _dateController1.text, _dateController2.text, siteId),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (!snapshot.hasData ||
-                          snapshot.data == null ||
-                          snapshot.data!.isEmpty) {
-                        return const Center(
-                            child: Text('No alerts in selected days',style: TextStyle(color: Colors.white),));
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(child: Text('No incidents found'));
-                      } else {
-                        Map<String, List<Incident>> groupedIncidents =
-                            groupIncidentsByActionTag(snapshot.data!);
-                        return IncidentGroupWidget(
-                            groupedIncidents: groupedIncidents);
-                      }
-                    },
-                  ),
-                ),
                         ],
-                      )
-                 )
-              ],
-              
-            )
-            
-          ],
-          
+                      )),
+                  
+                ],
+              ),
+              if (alarm == "F") // change logic as alarm == "F"
+                    ...[
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.143,
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.726,
+                          width: MediaQuery.of(context).size.width * 1,
+                          color: Colors.black54,
+                          child: Center(
+                            child: Text(
+                              "You have not availed this service.\n To subscribe please CONTACT",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+            ],
+          ),
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
           siteId: siteId,
@@ -489,13 +519,16 @@ class IncidentDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(actionTag,style: TextStyle(color:Colors.white),),
-        backgroundColor: Colors.red,
-        centerTitle: true,
-      ),
-      body:Stack(children: [ 
-        
+        appBar: AppBar(
+          title: Text(
+            actionTag,
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          centerTitle: true,
+        ),
+        body: Stack(
+          children: [
             Image.asset(
               'assets/images/bg.png',
               fit: BoxFit.cover,
@@ -503,79 +536,81 @@ class IncidentDetailPage extends StatelessWidget {
               width: double.infinity,
               alignment: Alignment.center,
             ),
-        ListView.builder(
-        itemCount: incidents.length,
-        itemBuilder: (context, index) {
-          Incident incident = incidents[index];
-          Duration duration =
-              incident.eventToTime.difference(incident.eventFromTime);
-          return Card(
-            margin: const EdgeInsets.all(8.0),
-            child: ListTile(
-              title: Text('${incident.name} (${incident.objectName})'),
-              subtitle: Text(
-                'From: ${incident.eventFromTime}\nTo: ${incident.eventToTime}\nDuration: ${duration.inMinutes} minutes',
-              ),
-              trailing: ElevatedButton(
-                child: const Text('View'),
-                style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.blue, // Background color of the button
-    ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      content: SizedBox(
-                        height: 400,
-                        child: incident.files.isEmpty
-                            ? Center(
-                                child: Text(
-                                  'No files available',
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                              )
-                            : ListView.builder(
-                                itemCount: incident.files.length,
-                                itemBuilder: (context, index) {
-                                  String file = incident.files[index];
-                                  if (file.contains('.mp4') ||
-                                      file.contains('.3gp')) {
-                                    return VlcPlayerWidget(
-                                        videoUrl: file);
-                                  } else if (file.contains('.png') ||
-                                      file.contains('.jpg') ||
-                                      file.contains('.JPG') ||
-                                      file.contains('.jpeg')) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: CachedNetworkImage(
-                                        imageUrl: file,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) => SizedBox(
-                                          width:
-                                              30, // Adjust the width as needed
-                                          height:
-                                              30, // Adjust the height as needed
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return SizedBox();
-                                },
-                              ),
-                      ),
+            ListView.builder(
+              itemCount: incidents.length,
+              itemBuilder: (context, index) {
+                Incident incident = incidents[index];
+                Duration duration =
+                    incident.eventToTime.difference(incident.eventFromTime);
+                return Card(
+                  margin: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    title: Text('${incident.name} (${incident.objectName})'),
+                    subtitle: Text(
+                      'From: ${incident.eventFromTime}\nTo: ${incident.eventToTime}\nDuration: ${duration.inMinutes} minutes',
                     ),
-                  );
-                },
-              ),
+                    trailing: ElevatedButton(
+                      child: const Text('View'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Colors.blue, // Background color of the button
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            content: SizedBox(
+                              height: 400,
+                              child: incident.files.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                        'No files available',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: incident.files.length,
+                                      itemBuilder: (context, index) {
+                                        String file = incident.files[index];
+                                        if (file.contains('.mp4') ||
+                                            file.contains('.3gp')) {
+                                          return VlcPlayerWidget(
+                                              videoUrl: file);
+                                        } else if (file.contains('.png') ||
+                                            file.contains('.jpg') ||
+                                            file.contains('.JPG') ||
+                                            file.contains('.jpeg')) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: CachedNetworkImage(
+                                              imageUrl: file,
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) =>
+                                                  SizedBox(
+                                                width:
+                                                    30, // Adjust the width as needed
+                                                height:
+                                                    30, // Adjust the height as needed
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        return SizedBox();
+                                      },
+                                    ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
-            
-          );
-        },
-      ),
-      ],)
-    );
+          ],
+        ));
   }
 }
 
@@ -590,7 +625,7 @@ class VlcPlayerWidget extends StatefulWidget {
 
 class _VlcPlayerWidgetState extends State<VlcPlayerWidget> {
   late VlcPlayerController _controller;
-
+  
   @override
   void initState() {
     super.initState();
@@ -598,8 +633,7 @@ class _VlcPlayerWidgetState extends State<VlcPlayerWidget> {
       widget.videoUrl,
       hwAcc: HwAcc.full,
       autoPlay: true,
-      
-      
+      options: VlcPlayerOptions(),
     );
   }
 
@@ -618,7 +652,6 @@ class _VlcPlayerWidgetState extends State<VlcPlayerWidget> {
     );
   }
 }
-
 
 class IncidentGroupWidget extends StatelessWidget {
   final Map<String, List<Incident>> groupedIncidents;

@@ -41,7 +41,9 @@ class LoginScreen extends StatelessWidget {
                     'SIGN IN',
                     style: TextStyle(
                       fontSize: 24,
-                      color: Colors.white,
+                      color: Color(0xFFFFFFFF),
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   SizedBox(height: Height * 0.05),
@@ -49,7 +51,7 @@ class LoginScreen extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(1),
+                      color: Color(0xFFFFFFFF),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: const LoginForm(),
@@ -143,10 +145,10 @@ class _LoginFormState extends State<LoginForm> {
         TextFormField(
           controller: userController,
           decoration: const InputDecoration(
-            labelText: 'Email ID Or UserName',
+            labelText: 'Email ID Or UserName',labelStyle:TextStyle(color: Color(0xFFABABAB),fontFamily: 'Montserrat',),
             border: OutlineInputBorder(),
             filled: true,
-            fillColor: Colors.white
+            fillColor: Color(0xFFEFEFEF)
           ),
         ),
         SizedBox(height: Height * 0.02),
@@ -154,10 +156,10 @@ class _LoginFormState extends State<LoginForm> {
           obscureText: !_showPassword,
           controller: passwordController,
           decoration: InputDecoration(
-            labelText: 'Password',
+            labelText: 'Password',labelStyle:TextStyle(color: Color(0xFFABABAB),fontFamily: 'Montserrat',),
             border: const OutlineInputBorder(),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: Color(0xFFEFEFEF),
             suffixIcon: GestureDetector(
               onTap: () {
                 setState(() {
@@ -184,7 +186,7 @@ class _LoginFormState extends State<LoginForm> {
                 );
               },
               child: const Text(
-                'Forgot Password?',
+                'Forgot Password?',style:TextStyle(color: Color(0xFFABABAB),fontFamily: 'Montserrat',fontStyle: FontStyle.italic),
               ),
             ),
           ],
@@ -196,12 +198,14 @@ class _LoginFormState extends State<LoginForm> {
             Checkbox(
               value: isChecked,
               onChanged: handleCheckbox,
+              activeColor: Color(0xFF084982),
             ),
             const Text(
               'Remember Me',
               style: TextStyle(
-                color: Colors.black,
+                color: Color(0xFF084982),//#084982
                 fontSize: 20,
+                fontFamily: 'Montserrat',
               ),
             ),
           ],
@@ -217,13 +221,14 @@ class _LoginFormState extends State<LoginForm> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(50),
             ),
-            backgroundColor: Colors.blue,
+            backgroundColor: Color(0xFF084982),
           ),
           child: const Text(
             'SIGN IN',
             style: TextStyle(
-              color: Colors.white,
+              color: Color(0xFFFFFFFF),
               fontSize: 20,
+              fontFamily: 'Montserrat',
             ),
           ),
         ),
@@ -272,8 +277,9 @@ class __VersionTextVisibilityState extends State<_VersionTextVisibility> {
         child: const Text(
           'Version 1.2.0',
           style: TextStyle(
-            color: Colors.white,
+            color:Color(0xFFFFFFFF),
             fontSize: 16,
+            fontFamily: 'Montserrat',
           ),
         ),
       ),

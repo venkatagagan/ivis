@@ -15,19 +15,19 @@ class ApiService {
 
         if (status == 'Success') {
           _showDialog(context, 'Success',
-              'New password link has been sent to your registered e-mail id.');
+              'New password link has been sent to your registered e-mail id.',email);
         } else {
-          _showDialog(context, 'Error', 'Enter a valid e mail');
+          _showDialog(context, 'Error', 'Enter a valid e mail',email);
         }
       } else {
-        _showDialog(context, 'Error', 'Server error: ${response.statusCode}');
+        _showDialog(context, 'Error', 'Server error: ${response.statusCode}',email);
       }
     } catch (e) {
-      _showDialog(context, 'Error', 'An error occurred. Please try again.');
+      _showDialog(context, 'Error', 'An error occurred. Please try again.',email);
     }
   }
 
-  static void _showDialog(BuildContext context, String title, String content) {
+  static void _showDialog(BuildContext context, String title, String content,String mail) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -52,32 +52,34 @@ class ApiService {
                       ),
                     ),
                     SizedBox(height: 20),
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: 'mail',
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      enabled: false,
-                    ),
-                    SizedBox(height: 20),
+                    
                   ],
                 ),
               ),
               Positioned(
-                top: 8,
-                right: 8,
-                child: IconButton(
-                  icon: Icon(Icons.close, color: Colors.red),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
+                          top: -15,
+                          right: -15,
+                          child: ShaderMask(
+                            shaderCallback: (Rect bounds) {
+                              return LinearGradient(
+                                colors: [Color(0xFFD34124), Color(0xFF084982)],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ).createShader(bounds);
+                            },
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.cancel,
+                                size: 30,
+                                color: Colors
+                                    .white, // This color is ignored but should be set to something that contrasts with the gradient
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ),
+                        ),
             ],
           ),
         );

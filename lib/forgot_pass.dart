@@ -6,6 +6,8 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double Height = MediaQuery.of(context).size.height;
+    double Width = MediaQuery.of(context).size.width;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -21,21 +23,22 @@ class ForgotPasswordScreen extends StatelessWidget {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 5),
+                  SizedBox(height: Height * 0.05),
                   Image.asset(
                     'assets/logos/logo.png',
-                    height: 200.0,
-                    width: 300.0,
+                    height: Height * 0.1,
+                    width: Width * 0.8,
                   ),
-                  const SizedBox(height: 80),
+                  SizedBox(height: Height * 0.1),
                   const Text(
                     'FORGOT PASSWORD',
                     style: TextStyle(
                       fontSize: 24,
                       color: Colors.white,
+                      fontFamily: 'Montserrat',
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: Height * 0.02),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(20),
@@ -75,9 +78,10 @@ class _ForgotFormState extends State<ForgotForm> {
         TextField(
           controller: _emailController,
           decoration: const InputDecoration(
-            labelText: 'Username or e-mail',
+            labelText: 'Username or e-mail',labelStyle: TextStyle(fontFamily: 'Montserrat',),
             border: OutlineInputBorder(),
             filled: true,
+            
           ),
         ),
         const SizedBox(height: 40),
@@ -95,6 +99,8 @@ class _ForgotFormState extends State<ForgotForm> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: Stack(
+                      clipBehavior: Clip
+                          .none, // This allows the button to be half outside the dialog
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -102,39 +108,54 @@ class _ForgotFormState extends State<ForgotForm> {
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               SizedBox(height: 40),
-                              Text(
-                                'Fill the mail ',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              TextField(
-                                decoration: InputDecoration(
-                                  hintText: 'mail',
-                                  filled: true,
-                                  fillColor: Colors.grey[200],
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                enabled: false,
-                              ),
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.warning_amber_rounded,
+                                      size: 40,
+                                    )
+                                  ]),
+                              SizedBox(height: 40),
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Your email is invalid!',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ]),
                               SizedBox(height: 20),
                             ],
                           ),
                         ),
                         Positioned(
-                          top: 8,
-                          right: 8,
-                          child: IconButton(
-                            icon: Icon(Icons.close, color: Colors.red),
-                            onPressed: () {
-                              Navigator.of(context).pop();
+                          top: -15,
+                          right: -15,
+                          child: ShaderMask(
+                            shaderCallback: (Rect bounds) {
+                              return LinearGradient(
+                                colors: [Color(0xFFD34124), Color(0xFF084982)],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ).createShader(bounds);
                             },
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.cancel,
+                                size: 30,
+                                color: Colors
+                                    .white, // This color is ignored but should be set to something that contrasts with the gradient
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
                           ),
                         ),
                       ],
@@ -144,7 +165,7 @@ class _ForgotFormState extends State<ForgotForm> {
               );
             }
           },
-          child: const Text('Send Reset Link'),
+          child: const Text('Send Reset Link',style: TextStyle(fontFamily: 'Montserrat',),),
         ),
         const SizedBox(height: 20),
       ],

@@ -40,7 +40,6 @@ class _MyHomePageState extends State<RequestScreen> {
   DateTime? date; //set date
   String priority = 'low';
 
-
   int sitID = 36323;
 
   late Map<String, dynamic> services;
@@ -240,186 +239,190 @@ class _MyHomePageState extends State<RequestScreen> {
               alignment: Alignment.center,
             ),
             SizedBox(
-                      height: Height * 0.25,
-                      child: Column(
-                        children: [
-                          SizedBox(height: Height * 0.05),
-                          Row(
-                            children: [
-                              SizedBox(width: Width * 0.1),
-                              Builder(
-                                builder: (context) => GestureDetector(
-                                  onTap: () {
-                                    Scaffold.of(context).openDrawer();
-                                  },
-                                  child: const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.menu,
-                                        size: 30,
-                                        color: Colors.white,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: Width * 0.05,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Your action when the image is tapped
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => HomePage()),
-                                  );
-                                  // Add your logic here, such as navigating to a new screen or performing some action.
-                                },
-                                child: Image.asset(
-                                  'assets/logos/logo.png',
-                                  height: Height * 0.04,
-                                  width: Width * 0.6,
-                                ),
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            height: Height * 0.02,
-                          ),
-                          const Divider(
-                            height: 1, // Set the height of the line
-                            thickness: 1, // Set the thickness of the line
-                            color: Colors.white, // Set the color of the line
-                          ),
-                          SizedBox(
-                            height: Height * 0.05,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                height: Height * 0.25,
+                child: Column(
+                  children: [
+                    SizedBox(height: Height * 0.05),
+                    Row(
+                      children: [
+                        SizedBox(width: Width * 0.1),
+                        Builder(
+                          builder: (context) => GestureDetector(
+                            onTap: () {
+                              Scaffold.of(context).openDrawer();
+                            },
+                            child: const Row(
                               children: [
-                                SizedBox(
-                                  width: Width * 0.05,
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.arrow_back_ios),
-                                  onPressed: currentIndex > 0
-                                      ? () {
-                                          String siteId =
-                                              siteNames[currentIndex - 1]
-                                                      ['siteId']
-                                                  .toString();
-                                          String sitename =
-                                              siteNames[currentIndex - 1]
-                                                      ['siteName']
-                                                  .toString();
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => RequestScreen(
-                                                i: currentIndex - 1,
-                                                siteId: siteId,
-                                                Sitename: sitename,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      : null,
-                                  iconSize: 21.13,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                    height: Height * 0.05,
-                                    width: Width * 0.6,
-                                    child: Center(
-                                      child: Text(
-                                        sitename,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    )),
-                                SizedBox(
-                                  width: Width * 0.01,
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.arrow_forward_ios),
-                                  onPressed: currentIndex < siteNames.length - 1
-                                      ? () {
-                                          String siteId =
-                                              siteNames[currentIndex + 1]
-                                                      ['siteId']
-                                                  .toString();
-                                          String sitename =
-                                              siteNames[currentIndex + 1]
-                                                      ['siteName']
-                                                  .toString();
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => RequestScreen(
-                                                i: currentIndex + 1,
-                                                siteId: siteId,
-                                                Sitename: sitename,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      : null,
-                                  iconSize: 21.13,
+                                Icon(
+                                  Icons.menu,
+                                  size: 30,
                                   color: Colors.white,
                                 ),
                               ],
                             ),
                           ),
-                          const Divider(
-                            height: 1, // Set the height of the line
-                            thickness: 1, // Set the thickness of the line
-                            color: Colors.white, // Set the color of the line
+                        ),
+                        SizedBox(
+                          width: Width * 0.05,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            // Your action when the image is tapped
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomePage()),
+                            );
+                            // Add your logic here, such as navigating to a new screen or performing some action.
+                          },
+                          child: Image.asset(
+                            'assets/logos/logo.png',
+                            height: Height * 0.04,
+                            width: Width * 0.6,
                           ),
-                          SizedBox(height: Height*0.01,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [TextButton(
-                onPressed: () => onButtonPressed(0),
-                child: const Text(
-                  'NEW REQUEST',
-                  style: TextStyle(
-                    color: Colors.white, // Set the text color to black
-                  ),
-                ),
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: Height * 0.02,
+                    ),
+                    const Divider(
+                      height: 1, // Set the height of the line
+                      thickness: 1, // Set the thickness of the line
+                      color: Colors.white, // Set the color of the line
+                    ),
+                    SizedBox(
+                      height: Height * 0.05,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: Width * 0.05,
                           ),
-                          SizedBox(width: Width*0.05,),
-                          TextButton(
-                onPressed: () => onButtonPressed(1),
-                child: const Text(
-                  'REQUEST STATUS',
-                  style: TextStyle(
-                    color: Colors.white, // Set the text color to black
-                  ),
-                ),
-              ),
-                          ],),
-                          SizedBox(height: Height*0.01,),
-                          SizedBox(width: Width*0.8,child: Divider(
-                height: 1, // Set the height of the line
-                thickness: 1, // Set the thickness of the line
-                color: Colors.white, // Set the color of the line
-              ),)
+                          IconButton(
+                            icon: Icon(Icons.arrow_back_ios),
+                            onPressed: currentIndex > 0
+                                ? () {
+                                    String siteId = siteNames[currentIndex - 1]
+                                            ['siteId']
+                                        .toString();
+                                    String sitename =
+                                        siteNames[currentIndex - 1]['siteName']
+                                            .toString();
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RequestScreen(
+                                          i: currentIndex - 1,
+                                          siteId: siteId,
+                                          Sitename: sitename,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                : null,
+                            iconSize: 21.13,
+                            color: Colors.white,
+                          ),
+                          SizedBox(
+                              height: Height * 0.05,
+                              width: Width * 0.6,
+                              child: Center(
+                                child: Text(
+                                  sitename,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )),
+                          SizedBox(
+                            width: Width * 0.01,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.arrow_forward_ios),
+                            onPressed: currentIndex < siteNames.length - 1
+                                ? () {
+                                    String siteId = siteNames[currentIndex + 1]
+                                            ['siteId']
+                                        .toString();
+                                    String sitename =
+                                        siteNames[currentIndex + 1]['siteName']
+                                            .toString();
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RequestScreen(
+                                          i: currentIndex + 1,
+                                          siteId: siteId,
+                                          Sitename: sitename,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                : null,
+                            iconSize: 21.13,
+                            color: Colors.white,
+                          ),
                         ],
-                      )),
-                     
-            
-            
-            
-            
+                      ),
+                    ),
+                    const Divider(
+                      height: 1, // Set the height of the line
+                      thickness: 1, // Set the thickness of the line
+                      color: Colors.white, // Set the color of the line
+                    ),
+                    SizedBox(
+                      height: Height * 0.01,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () => onButtonPressed(0),
+                          child: const Text(
+                            'NEW REQUEST',
+                            style: TextStyle(
+                              color:
+                                  Colors.white, // Set the text color to black
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: Width * 0.05,
+                        ),
+                        TextButton(
+                          onPressed: () => onButtonPressed(1),
+                          child: const Text(
+                            'REQUEST STATUS',
+                            style: TextStyle(
+                              color:
+                                  Colors.white, // Set the text color to black
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: Height * 0.01,
+                    ),
+                    SizedBox(
+                      width: Width * 0.8,
+                      child: Divider(
+                        height: 1, // Set the height of the line
+                        thickness: 1, // Set the thickness of the line
+                        color: Colors.white, // Set the color of the line
+                      ),
+                    )
+                  ],
+                )),
             if (selectedButtonIndex == 0) ...[
               // Display content for Button 1
-               Positioned(
-                top: Height*0.24, // Adjust the position from the bottom
-                left: Width*0.1,
-                right: Width*0.5,
+              Positioned(
+                top: Height * 0.24, // Adjust the position from the bottom
+                left: Width * 0.1,
+                right: Width * 0.5,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
@@ -432,13 +435,12 @@ class _MyHomePageState extends State<RequestScreen> {
                   Column(
                     children: [
                       SizedBox(
-                        height: Height*0.27,
+                        height: Height * 0.27,
                       ),
-                      
                       Expanded(
                         child: SingleChildScrollView(
                           child: Container(
-                              width: Width*0.8,
+                              width: Width * 0.8,
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(1),
                                 borderRadius: BorderRadius.circular(5),
@@ -447,11 +449,11 @@ class _MyHomePageState extends State<RequestScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: Height*0.02,
+                                    height: Height * 0.02,
                                   ),
                                   SizedBox(
-                                    width: Width*0.7,
-                                    height: Height*0.08,
+                                    width: Width * 0.7,
+                                    height: Height * 0.08,
                                     child: DropdownButtonFormField<String>(
                                       value: catName,
                                       items: categoryList.map((item) {
@@ -491,10 +493,12 @@ class _MyHomePageState extends State<RequestScreen> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(height: Height*0.01,),
                                   SizedBox(
-                                    width: Width*0.7,
-                                    height: Height*0.08,
+                                    height: Height * 0.01,
+                                  ),
+                                  SizedBox(
+                                    width: Width * 0.7,
+                                    height: Height * 0.08,
                                     child: DropdownButtonFormField<String>(
                                       value: subCatName,
                                       items: subCategoryList.map((item) {
@@ -529,21 +533,23 @@ class _MyHomePageState extends State<RequestScreen> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(height: Height*0.01,),
+                                  SizedBox(
+                                    height: Height * 0.01,
+                                  ),
                                   Row(children: [
                                     SizedBox(
-                                      width: Width*0.05,
+                                      width: Width * 0.05,
                                     ),
                                     Text(
                                       "Priority:",
                                     ),
                                   ]),
                                   SizedBox(
-                                    height: Height*0.01,
+                                    height: Height * 0.01,
                                   ),
                                   Row(children: [
                                     SizedBox(
-                                      width: Width*0.01,
+                                      width: Width * 0.01,
                                     ),
                                     Radio<int>(
                                       value: 1,
@@ -583,7 +589,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                     Text('high'),
                                   ]),
                                   SizedBox(
-                                    height: Height*0.01,
+                                    height: Height * 0.01,
                                   ),
                                   Row(
                                     children: [
@@ -591,8 +597,8 @@ class _MyHomePageState extends State<RequestScreen> {
                                         width: 20,
                                       ),
                                       Container(
-                                        width: Width*0.7,
-                                        height: Height*0.15,
+                                        width: Width * 0.7,
+                                        height: Height * 0.15,
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           border: Border.all(
@@ -614,11 +620,11 @@ class _MyHomePageState extends State<RequestScreen> {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: Height*0.02,
+                                    height: Height * 0.02,
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(width: Width*0.04),
+                                      SizedBox(width: Width * 0.04),
                                       Checkbox(
                                         value: isChecked,
                                         onChanged: (value) {
@@ -631,7 +637,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                       Text("Preferred Time to Call Back"),
                                     ],
                                   ),
-                                  SizedBox(height: Height*0.01),
+                                  SizedBox(height: Height * 0.01),
                                   if (isChecked)
                                     Row(
                                       children: [
@@ -643,7 +649,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                                 builder:
                                                     (BuildContext builder) {
                                                   return Container(
-                                                      height: Height*0.3,
+                                                      height: Height * 0.3,
                                                       child:
                                                           CupertinoDatePicker(
                                                         onDateTimeChanged:
@@ -672,25 +678,30 @@ class _MyHomePageState extends State<RequestScreen> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: Height*0.01),
+                                  SizedBox(height: Height * 0.01),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                     
                                       ElevatedButton(
                                         onPressed: () {
                                           submitData();
                                         },
                                         style: ButtonStyle(
-    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-      RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25.0), // Adjust the radius as needed
-      ),
-    ),
-    minimumSize: MaterialStateProperty.all(const Size(150, 50)), // Set the size here
-    backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // Set background color
-  ),
-                                        
+                                          shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                  25.0), // Adjust the radius as needed
+                                            ),
+                                          ),
+                                          minimumSize:
+                                              MaterialStateProperty.all(
+                                                  const Size(150,
+                                                      50)), // Set the size here
+                                          backgroundColor: MaterialStateProperty
+                                              .all<Color>(Colors
+                                                  .blue), // Set background color
+                                        ),
                                         child: const Text('SUBMIT'),
                                       ),
                                     ],
@@ -713,10 +724,10 @@ class _MyHomePageState extends State<RequestScreen> {
               // Add rows and columns specific to Button 1
             ] else if (selectedButtonIndex == 1) ...[
               // Display content for Button 2
-               Positioned(
-                top: Height*0.24, // Adjust the position from the bottom
-                left: Width*0.5,
-                right: Width*0.1,
+              Positioned(
+                top: Height * 0.24, // Adjust the position from the bottom
+                left: Width * 0.5,
+                right: Width * 0.1,
                 child: Divider(
                   height: 1, // Set the height of the line
                   thickness: 6, // Set the thickness of the line
@@ -726,18 +737,19 @@ class _MyHomePageState extends State<RequestScreen> {
               // ignore: unnecessary_null_comparison
               if (helpDeskList != null)
                 Padding(
-                  padding: EdgeInsets.fromLTRB(Width*0.1, Height*0.24, Width*0.1, Height*0.03),
+                  padding: EdgeInsets.fromLTRB(
+                      Width * 0.1, Height * 0.24, Width * 0.1, Height * 0.03),
                   child: ListView.separated(
                     itemCount: helpDeskList.length,
                     separatorBuilder: (BuildContext context, int index) {
                       // Add the space between containers here
                       return SizedBox(
-                          height: Height*0.02); // Adjust the height as needed
+                          height: Height * 0.02); // Adjust the height as needed
                     },
                     itemBuilder: (BuildContext context, int index) {
                       final item = helpDeskList[index];
                       return Container(
-                        width: Width*0.8,
+                        width: Width * 0.8,
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(8.0),
@@ -746,53 +758,56 @@ class _MyHomePageState extends State<RequestScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              width: Width*0.8,
-                              height: Height*0.05,
+                              width: Width * 0.8,
+                              height: Height * 0.05,
                               color: Color.fromARGB(255, 220, 222, 222),
                               // Replace with the desired color
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                
                                   Row(
                                     children: [
-                                    SizedBox(width: Width*0.03,),
-                                    SizedBox(width: Width*0.535,child:Text(
-                                      '${item['serviceReqId']}',
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.black,
+                                      SizedBox(
+                                        width: Width * 0.03,
                                       ),
-                                    ),),
-                                    SizedBox(width: Width*0.22,child:Text(
-                                      '${item['status']}',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: item['status'] == 'Deleted'
-                                            ? Colors.red
-                                            : Colors.green,
+                                      SizedBox(
+                                        width: Width * 0.535,
+                                        child: Text(
+                                          '${item['serviceReqId']}',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.black,
+                                          ),
+                                        ),
                                       ),
-                                    ),),
-                                    
-                                    
-                                  ],),
-                                  
-                                 
-                                 
+                                      SizedBox(
+                                        width: Width * 0.22,
+                                        child: Text(
+                                          '${item['status']}',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: item['status'] == 'Deleted'
+                                                ? Colors.red
+                                                : Colors.green,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
                             SizedBox(
-                              height: Height*0.005,
+                              height: Height * 0.005,
                             ),
                             Row(
                               children: [
                                 SizedBox(
-                                  width: Width*0.03,
+                                  width: Width * 0.03,
                                 ),
                                 SizedBox(
-                                  width: Width*0.53,
-                                  height: Height*0.02,
+                                  width: Width * 0.5,
+                                  height: Height * 0.03,
                                   child: Text(
                                     '${item['service_cat_name']}',
                                     style: const TextStyle(
@@ -803,7 +818,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: Width*0.005,
+                                  width: Width * 0.005,
                                 ),
                                 Text(
                                   formatDate('${item['createdTime']}'),
@@ -815,16 +830,16 @@ class _MyHomePageState extends State<RequestScreen> {
                               ],
                             ),
                             SizedBox(
-                              height: Height*0.02,
+                              height: Height * 0.02,
                             ),
                             Row(
                               children: [
                                 SizedBox(
-                                  width: Width*0.03,
+                                  width: Width * 0.03,
                                 ),
                                 SizedBox(
-                                  width: Width*0.4,
-                                  height: Height*0.03,
+                                  width: Width * 0.45,
+                                  height: Height * 0.03,
                                   child: Text(
                                     '${item['description']}',
                                     style: const TextStyle(
@@ -835,52 +850,60 @@ class _MyHomePageState extends State<RequestScreen> {
                                   ),
                                 ),
                                 if (item['status'] != 'Deleted') ...[
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons
-                                          .edit_rounded, // Replace with the desired icon
-                                      size: 20,
-                                      color: Colors.blue,
+                                  SizedBox(
+                                    width: Width*0.1, // Adjust the width as needed
+                                     // Adjust the height as needed
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons
+                                            .edit_rounded, // Replace with the desired icon
+                                        size: 20,
+                                        color: Colors.blue,
+                                      ),
+                                      onPressed: () {
+                                        // Add your onPressed functionality here
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return Edit(
+                                              sitename: widget.Sitename,
+                                              index: widget.i,
+                                              rnum: item['serviceReqId'],
+                                              siteId: widget.siteId,
+                                              catId: item['service_cat_id']
+                                                      ?.toString() ??
+                                                  'Not Available',
+                                              subCatId:
+                                                  item['service_subcat_id']
+                                                          ?.toString() ??
+                                                      'Not Available',
+                                              Priority: item['priority']
+                                                      ?.toString() ??
+                                                  'Not Available',
+                                              catname: item['service_cat_name']
+                                                      ?.toString() ??
+                                                  'Not Available',
+                                              subCatName:
+                                                  item['service_subcat_name']
+                                                          ?.toString() ??
+                                                      'Not Available',
+                                              Desc: item['description']
+                                                      ?.toString() ??
+                                                  'Not Available',
+                                              PrefTimeToCall:
+                                                  item['PrefTimeToCall']
+                                                          ?.toString() ??
+                                                      'Not Available',
+                                            );
+                                          },
+                                        );
+                                      },
                                     ),
-                                    onPressed: () {
-                                      // Add your onPressed functionality here
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return Edit(
-                                            sitename: widget.Sitename,
-                                            index: widget.i,
-                                            rnum: item['serviceReqId'],
-                                            siteId: widget.siteId,
-                                            catId: item['service_cat_id']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            subCatId: item['service_subcat_id']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            Priority:
-                                                item['priority']?.toString() ??
-                                                    'Not Available',
-                                            catname: item['service_cat_name']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            subCatName:
-                                                item['service_subcat_name']
-                                                        ?.toString() ??
-                                                    'Not Available',
-                                            Desc: item['description']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            PrefTimeToCall:
-                                                item['PrefTimeToCall']
-                                                        ?.toString() ??
-                                                    'Not Available',
-                                          );
-                                        },
-                                      );
-                                    },
                                   ),
-                                  IconButton(
+                                  SizedBox(
+                                    width: Width*0.1, // Adjust the width as needed
+                                  
+                                  child:IconButton(
                                     icon: Icon(
                                       Icons.preview_rounded,
                                       size: 20,
@@ -925,7 +948,11 @@ class _MyHomePageState extends State<RequestScreen> {
                                       );
                                     },
                                   ),
-                                  IconButton(
+                                  ),
+                                  SizedBox(
+                                    width: Width*0.1, // Adjust the width as needed
+                                  
+                                  child:IconButton(
                                     icon: Icon(
                                       Icons.delete,
                                       size: 20,
@@ -946,6 +973,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                         },
                                       );
                                     },
+                                  ),
                                   ),
                                 ]
                               ],
@@ -1014,8 +1042,8 @@ class _CustomFormDialogState extends State<Edit> {
   String? subCatName;
   int? selectedOption;
   List<dynamic> subCategoryList = [];
-  int catId=0;
-  int subCatId=0;
+  int catId = 0;
+  int subCatId = 0;
   String priority = 'low';
   bool isChecked = false;
   DateTime date = DateTime.now();
@@ -1066,7 +1094,8 @@ class _CustomFormDialogState extends State<Edit> {
     }
   }
 
-  Future<void> submitData(int rnum,String siteid,String siteName,int index) async {
+  Future<void> submitData(
+      int rnum, String siteid, String siteName, int index) async {
     final String apiUrl =
         'http://rsmgmt.ivisecurity.com:8949/serviceHelpDesk/updateService_1_0/$rnum';
 
@@ -1190,10 +1219,8 @@ class _CustomFormDialogState extends State<Edit> {
                                 selectedCategory['subCategoryList'] ?? [];
                             catId = selectedCategory['catId'];
                             subCatName = null; // Reset subcategory selection
-                            
                           } else {
                             subCategoryList = [];
-                            
                           }
                         });
                       },
@@ -1226,9 +1253,7 @@ class _CustomFormDialogState extends State<Edit> {
                                   value,
                             );
                             subCatId = selectedSubCategory['serviceSubcatId'];
-                          } else {
-                            
-                          }
+                          } else {}
                         });
                       },
                       decoration: InputDecoration(
@@ -1383,7 +1408,8 @@ class _CustomFormDialogState extends State<Edit> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          submitData(widget.rnum,widget.siteId,widget.sitename,widget.index);
+                          submitData(widget.rnum, widget.siteId,
+                              widget.sitename, widget.index);
                         },
                         style: ButtonStyle(
                           shape:

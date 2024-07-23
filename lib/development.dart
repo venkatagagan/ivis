@@ -130,7 +130,8 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Stack(
+        body: SafeArea(child: 
+        Stack(
           children: [
             Image.asset(
               'assets/images/bg.png',
@@ -143,7 +144,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
                       height: Height * 0.18,
                       child: Column(
                         children: [
-                          SizedBox(height: Height * 0.05),
+                          SizedBox(height: Height * 0.03),
                           Row(
                             children: [
                               SizedBox(width: Width * 0.1),
@@ -517,10 +518,10 @@ class _MyHomePageState extends State<DevelopmentScreen> {
               Column(
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.18
+                    height: MediaQuery.of(context).size.height * 0.143
                   ),
                   Container(
-                    height: MediaQuery.of(context).size.height * 0.75,
+                    height: MediaQuery.of(context).size.height * 0.726,
                     width: MediaQuery.of(context).size.width * 1,
                     color: Colors.black54,
                     child: Center(
@@ -534,6 +535,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
               ),
             ],
           ],
+        ),
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
           selected: 2,
