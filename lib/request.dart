@@ -476,24 +476,29 @@ class _MyHomePageState extends State<RequestScreen> {
                   )),
               if (selectedButtonIndex == 0) ...[
                 // Display content for Button 1
-                Positioned(
-                  top: Height * 0.23, // Adjust the position from the bottom
-                  left: Width * 0.1,
-                  right: Width * 0.5,
-                  child: Divider(
-                    height: 1, // Set the height of the line
-                    thickness: 6, // Set the thickness of the line
-                    color: Colors.white, // Set the color of the line
-                  ),
-                ),
+                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Column(
                       children: [
                         SizedBox(
-                          height: Height * 0.25,
+                          height: Height * 0.223,
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                          SizedBox(width: Width*0.1,),
+                          SizedBox(width: Width*0.4,child: 
+                        Divider(
+                          
+                     // Set the height of the line
+                    thickness: 6, // Set the thickness of the line
+                    color: Colors.white, // Set the color of the line
+                  ),  ),
+                  
+                  SizedBox(width: Width*0.5,),],),
+                  SizedBox(height: Height*0.01,),
                         Expanded(
                           child: SingleChildScrollView(
                             child: Container(
@@ -825,7 +830,7 @@ class _MyHomePageState extends State<RequestScreen> {
               ] else if (selectedButtonIndex == 1) ...[
                 // Display content for Button 2
                 Positioned(
-                  top: Height * 0.23, // Adjust the position from the bottom
+                  top: Height * 0.235, // Adjust the position from the bottom
                   left: Width * 0.5,
                   right: Width * 0.1,
                   child: Divider(
@@ -838,7 +843,7 @@ class _MyHomePageState extends State<RequestScreen> {
                 if (helpDeskList != null)
                   Padding(
                     padding: EdgeInsets.fromLTRB(
-                        Width * 0.1, Height * 0.24, Width * 0.1, Height * 0.03),
+                        Width * 0.1, Height * 0.25, Width * 0.1, Height * 0.03),
                     child: ListView.separated(
                       itemCount: helpDeskList.length,
                       separatorBuilder: (BuildContext context, int index) {
@@ -876,7 +881,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                           width: Width * 0.03,
                                         ),
                                         SizedBox(
-                                          width: Width * 0.535,
+                                          width: Width * 0.53,
                                           child: Text(
                                             '${item['serviceReqId']}',
                                             style: const TextStyle(
@@ -912,7 +917,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                     width: Width * 0.03,
                                   ),
                                   SizedBox(
-                                    width: Width * 0.5,
+                                    width: Width * 0.48,
                                     height: Height * 0.03,
                                     child: Text(
                                       '${item['service_cat_name']}',
@@ -927,6 +932,9 @@ class _MyHomePageState extends State<RequestScreen> {
                                   SizedBox(
                                     width: Width * 0.005,
                                   ),
+                                  SizedBox(
+                                    width: Width * 0.27,
+                                  child: 
                                   Text(
                                     formatDate('${item['createdTime']}'),
                                     style: const TextStyle(
@@ -934,6 +942,7 @@ class _MyHomePageState extends State<RequestScreen> {
                                       fontSize: 13,
                                       color: Color(0xFFABABAB), //#ABABAB
                                     ),
+                                  ),
                                   ),
                                 ],
                               ),
@@ -1650,7 +1659,7 @@ class _ViewState extends State<View> {
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5.0),
                               side: BorderSide(
-                                  color: Colors.green,
+                                  color: Color(0xFF00A44C),//#00A44C
                                   width: 2.0), // Adjust the radius as needed
                             ),
                           ),
@@ -1659,7 +1668,9 @@ class _ViewState extends State<View> {
                         ),
                         child: Text(
                           widget.Status,
-                          style: TextStyle(fontFamily: 'Montserrat'),
+                          style: TextStyle(
+                            color:  Color(0xFF00A44C),
+                            fontFamily: 'Montserrat'),
                         ),
                       ),
                       SizedBox(
@@ -1675,7 +1686,7 @@ class _ViewState extends State<View> {
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5.0),
                               side: BorderSide(
-                                  color: Colors.green,
+                                  color: Color(0xFF084982),//#084982
                                   width: 2.0), // Adjust the radius as needed
                             ),
                           ),
@@ -1684,7 +1695,9 @@ class _ViewState extends State<View> {
                         ),
                         child: Text(
                           widget.Priority,
-                          style: TextStyle(fontFamily: 'Montserrat'),
+                          style: TextStyle(
+                            color: Color(0xFF084982),
+                            fontFamily: 'Montserrat'),
                         ),
                       ),
                       SizedBox(
@@ -1725,7 +1738,7 @@ class _ViewState extends State<View> {
                           SizedBox(
                             width: Width * 0.05,
                           ),
-                          Text(widget.Desc),
+                          Text(widget.Desc,style: TextStyle(color: Color(0xFF848484)),),
                         ],
                       ),
                       SizedBox(
@@ -1736,7 +1749,7 @@ class _ViewState extends State<View> {
                           SizedBox(
                             width: Width * 0.05,
                           ),
-                          Text(widget.Resultion),
+                          Text(widget.Resultion,style: TextStyle(color: Color(0xFF848484)),),//#848484
                         ],
                       ),
                       SizedBox(
@@ -1747,7 +1760,7 @@ class _ViewState extends State<View> {
                           SizedBox(
                             width: Width * 0.05,
                           ),
-                          Text("Assigned to"),
+                          Text("Assigned to",style: TextStyle(color: Color(0xFF000000)),),
                         ],
                       ),
                       Row(
@@ -1875,7 +1888,7 @@ class _DeleteState extends State<Delete> {
             Clip.none, // This allows the button to be half outside the dialog
         children: [
           Container(
-            height: Height * 0.3,
+            height: Height * 0.33,
             width: Width * 0.8,
             decoration: BoxDecoration(
               color: Color(0xFFFFFFFF),
@@ -1891,14 +1904,14 @@ class _DeleteState extends State<Delete> {
                   Text("Do you want to delete "),
                   Text(
                     "Request No: ${widget.Rnum}",
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(color: Color(0xFFEF2800)),//#EF2800
                   ),
                   SizedBox(
                     height: Height * 0.03,
                   ),
                   Text(
                     "You can't undo this action.",
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color:Color(0xFFABABAB)),//#ABABAB
                   ),
                   SizedBox(
                     height: Height * 0.03,
@@ -1916,14 +1929,14 @@ class _DeleteState extends State<Delete> {
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25.0),
                               side: BorderSide(
-                                  color: Colors.blue,
+                                  color:Color(0xFF084982),
                                   width: 2.0), // Adjust the radius as needed
                             ),
                           ),
                           minimumSize: MaterialStateProperty.all(
                               const Size(100, 35)), // Set the size here
                         ),
-                        child: const Text('Cancel'),
+                        child: const Text('Cancel',style: TextStyle(color: Color(0xFF084982)),),
                       ),
                       SizedBox(
                         width: Width * 0.02,
@@ -1939,7 +1952,7 @@ class _DeleteState extends State<Delete> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                           ),
-                          backgroundColor: Colors.blue,
+                          backgroundColor:Color(0xFF084982),
                         ),
                         child: const Text(
                           'Delete',

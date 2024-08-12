@@ -726,6 +726,7 @@ class YourWidget extends StatelessWidget {
                                   SizedBox(
                                     height: Height * 0.01,
                                   ),
+                                  SizedBox(height: Height*0.028,child: 
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -753,6 +754,9 @@ class YourWidget extends StatelessWidget {
                                       )
                                     ],
                                   ),
+                                  ),
+                                  SizedBox(height: Height*0.028,child: 
+                                  
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -764,6 +768,7 @@ class YourWidget extends StatelessWidget {
                                         ),
                                       ),
                                     ],
+                                  ),
                                   ),
                                 ],
                               ),
@@ -784,6 +789,8 @@ class YourWidget extends StatelessWidget {
                                   SizedBox(
                                     height: Height * 0.01,
                                   ),
+                                  SizedBox(height: Height*0.028,child: 
+                                  
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -812,6 +819,9 @@ class YourWidget extends StatelessWidget {
                                       )
                                     ],
                                   ),
+                                  ),
+                                  SizedBox(height: Height*0.028,child: 
+                                  
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -823,6 +833,7 @@ class YourWidget extends StatelessWidget {
                                         ),
                                       ),
                                     ],
+                                  ),
                                   ),
                                 ],
                               ),
@@ -843,6 +854,8 @@ class YourWidget extends StatelessWidget {
                                   SizedBox(
                                     height: Height * 0.01,
                                   ),
+                                  SizedBox(height: Height*0.028,child: 
+                                  
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -870,6 +883,9 @@ class YourWidget extends StatelessWidget {
                                       )
                                     ],
                                   ),
+                                  ),
+                                  SizedBox(height: Height*0.028,child: 
+                                  
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -881,6 +897,7 @@ class YourWidget extends StatelessWidget {
                                         ),
                                       ),
                                     ],
+                                  ),
                                   ),
                                 ],
                               ),

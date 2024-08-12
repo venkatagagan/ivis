@@ -273,7 +273,7 @@ class _PasswordValidatorState extends State<ResetForm> {
       height: Height * 0.3,
       child: Column(
         children: [
-          SizedBox(height: Height * 0.02),
+          SizedBox(height: Height * 0.01),
           TextFormField(
             controller: _oldPasswordController,
             decoration: const InputDecoration(
@@ -283,7 +283,7 @@ class _PasswordValidatorState extends State<ResetForm> {
                 filled: true,
                 fillColor: Colors.white),
           ),
-          SizedBox(height: Height * 0.02),
+          SizedBox(height: Height * 0.01),
           TextFormField(
             obscureText: !_showPassword,
             controller: _newPasswordController,
@@ -316,7 +316,7 @@ class _PasswordValidatorState extends State<ResetForm> {
               });
             },
           ),
-          SizedBox(height: Height * 0.02),
+          SizedBox(height: Height * 0.01),
           TextFormField(
             obscureText: !_showPassword,
             controller: _reenterPasswordController,
@@ -439,6 +439,8 @@ class _PasswordValidatorState extends State<ResetForm> {
   }
 
   Widget _buildPasswordCriteriaText(String text, bool isSatisfied) {
+    double Width= MediaQuery.of(context).size.width;
+    double Height= MediaQuery.of(context).size.height;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -447,7 +449,7 @@ class _PasswordValidatorState extends State<ResetForm> {
             isSatisfied ? Icons.check_circle : Icons.cancel,
             color: isSatisfied ? Colors.green : Colors.red,
           ),
-          SizedBox(width: 8),
+          SizedBox(width: Width*0.05),
           Text(
             text,
             style: TextStyle(

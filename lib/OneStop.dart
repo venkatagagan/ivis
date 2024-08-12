@@ -252,8 +252,11 @@ class _OneStopScreenState extends State<OneStopScreen> {
                     height: Height * 0.01,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      SizedBox(
+                        width: Width * 0.08,
+                      ),
                       InkWell(
                         onTap: () {
                           // Handle the button press event here
