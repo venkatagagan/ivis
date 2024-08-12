@@ -197,6 +197,7 @@ class _MyHomePageState extends State<CenterScreen> {
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: Colors.white,
+                                          fontFamily: 'Montserrat',
                                         ),
                                       ),
                                     )),
@@ -256,7 +257,7 @@ class _MyHomePageState extends State<CenterScreen> {
                     child: Center(
                       child: Text(
                         "You have not availed this service.\n To subscribe please CONTACT",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.white,fontFamily: 'Montserrat',),
                       ),
                     ),
                   )

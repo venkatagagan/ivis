@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/login_api_service.dart';
 import 'package:ivis_security/forgot_Pass.dart';
+import 'package:ivis_security/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -138,7 +139,7 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     double Height = MediaQuery.of(context).size.height;
     double Width = MediaQuery.of(context).size.width;
-    return Column(
+    return SafeArea(child: Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SizedBox(height: Height * 0.04),
@@ -215,6 +216,7 @@ class _LoginFormState extends State<LoginForm> {
           onPressed: () {
             // Handle login button press
             _handleLogin(context);
+            
           },
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(150, 50),
@@ -233,6 +235,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
       ],
+    )
     );
   }
 }

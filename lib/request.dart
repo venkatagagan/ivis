@@ -102,40 +102,91 @@ class _MyHomePageState extends State<RequestScreen> {
     if (response.statusCode == 200) {
       print('Data submitted successfully');
       // Handle successful submission
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Success'),
-            content: Text('Data submitted successfully'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      selectedButtonIndex = 1;
     } else {
       print('Failed to submit data');
       // Handle failed submission
       showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to submit data'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
+        builder: (BuildContext context) {
+          double Height = MediaQuery.of(context).size.height;
+          double Width = MediaQuery.of(context).size.width;
+
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Stack(
+              clipBehavior: Clip
+                  .none, // This allows the button to be half outside the dialog
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFFFFF),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        SizedBox(height: 40),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.close,
+                                color: Colors.red,
+                              )
+                            ]),
+                        SizedBox(height: 40),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: Width * 0.6,
+                                child: Text(
+                                  'Submission failed please check all details once ',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Montserrat',
+                                  ),
+                                ),
+                              ),
+                            ]),
+                        SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: -20,
+                  right: -20,
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        colors: [Color(0xFFD34124), Color(0xFF084982)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ).createShader(bounds);
+                    },
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.cancel,
+                        size: 25,
+                        color: Colors
+                            .white, // This color is ignored but should be set to something that contrasts with the gradient
+                      ),
+                      onPressed: () {
+                        // Add your onPressed functionality here
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       );
@@ -229,766 +280,830 @@ class _MyHomePageState extends State<RequestScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Stack(
-          children: [
-            Image.asset(
-              'assets/images/bg.png',
-              fit: BoxFit.cover,
-              height: double.infinity,
-              width: double.infinity,
-              alignment: Alignment.center,
-            ),
-            SizedBox(
-                height: Height * 0.25,
-                child: Column(
-                  children: [
-                    SizedBox(height: Height * 0.05),
-                    Row(
-                      children: [
-                        SizedBox(width: Width * 0.1),
-                        Builder(
-                          builder: (context) => GestureDetector(
-                            onTap: () {
-                              Scaffold.of(context).openDrawer();
-                            },
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.menu,
-                                  size: 30,
-                                  color: Colors.white,
-                                ),
-                              ],
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Image.asset(
+                'assets/images/bg.png',
+                fit: BoxFit.cover,
+                height: double.infinity,
+                width: double.infinity,
+                alignment: Alignment.center,
+              ),
+              SizedBox(
+                  height: Height * 0.25,
+                  child: Column(
+                    children: [
+                      SizedBox(height: Height * 0.03),
+                      Row(
+                        children: [
+                          SizedBox(width: Width * 0.1),
+                          Builder(
+                            builder: (context) => GestureDetector(
+                              onTap: () {
+                                Scaffold.of(context).openDrawer();
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(
+                                    Icons.menu,
+                                    size: 30,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          width: Width * 0.05,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            // Your action when the image is tapped
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HomePage()),
-                            );
-                            // Add your logic here, such as navigating to a new screen or performing some action.
-                          },
-                          child: Image.asset(
-                            'assets/logos/logo.png',
-                            height: Height * 0.04,
-                            width: Width * 0.6,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: Height * 0.02,
-                    ),
-                    const Divider(
-                      height: 1, // Set the height of the line
-                      thickness: 1, // Set the thickness of the line
-                      color: Colors.white, // Set the color of the line
-                    ),
-                    SizedBox(
-                      height: Height * 0.05,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
                           SizedBox(
                             width: Width * 0.05,
                           ),
-                          IconButton(
-                            icon: Icon(Icons.arrow_back_ios),
-                            onPressed: currentIndex > 0
-                                ? () {
-                                    String siteId = siteNames[currentIndex - 1]
-                                            ['siteId']
-                                        .toString();
-                                    String sitename =
-                                        siteNames[currentIndex - 1]['siteName']
-                                            .toString();
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => RequestScreen(
-                                          i: currentIndex - 1,
-                                          siteId: siteId,
-                                          Sitename: sitename,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                : null,
-                            iconSize: 21.13,
-                            color: Colors.white,
-                          ),
-                          SizedBox(
-                              height: Height * 0.05,
+                          GestureDetector(
+                            onTap: () {
+                              // Your action when the image is tapped
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomePage()),
+                              );
+                              // Add your logic here, such as navigating to a new screen or performing some action.
+                            },
+                            child: Image.asset(
+                              'assets/logos/logo.png',
+                              height: Height * 0.04,
                               width: Width * 0.6,
-                              child: Center(
-                                child: Text(
-                                  sitename,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              )),
-                          SizedBox(
-                            width: Width * 0.01,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.arrow_forward_ios),
-                            onPressed: currentIndex < siteNames.length - 1
-                                ? () {
-                                    String siteId = siteNames[currentIndex + 1]
-                                            ['siteId']
-                                        .toString();
-                                    String sitename =
-                                        siteNames[currentIndex + 1]['siteName']
-                                            .toString();
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => RequestScreen(
-                                          i: currentIndex + 1,
-                                          siteId: siteId,
-                                          Sitename: sitename,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                : null,
-                            iconSize: 21.13,
-                            color: Colors.white,
-                          ),
+                            ),
+                          )
                         ],
                       ),
-                    ),
-                    const Divider(
-                      height: 1, // Set the height of the line
-                      thickness: 1, // Set the thickness of the line
-                      color: Colors.white, // Set the color of the line
-                    ),
-                    SizedBox(
-                      height: Height * 0.01,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: () => onButtonPressed(0),
-                          child: const Text(
-                            'NEW REQUEST',
-                            style: TextStyle(
-                              color:
-                                  Colors.white, // Set the text color to black
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: Width * 0.05,
-                        ),
-                        TextButton(
-                          onPressed: () => onButtonPressed(1),
-                          child: const Text(
-                            'REQUEST STATUS',
-                            style: TextStyle(
-                              color:
-                                  Colors.white, // Set the text color to black
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: Height * 0.01,
-                    ),
-                    SizedBox(
-                      width: Width * 0.8,
-                      child: Divider(
+                      SizedBox(
+                        height: Height * 0.02,
+                      ),
+                      const Divider(
                         height: 1, // Set the height of the line
                         thickness: 1, // Set the thickness of the line
                         color: Colors.white, // Set the color of the line
                       ),
-                    )
-                  ],
-                )),
-            if (selectedButtonIndex == 0) ...[
-              // Display content for Button 1
-              Positioned(
-                top: Height * 0.24, // Adjust the position from the bottom
-                left: Width * 0.1,
-                right: Width * 0.5,
-                child: Divider(
-                  height: 1, // Set the height of the line
-                  thickness: 6, // Set the thickness of the line
-                  color: Colors.white, // Set the color of the line
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
                       SizedBox(
-                        height: Height * 0.27,
+                        height: Height * 0.05,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: Width * 0.05,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.arrow_back_ios),
+                              onPressed: currentIndex > 0
+                                  ? () {
+                                      String siteId =
+                                          siteNames[currentIndex - 1]['siteId']
+                                              .toString();
+                                      String sitename =
+                                          siteNames[currentIndex - 1]
+                                                  ['siteName']
+                                              .toString();
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => RequestScreen(
+                                            i: currentIndex - 1,
+                                            siteId: siteId,
+                                            Sitename: sitename,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  : null,
+                              iconSize: 21.13,
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                                height: Height * 0.05,
+                                width: Width * 0.6,
+                                child: Center(
+                                  child: Text(
+                                    sitename,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                  ),
+                                )),
+                            SizedBox(
+                              width: Width * 0.01,
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.arrow_forward_ios),
+                              onPressed: currentIndex < siteNames.length - 1
+                                  ? () {
+                                      String siteId =
+                                          siteNames[currentIndex + 1]['siteId']
+                                              .toString();
+                                      String sitename =
+                                          siteNames[currentIndex + 1]
+                                                  ['siteName']
+                                              .toString();
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => RequestScreen(
+                                            i: currentIndex + 1,
+                                            siteId: siteId,
+                                            Sitename: sitename,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  : null,
+                              iconSize: 21.13,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
                       ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Container(
-                              width: Width * 0.8,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(1),
-                                borderRadius: BorderRadius.circular(5),
+                      const Divider(
+                        height: 1, // Set the height of the line
+                        thickness: 1, // Set the thickness of the line
+                        color: Colors.white, // Set the color of the line
+                      ),
+                      SizedBox(
+                        height: Height * 0.01,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: () => onButtonPressed(0),
+                            child: const Text(
+                              'NEW REQUEST',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily:
+                                    'Montserrat', // Set the text color to black
                               ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: Height * 0.02,
-                                  ),
-                                  SizedBox(
-                                    width: Width * 0.7,
-                                    height: Height * 0.08,
-                                    child: DropdownButtonFormField<String>(
-                                      value: catName,
-                                      items: categoryList.map((item) {
-                                        return DropdownMenuItem<String>(
-                                          value: item['catName'].toString(),
-                                          child:
-                                              Text(item['catName'].toString()),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? value) {
-                                        setState(() {
-                                          catName = value;
-                                          if (value != null) {
-                                            final selectedCategory =
-                                                categoryList.firstWhere(
-                                              (element) =>
-                                                  element['catName']
-                                                      .toString() ==
-                                                  value,
-                                            );
-                                            subCategoryList = selectedCategory[
-                                                    'subCategoryList'] ??
-                                                [];
-                                            catId = selectedCategory['catId'];
-                                            subCatName =
-                                                null; // Reset subcategory selection
-                                            subCatId = null;
-                                          } else {
-                                            subCategoryList = [];
-                                            catId = null;
-                                          }
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: 'Category',
-                                        border: OutlineInputBorder(),
+                            ),
+                          ),
+                          SizedBox(
+                            width: Width * 0.05,
+                          ),
+                          TextButton(
+                            onPressed: () => onButtonPressed(1),
+                            child: const Text(
+                              'REQUEST STATUS',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily:
+                                    'Montserrat', // Set the text color to black
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: Height * 0.01,
+                      ),
+                      SizedBox(
+                        width: Width * 0.8,
+                        child: Divider(
+                          height: 1, // Set the height of the line
+                          thickness: 1, // Set the thickness of the line
+                          color: Colors.white, // Set the color of the line
+                        ),
+                      )
+                    ],
+                  )),
+              if (selectedButtonIndex == 0) ...[
+                // Display content for Button 1
+                Positioned(
+                  top: Height * 0.23, // Adjust the position from the bottom
+                  left: Width * 0.1,
+                  right: Width * 0.5,
+                  child: Divider(
+                    height: 1, // Set the height of the line
+                    thickness: 6, // Set the thickness of the line
+                    color: Colors.white, // Set the color of the line
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: Height * 0.25,
+                        ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Container(
+                                width: Width * 0.8,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(1),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: Height * 0.02,
+                                    ),
+                                    SizedBox(
+                                      width: Width * 0.7,
+                                      height: Height * 0.08,
+                                      child: DropdownButtonFormField<String>(
+                                        dropdownColor: Colors.white,
+                                        value: catName,
+                                        items: categoryList.map((item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item['catName'].toString(),
+                                            child: Text(
+                                                item['catName'].toString()),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            catName = value;
+                                            if (value != null) {
+                                              final selectedCategory =
+                                                  categoryList.firstWhere(
+                                                (element) =>
+                                                    element['catName']
+                                                        .toString() ==
+                                                    value,
+                                              );
+                                              subCategoryList =
+                                                  selectedCategory[
+                                                          'subCategoryList'] ??
+                                                      [];
+                                              catId = selectedCategory['catId'];
+                                              subCatName =
+                                                  null; // Reset subcategory selection
+                                              subCatId = null;
+                                            } else {
+                                              subCategoryList = [];
+                                              catId = null;
+                                            }
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Category',
+                                          labelStyle: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                          ),
+                                          border: OutlineInputBorder(),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: Height * 0.01,
-                                  ),
-                                  SizedBox(
-                                    width: Width * 0.7,
-                                    height: Height * 0.08,
-                                    child: DropdownButtonFormField<String>(
-                                      value: subCatName,
-                                      items: subCategoryList.map((item) {
-                                        return DropdownMenuItem<String>(
-                                          value: item['serviceSubcatName']
-                                              .toString(),
-                                          child: Text(item['serviceSubcatName']
-                                              .toString()),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? value) {
-                                        setState(() {
-                                          subCatName = value;
-                                          if (value != null) {
-                                            final selectedSubCategory =
-                                                subCategoryList.firstWhere(
-                                              (element) =>
-                                                  element['serviceSubcatName']
-                                                      .toString() ==
-                                                  value,
-                                            );
-                                            subCatId = selectedSubCategory[
-                                                'serviceSubcatId'];
-                                          } else {
-                                            subCatId = null;
-                                          }
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: 'Subcategory',
-                                        border: OutlineInputBorder(),
+                                    SizedBox(
+                                      height: Height * 0.01,
+                                    ),
+                                    SizedBox(
+                                      width: Width * 0.7,
+                                      height: Height * 0.08,
+                                      child: DropdownButtonFormField<String>(
+                                        dropdownColor: Colors.white,
+                                        value: subCatName,
+                                        items: subCategoryList.map((item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item['serviceSubcatName']
+                                                .toString(),
+                                            child: Text(
+                                                item['serviceSubcatName']
+                                                    .toString()),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            subCatName = value;
+                                            if (value != null) {
+                                              final selectedSubCategory =
+                                                  subCategoryList.firstWhere(
+                                                (element) =>
+                                                    element['serviceSubcatName']
+                                                        .toString() ==
+                                                    value,
+                                              );
+                                              subCatId = selectedSubCategory[
+                                                  'serviceSubcatId'];
+                                            } else {
+                                              subCatId = null;
+                                            }
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Subcategory',
+                                          labelStyle: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                          ),
+                                          border: OutlineInputBorder(),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: Height * 0.01,
-                                  ),
-                                  Row(children: [
                                     SizedBox(
-                                      width: Width * 0.05,
+                                      height: Height * 0.01,
                                     ),
-                                    Text(
-                                      "Priority:",
-                                    ),
-                                  ]),
-                                  SizedBox(
-                                    height: Height * 0.01,
-                                  ),
-                                  Row(children: [
-                                    SizedBox(
-                                      width: Width * 0.01,
-                                    ),
-                                    Radio<int>(
-                                      value: 1,
-                                      groupValue: selectedOption,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          selectedOption = value!;
-                                          priority = 'low';
-                                        });
-                                      },
-                                    ),
-                                    Text('low'),
-                                    SizedBox(width: 10),
-                                    Radio<int>(
-                                      value: 2,
-                                      groupValue: selectedOption,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          selectedOption = value!;
-                                          priority = 'medium';
-                                        });
-                                      },
-                                    ),
-                                    Text('medium'),
-                                    SizedBox(width: 10),
-                                    Radio<int>(
-                                      value: 3,
-                                      groupValue: selectedOption,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          selectedOption = value!;
-
-                                          priority = 'high';
-                                        });
-                                      },
-                                    ),
-                                    Text('high'),
-                                  ]),
-                                  SizedBox(
-                                    height: Height * 0.01,
-                                  ),
-                                  Row(
-                                    children: [
+                                    Row(children: [
                                       SizedBox(
-                                        width: 20,
+                                        width: Width * 0.05,
                                       ),
-                                      Container(
-                                        width: Width * 0.7,
-                                        height: Height * 0.15,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            width: 2,
-                                          ),
+                                      Text(
+                                        "Priority:",
+                                        style: TextStyle(
+                                          fontFamily: 'Montserrat',
                                         ),
-                                        child: TextField(
-                                          controller: _descriptionController,
-                                          decoration: InputDecoration(
-                                            hintText: 'Description here',
-                                            hintStyle:
-                                                TextStyle(color: Colors.grey),
-                                            border: InputBorder.none,
-                                            contentPadding: EdgeInsets.all(16),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: Height * 0.02,
-                                  ),
-                                  Row(
-                                    children: [
-                                      SizedBox(width: Width * 0.04),
-                                      Checkbox(
-                                        value: isChecked,
+                                      ),
+                                    ]),
+                                    SizedBox(
+                                      height: Height * 0.01,
+                                    ),
+                                    Row(children: [
+                                      SizedBox(
+                                        width: Width * 0.01,
+                                      ),
+                                      Radio<int>(
+                                        value: 1,
+                                        groupValue: selectedOption,
                                         onChanged: (value) {
                                           setState(() {
-                                            isChecked = value ?? false;
+                                            selectedOption = value!;
+                                            priority = 'low';
                                           });
                                         },
                                       ),
-                                      SizedBox(width: 12),
-                                      Text("Preferred Time to Call Back"),
-                                    ],
-                                  ),
-                                  SizedBox(height: Height * 0.01),
-                                  if (isChecked)
+                                      SizedBox(width: Width * 0.01),
+                                      Text(
+                                        'low',
+                                        style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                        ),
+                                      ),
+                                      SizedBox(width: Width * 0.01),
+                                      Radio<int>(
+                                        value: 2,
+                                        groupValue: selectedOption,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedOption = value!;
+                                            priority = 'medium';
+                                          });
+                                        },
+                                      ),
+                                      Text(
+                                        'medium',
+                                        style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                        ),
+                                      ),
+                                      SizedBox(width: Width * 0.01),
+                                      Radio<int>(
+                                        value: 3,
+                                        groupValue: selectedOption,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedOption = value!;
+
+                                            priority = 'high';
+                                          });
+                                        },
+                                      ),
+                                      Text(
+                                        'high',
+                                        style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                        ),
+                                      ),
+                                    ]),
+                                    SizedBox(
+                                      height: Height * 0.01,
+                                    ),
                                     Row(
                                       children: [
-                                        SizedBox(width: 100),
-                                        OutlinedButton(
-                                          onPressed: () {
-                                            showModalBottomSheet<DateTime>(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext builder) {
-                                                  return Container(
-                                                      height: Height * 0.3,
-                                                      child:
-                                                          CupertinoDatePicker(
-                                                        onDateTimeChanged:
-                                                            (newDate) {
-                                                          setState(() {
-                                                            date = newDate;
-                                                          });
-                                                        },
-                                                      ));
-                                                });
-                                            // Add your button press logic here
-                                          },
-                                          style: OutlinedButton.styleFrom(
-                                            side:
-                                                BorderSide(color: Colors.blue),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Container(
+                                          width: Width * 0.7,
+                                          height: Height * 0.15,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              width: 2,
                                             ),
                                           ),
-                                          child: Text(
-                                            'Set Time',
-                                            style:
-                                                TextStyle(color: Colors.blue),
+                                          child: TextField(
+                                            controller: _descriptionController,
+                                            decoration: InputDecoration(
+                                              hintText: 'Description here',
+                                              labelStyle: TextStyle(
+                                                  fontFamily: 'Montserrat'),
+                                              hintStyle:
+                                                  TextStyle(color: Colors.grey),
+                                              border: InputBorder.none,
+                                              contentPadding:
+                                                  EdgeInsets.all(16),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: Height * 0.02,
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(width: Width * 0.04),
+                                        Checkbox(
+                                          value: isChecked,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isChecked = value ?? false;
+                                            });
+                                          },
+                                        ),
+                                        SizedBox(width: 12),
+                                        Text(
+                                          "Preferred Time to Call Back",
+                                          style: TextStyle(
+                                              fontFamily: 'Montserrat'),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: Height * 0.01),
+                                    if (isChecked)
+                                      Row(
+                                        children: [
+                                          SizedBox(width: 100),
+                                          OutlinedButton(
+                                            onPressed: () {
+                                              showModalBottomSheet<DateTime>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext builder) {
+                                                    return Container(
+                                                        height: Height * 0.3,
+                                                        child:
+                                                            CupertinoDatePicker(
+                                                          onDateTimeChanged:
+                                                              (newDate) {
+                                                            setState(() {
+                                                              date = newDate;
+                                                            });
+                                                          },
+                                                        ));
+                                                  });
+                                              // Add your button press logic here
+                                            },
+                                            style: OutlinedButton.styleFrom(
+                                              side: BorderSide(
+                                                  color: Colors.blue),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              'Set Time',
+                                              style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontFamily: 'Montserrat'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    SizedBox(height: Height * 0.01),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            submitData();
+                                          },
+                                          style: ButtonStyle(
+                                            shape: MaterialStateProperty.all<
+                                                RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    25.0), // Adjust the radius as needed
+                                              ),
+                                            ),
+                                            minimumSize: MaterialStateProperty
+                                                .all(const Size(150,
+                                                    50)), // Set the size here
+                                            backgroundColor: MaterialStateProperty
+                                                .all<Color>(Color(
+                                                    0xFF084982)), // Set background color
+                                          ),
+                                          child: const Text(
+                                            'SUBMIT',
+                                            style: TextStyle(
+                                                fontFamily: 'Montserrat',
+                                                color: Colors.white),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  SizedBox(height: Height * 0.01),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          submitData();
-                                        },
-                                        style: ButtonStyle(
-                                          shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                  25.0), // Adjust the radius as needed
+                                    SizedBox(
+                                      height: 20,
+                                    )
+                                  ],
+                                )),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 0,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                // Add rows and columns specific to Button 1
+              ] else if (selectedButtonIndex == 1) ...[
+                // Display content for Button 2
+                Positioned(
+                  top: Height * 0.23, // Adjust the position from the bottom
+                  left: Width * 0.5,
+                  right: Width * 0.1,
+                  child: Divider(
+                    height: 1, // Set the height of the line
+                    thickness: 6, // Set the thickness of the line
+                    color: Colors.white, // Set the color of the line
+                  ),
+                ),
+                // ignore: unnecessary_null_comparison
+                if (helpDeskList != null)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                        Width * 0.1, Height * 0.24, Width * 0.1, Height * 0.03),
+                    child: ListView.separated(
+                      itemCount: helpDeskList.length,
+                      separatorBuilder: (BuildContext context, int index) {
+                        // Add the space between containers here
+                        return SizedBox(
+                            height:
+                                Height * 0.02); // Adjust the height as needed
+                      },
+                      itemBuilder: (BuildContext context, int index) {
+                        final item = helpDeskList[index];
+                        return Container(
+                          width: Width * 0.8,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: Color(0xFFEFEFEF), // Set the border color
+                              width: 2.0, // Set the border width
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: Width * 0.8,
+                                height: Height * 0.05,
+                                color: Color(0xFFEFEFEF),
+                                // Replace with the desired color
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: Width * 0.03,
+                                        ),
+                                        SizedBox(
+                                          width: Width * 0.535,
+                                          child: Text(
+                                            '${item['serviceReqId']}',
+                                            style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.black,
+                                                fontFamily: 'Montserrat'),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: Width * 0.22,
+                                          child: Text(
+                                            '${item['status']}',
+                                            style: TextStyle(
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 13,
+                                              color: item['status'] == 'Deleted'
+                                                  ? Color(0xFFEF2800)
+                                                  : Color(0xFF00A44C),
                                             ),
                                           ),
-                                          minimumSize:
-                                              MaterialStateProperty.all(
-                                                  const Size(150,
-                                                      50)), // Set the size here
-                                          backgroundColor: MaterialStateProperty
-                                              .all<Color>(Colors
-                                                  .blue), // Set background color
                                         ),
-                                        child: const Text('SUBMIT'),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: Height * 0.005,
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: Width * 0.03,
                                   ),
                                   SizedBox(
-                                    height: 20,
-                                  )
-                                ],
-                              )),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 0,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              // Add rows and columns specific to Button 1
-            ] else if (selectedButtonIndex == 1) ...[
-              // Display content for Button 2
-              Positioned(
-                top: Height * 0.24, // Adjust the position from the bottom
-                left: Width * 0.5,
-                right: Width * 0.1,
-                child: Divider(
-                  height: 1, // Set the height of the line
-                  thickness: 6, // Set the thickness of the line
-                  color: Colors.white, // Set the color of the line
-                ),
-              ),
-              // ignore: unnecessary_null_comparison
-              if (helpDeskList != null)
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      Width * 0.1, Height * 0.24, Width * 0.1, Height * 0.03),
-                  child: ListView.separated(
-                    itemCount: helpDeskList.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      // Add the space between containers here
-                      return SizedBox(
-                          height: Height * 0.02); // Adjust the height as needed
-                    },
-                    itemBuilder: (BuildContext context, int index) {
-                      final item = helpDeskList[index];
-                      return Container(
-                        width: Width * 0.8,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: Width * 0.8,
-                              height: Height * 0.05,
-                              color: Color.fromARGB(255, 220, 222, 222),
-                              // Replace with the desired color
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: Width * 0.03,
+                                    width: Width * 0.5,
+                                    height: Height * 0.03,
+                                    child: Text(
+                                      '${item['service_cat_name']}',
+                                      style: const TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 15,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      SizedBox(
-                                        width: Width * 0.535,
-                                        child: Text(
-                                          '${item['serviceReqId']}',
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: Width * 0.22,
-                                        child: Text(
-                                          '${item['status']}',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: item['status'] == 'Deleted'
-                                                ? Colors.red
-                                                : Colors.green,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: Width * 0.005,
+                                  ),
+                                  Text(
+                                    formatDate('${item['createdTime']}'),
+                                    style: const TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 13,
+                                      color: Color(0xFFABABAB), //#ABABAB
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                            SizedBox(
-                              height: Height * 0.005,
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: Width * 0.03,
-                                ),
-                                SizedBox(
-                                  width: Width * 0.5,
-                                  height: Height * 0.03,
-                                  child: Text(
-                                    '${item['service_cat_name']}',
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: Width * 0.005,
-                                ),
-                                Text(
-                                  formatDate('${item['createdTime']}'),
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: Height * 0.02,
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: Width * 0.03,
-                                ),
-                                SizedBox(
-                                  width: Width * 0.45,
-                                  height: Height * 0.03,
-                                  child: Text(
-                                    '${item['description']}',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.black,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (item['status'] != 'Deleted') ...[
+                              SizedBox(
+                                height: Height * 0.02,
+                              ),
+                              Row(
+                                children: [
                                   SizedBox(
-                                    width: Width*0.1, // Adjust the width as needed
-                                     // Adjust the height as needed
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons
-                                            .edit_rounded, // Replace with the desired icon
-                                        size: 20,
-                                        color: Colors.blue,
+                                    width: Width * 0.03,
+                                  ),
+                                  SizedBox(
+                                    width: Width * 0.45,
+                                    height: Height * 0.03,
+                                    child: Text(
+                                      '${item['description']}',
+                                      style: const TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 13,
+                                        color: Colors.black,
                                       ),
-                                      onPressed: () {
-                                        // Add your onPressed functionality here
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return Edit(
-                                              sitename: widget.Sitename,
-                                              index: widget.i,
-                                              rnum: item['serviceReqId'],
-                                              siteId: widget.siteId,
-                                              catId: item['service_cat_id']
-                                                      ?.toString() ??
-                                                  'Not Available',
-                                              subCatId:
-                                                  item['service_subcat_id']
-                                                          ?.toString() ??
-                                                      'Not Available',
-                                              Priority: item['priority']
-                                                      ?.toString() ??
-                                                  'Not Available',
-                                              catname: item['service_cat_name']
-                                                      ?.toString() ??
-                                                  'Not Available',
-                                              subCatName:
-                                                  item['service_subcat_name']
-                                                          ?.toString() ??
-                                                      'Not Available',
-                                              Desc: item['description']
-                                                      ?.toString() ??
-                                                  'Not Available',
-                                              PrefTimeToCall:
-                                                  item['PrefTimeToCall']
-                                                          ?.toString() ??
-                                                      'Not Available',
-                                            );
-                                          },
-                                        );
-                                      },
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: Width*0.1, // Adjust the width as needed
-                                  
-                                  child:IconButton(
-                                    icon: Icon(
-                                      Icons.preview_rounded,
-                                      size: 20,
-                                      color: Colors.blue,
-                                    ),
-                                    onPressed: () {
-                                      // Show another dialog when the IconButton is pressed
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return View(
-                                            requestId: item['serviceReqId']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            createdTime: item['createdTime']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            Status:
-                                                item['status']?.toString() ??
-                                                    'Not Available',
-                                            Priority:
-                                                item['priority']?.toString() ??
-                                                    'Not Available',
-                                            catname: item['service_cat_name']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            subCatName:
-                                                item['service_subcat_name']
+                                  if (item['status'] != 'Deleted') ...[
+                                    SizedBox(
+                                      width: Width *
+                                          0.1, // Adjust the width as needed
+                                      // Adjust the height as needed
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons
+                                              .edit_rounded, // Replace with the desired icon
+                                          size: 20,
+                                          color: Color(0xFF084982),
+                                        ),
+                                        onPressed: () {
+                                          // Add your onPressed functionality here
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return Edit(
+                                                sitename: widget.Sitename,
+                                                index: widget.i,
+                                                rnum: item['serviceReqId'],
+                                                siteId: widget.siteId,
+                                                catId: item['service_cat_id']
                                                         ?.toString() ??
                                                     'Not Available',
-                                            Desc: item['description']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            Resultion: item['resolution']
-                                                    ?.toString() ??
-                                                'Not Available',
-                                            assignedTo: item['assignedTo']
-                                                    ?.toString() ??
-                                                'Not Available',
+                                                subCatId:
+                                                    item['service_subcat_id']
+                                                            ?.toString() ??
+                                                        'Not Available',
+                                                Priority: item['priority']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                                catname:
+                                                    item['service_cat_name']
+                                                            ?.toString() ??
+                                                        'Not Available',
+                                                subCatName:
+                                                    item['service_subcat_name']
+                                                            ?.toString() ??
+                                                        'Not Available',
+                                                Desc: item['description']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                                PrefTimeToCall:
+                                                    item['PrefTimeToCall']
+                                                            ?.toString() ??
+                                                        'Not Available',
+                                              );
+                                            },
                                           );
                                         },
-                                      );
-                                    },
-                                  ),
-                                  ),
-                                  SizedBox(
-                                    width: Width*0.1, // Adjust the width as needed
-                                  
-                                  child:IconButton(
-                                    icon: Icon(
-                                      Icons.delete,
-                                      size: 20,
-                                      color: Colors.red,
+                                      ),
                                     ),
-                                    onPressed: () {
-                                      // Show another dialog when the IconButton is pressed
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return Delete(
-                                            siteId: widget.siteId,
-                                            siteName: widget.Sitename,
-                                            index: widget.i.toString(),
-                                            Rnum:
-                                                item['serviceReqId'].toString(),
+                                    SizedBox(
+                                      width: Width *
+                                          0.1, // Adjust the width as needed
+
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons.preview_rounded,
+                                          size: 20,
+                                          color: Color(0xFF084982),
+                                        ),
+                                        onPressed: () {
+                                          // Show another dialog when the IconButton is pressed
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return View(
+                                                requestId: item['serviceReqId']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                                createdTime: item['createdTime']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                                Status: item['status']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                                Priority: item['priority']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                                catname:
+                                                    item['service_cat_name']
+                                                            ?.toString() ??
+                                                        'Not Available',
+                                                subCatName:
+                                                    item['service_subcat_name']
+                                                            ?.toString() ??
+                                                        'Not Available',
+                                                Desc: item['description']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                                Resultion: item['resolution']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                                assignedTo: item['assignedTo']
+                                                        ?.toString() ??
+                                                    'Not Available',
+                                              );
+                                            },
                                           );
                                         },
-                                      );
-                                    },
-                                  ),
-                                  ),
-                                ]
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: Width *
+                                          0.1, // Adjust the width as needed
+
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          size: 20,
+                                          color: Color(0xFFEF2800),
+                                        ),
+                                        onPressed: () {
+                                          // Show another dialog when the IconButton is pressed
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return Delete(
+                                                siteId: widget.siteId,
+                                                siteName: widget.Sitename,
+                                                index: widget.i.toString(),
+                                                Rnum: item['serviceReqId']
+                                                    .toString(),
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ]
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
+              ],
             ],
-          ],
+          ),
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
           siteId: siteId,
@@ -1479,146 +1594,202 @@ class _ViewState extends State<View> {
     return Dialog(
       child: Expanded(
         child: SingleChildScrollView(
-          child: Container(
-              width: Width * 0.8,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(1),
-                borderRadius: BorderRadius.circular(5),
+          child: Stack(
+            clipBehavior: Clip
+                .none, // This allows the button to be half outside the dialog
+            children: [
+              Container(
+                  width: Width * 0.8,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(1),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                          height: Height * 0.05,
+                          width: Width * 0.8,
+                          color: Color(0xFF084982),
+                          child: Center(
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: Width * 0.05,
+                                ),
+                                SizedBox(
+                                  width: Width * 0.47,
+                                  child: Text(widget.requestId,
+                                      style: TextStyle(
+                                          color: Color(0xFFEFEFEF),
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Montserrat')),
+                                ),
+                                SizedBox(
+                                  width: Width * 0.25,
+                                  child: Text(
+                                    widget.createdTime.substring(0, 10),
+                                    style: TextStyle(
+                                        color: Color(0xFFEFEFEF),
+                                        fontFamily: 'Montserrat'),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )),
+                      SizedBox(
+                        height: Height * 0.03,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                              side: BorderSide(
+                                  color: Colors.green,
+                                  width: 2.0), // Adjust the radius as needed
+                            ),
+                          ),
+                          minimumSize: MaterialStateProperty.all(
+                              const Size(150, 50)), // Set the size here
+                        ),
+                        child: Text(
+                          widget.Status,
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                        ),
+                      ),
+                      SizedBox(
+                        height: Height * 0.03,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                              side: BorderSide(
+                                  color: Colors.green,
+                                  width: 2.0), // Adjust the radius as needed
+                            ),
+                          ),
+                          minimumSize: MaterialStateProperty.all(
+                              const Size(150, 50)), // Set the size here
+                        ),
+                        child: Text(
+                          widget.Priority,
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                        ),
+                      ),
+                      SizedBox(
+                        height: Height * 0.03,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: Width * 0.05,
+                          ),
+                          Text(
+                            widget.catname.toUpperCase(),
+                            style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                color: Color(0xFF084982)),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: Height * 0.02,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: Width * 0.05,
+                          ),
+                          Text(widget.subCatName,
+                              style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      SizedBox(
+                        height: Height * 0.02,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: Width * 0.05,
+                          ),
+                          Text(widget.Desc),
+                        ],
+                      ),
+                      SizedBox(
+                        height: Height * 0.02,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: Width * 0.05,
+                          ),
+                          Text(widget.Resultion),
+                        ],
+                      ),
+                      SizedBox(
+                        height: Height * 0.02,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: Width * 0.05,
+                          ),
+                          Text("Assigned to"),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: Width * 0.05,
+                          ),
+                          Text(
+                            widget.assignedTo,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )
+                    ],
+                  )),
+              Positioned(
+                top: -20,
+                right: -20,
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return LinearGradient(
+                      colors: [Colors.white,Colors.white],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ).createShader(bounds);
+                  },
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.cancel,
+                      size: 25,
+                      color: Colors
+                          .white, // This color is ignored but should be set to something that contrasts with the gradient
+                    ),
+                    onPressed: () {
+                      // Add your onPressed functionality here
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                      height: Height * 0.05,
-                      width: Width * 0.8,
-                      color: Colors.blue,
-                      child: Center(
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: Width * 0.05,
-                            ),
-                            SizedBox(
-                              width: Width * 0.47,
-                              child: Text(widget.requestId),
-                            ),
-                            SizedBox(
-                              width: Width * 0.25,
-                              child: Text(widget.createdTime),
-                            )
-                          ],
-                        ),
-                      )),
-                  SizedBox(
-                    height: Height * 0.03,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                          side: BorderSide(
-                              color: Colors.green,
-                              width: 2.0), // Adjust the radius as needed
-                        ),
-                      ),
-                      minimumSize: MaterialStateProperty.all(
-                          const Size(150, 50)), // Set the size here
-                    ),
-                    child: Text(widget.Status),
-                  ),
-                  SizedBox(
-                    height: Height * 0.03,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                          side: BorderSide(
-                              color: Colors.green,
-                              width: 2.0), // Adjust the radius as needed
-                        ),
-                      ),
-                      minimumSize: MaterialStateProperty.all(
-                          const Size(150, 50)), // Set the size here
-                    ),
-                    child: Text(widget.Priority),
-                  ),
-                  SizedBox(
-                    height: Height * 0.03,
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: Width * 0.05,
-                      ),
-                      Text(widget.catname),
-                    ],
-                  ),
-                  SizedBox(
-                    height: Height * 0.02,
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: Width * 0.05,
-                      ),
-                      Text(widget.subCatName),
-                    ],
-                  ),
-                  SizedBox(
-                    height: Height * 0.02,
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: Width * 0.05,
-                      ),
-                      Text(widget.Desc),
-                    ],
-                  ),
-                  SizedBox(
-                    height: Height * 0.02,
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: Width * 0.05,
-                      ),
-                      Text(widget.Resultion),
-                    ],
-                  ),
-                  SizedBox(
-                    height: Height * 0.02,
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: Width * 0.05,
-                      ),
-                      Text("assigned to"),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: Width * 0.05,
-                      ),
-                      Text(
-                        widget.assignedTo,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  )
-                ],
-              )),
+            ],
+          ),
         ),
       ),
     );
@@ -1696,17 +1867,23 @@ class _DeleteState extends State<Delete> {
     double Height = MediaQuery.of(context).size.height;
     double Width = MediaQuery.of(context).size.width;
     return Dialog(
-      child: Expanded(
-        child: SingleChildScrollView(
-          child: Container(
-              height: Height * 0.3,
-              width: Width * 0.8,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(1),
-                borderRadius: BorderRadius.circular(5),
-              ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Stack(
+        clipBehavior:
+            Clip.none, // This allows the button to be half outside the dialog
+        children: [
+          Container(
+            height: Height * 0.3,
+            width: Width * 0.8,
+            decoration: BoxDecoration(
+              color: Color(0xFFFFFFFF),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
                     height: Height * 0.05,
@@ -1773,10 +1950,37 @@ class _DeleteState extends State<Delete> {
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
-              )),
-        ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: -20,
+            right: -20,
+            child: ShaderMask(
+              shaderCallback: (Rect bounds) {
+                return LinearGradient(
+                  colors: [Color(0xFFD34124), Color(0xFF084982)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ).createShader(bounds);
+              },
+              child: IconButton(
+                icon: Icon(
+                  Icons.cancel,
+                  size: 25,
+                  color: Colors
+                      .white, // This color is ignored but should be set to something that contrasts with the gradient
+                ),
+                onPressed: () {
+                  // Add your onPressed functionality here
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

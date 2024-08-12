@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
 import 'package:ivis_security/apis/Services.dart';
 import 'package:http/http.dart' as http;
+import 'package:ivis_security/cctv/screens.dart';
 import 'package:ivis_security/navigation.dart';
 import 'package:ivis_security/home.dart';
 import 'package:ivis_security/drawer.dart';
@@ -155,8 +156,7 @@ class _MyHomePageState extends State<AlarmScreen> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: SafeArea(
-          child: 
-          Stack(
+          child: Stack(
             children: [
               Image.asset(
                 'assets/images/bg.png',
@@ -265,6 +265,7 @@ class _MyHomePageState extends State<AlarmScreen> {
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: Colors.white,
+                                          fontFamily: 'Montserrat',
                                         ),
                                       ),
                                     )),
@@ -323,8 +324,10 @@ class _MyHomePageState extends State<AlarmScreen> {
                               Text(
                                 'Start Date',
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Montserrat',
+                                ),
                               ),
                               SizedBox(
                                 width: Width * 0.3,
@@ -332,8 +335,10 @@ class _MyHomePageState extends State<AlarmScreen> {
                               Text(
                                 'End Date',
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Montserrat',
+                                ),
                               ),
                             ],
                           ),
@@ -378,7 +383,8 @@ class _MyHomePageState extends State<AlarmScreen> {
                                   controller: _dateController2,
                                   decoration: InputDecoration(
                                     suffixIcon: IconButton(
-                                      icon: const Icon(Icons.calendar_month_outlined),
+                                      icon: const Icon(
+                                          Icons.calendar_month_outlined),
                                       onPressed: () => _selectDate(
                                           context, _dateController2),
                                     ),
@@ -387,6 +393,9 @@ class _MyHomePageState extends State<AlarmScreen> {
                                 ),
                               )
                             ],
+                          ),
+                          SizedBox(
+                            height: Height * 0.03,
                           ),
                           Expanded(
                             child: FutureBuilder<List<Incident>>(
@@ -403,7 +412,10 @@ class _MyHomePageState extends State<AlarmScreen> {
                                   return const Center(
                                       child: Text(
                                     'No alerts in selected days',
-                                    style: TextStyle(color: Colors.white),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Montserrat',
+                                    ),
                                   ));
                                 } else if (snapshot.hasError) {
                                   return Center(
@@ -423,30 +435,32 @@ class _MyHomePageState extends State<AlarmScreen> {
                           ),
                         ],
                       )),
-                  
                 ],
               ),
               if (alarm == "F") // change logic as alarm == "F"
-                    ...[
-                    Column(
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.143,
-                        ),
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.726,
-                          width: MediaQuery.of(context).size.width * 1,
-                          color: Colors.black54,
-                          child: Center(
-                            child: Text(
-                              "You have not availed this service.\n To subscribe please CONTACT",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        )
-                      ],
+                ...[
+                Column(
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.143,
                     ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.726,
+                      width: MediaQuery.of(context).size.width * 1,
+                      color: Colors.black54,
+                      child: Center(
+                        child: Text(
+                          "You have not availed this service.\n To subscribe please CONTACT",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                      ),
+                    )
                   ],
+                ),
+              ],
             ],
           ),
         ),
@@ -572,11 +586,7 @@ class IncidentDetailPage extends StatelessWidget {
                                       itemCount: incident.files.length,
                                       itemBuilder: (context, index) {
                                         String file = incident.files[index];
-                                        if (file.contains('.mp4') ||
-                                            file.contains('.3gp')) {
-                                          return VlcPlayerWidget(
-                                              videoUrl: file);
-                                        } else if (file.contains('.png') ||
+                                        if (file.contains('.png') ||
                                             file.contains('.jpg') ||
                                             file.contains('.JPG') ||
                                             file.contains('.jpeg')) {
@@ -586,17 +596,16 @@ class IncidentDetailPage extends StatelessWidget {
                                               imageUrl: file,
                                               fit: BoxFit.cover,
                                               placeholder: (context, url) =>
-                                                  SizedBox(
-                                                width:
-                                                    30, // Adjust the width as needed
-                                                height:
-                                                    30, // Adjust the height as needed
+                                                  Transform.scale(
+                                                scale:
+                                                    0.2, // Scale the progress indicator to half its size
                                                 child:
                                                     CircularProgressIndicator(),
                                               ),
                                             ),
                                           );
                                         }
+                                        
                                         return SizedBox();
                                       },
                                     ),
@@ -625,7 +634,7 @@ class VlcPlayerWidget extends StatefulWidget {
 
 class _VlcPlayerWidgetState extends State<VlcPlayerWidget> {
   late VlcPlayerController _controller;
-  
+
   @override
   void initState() {
     super.initState();
@@ -699,14 +708,21 @@ class IncidentGroupWidget extends StatelessWidget {
                         child: Text(
                           actionTag,
                           style: const TextStyle(
-                              color: Colors.black, fontSize: 16),
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontFamily: 'Montserrat',
+                          ),
                         ),
                       )
                     ],
                   ),
                   Text(
                     count.toString(),
-                    style: const TextStyle(color: Colors.black, fontSize: 18),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontFamily: 'Montserrat',
+                    ),
                   ),
                 ],
               ),

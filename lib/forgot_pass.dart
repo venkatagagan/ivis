@@ -11,7 +11,8 @@ class ForgotPasswordScreen extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Stack(
+        body:SafeArea(child:  
+        Stack(
           children: [
             Image.asset(
               'assets/images/bg.png',
@@ -54,6 +55,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             const VersionTextVisibility(),
           ],
         ),
+      ),
       ),
     );
   }

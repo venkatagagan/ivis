@@ -1,3 +1,44 @@
+showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Upload Profile Picture'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  ElevatedButton(
+                                    onPressed: _pickImage,
+                                    child: Text('Pick Image'),
+                                  ),
+                                  SizedBox(height: 20),
+                                  
+                                  _imageFile != null
+                                      ? Column(
+                                          children: [
+                                            Image.file(_imageFile!),
+                                            SizedBox(height: 10),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _imageFile = null;
+                                                });
+                                              },
+                                              child: Text('Remove Image'),
+                                            ),
+                                          ],
+                                        )
+                                      : Text('No image selected.'),
+                                  SizedBox(height: 20),
+                                  ElevatedButton(
+                                    onPressed: _uploadImage,
+                                    child: Text('Submit'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+*****************************************************************************
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

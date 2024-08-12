@@ -1,9 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:ivis_security/T&C.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 import 'package:ivis_security/apis/login_api_service.dart';
 import 'package:ivis_security/contact.dart';
 import 'package:ivis_security/login.dart';
 import 'package:ivis_security/reset.dart';
-import 'package:http/http.dart ' as http;
 import 'dart:convert';
 
 class DrawerWidget extends StatefulWidget {
@@ -66,6 +71,55 @@ class _OneStopScreenState extends State<DrawerWidget> {
 
   bool _isExpanded = false;
 
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+        });
+      } else {
+        // Handle the case when the user cancels the image picker
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No image selected.')),
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the image picking process
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    if (_imageFile == null) return;
+
+    String url = 'http://34.206.37.237/userDetails/updateProfilePicture_1_0';
+    String siteId =
+        LoginApiService.UserId.toString(); // Replace with your actual site_id
+
+    var request = http.MultipartRequest('POST', Uri.parse(url))
+      ..fields['site_id'] = siteId
+      ..files.add(await http.MultipartFile.fromPath(
+        'file',
+        _imageFile!.path,
+        filename: path.basename(_imageFile!.path),
+      ));
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      print('Image uploaded successfully');
+    } else {
+      print('Failed to upload image');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double Height = MediaQuery.of(context).size.height;
@@ -95,6 +149,20 @@ class _OneStopScreenState extends State<DrawerWidget> {
                       icon: Icon(
                         Icons.camera_alt,
                         size: 20,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        // Add your edit button functionality here
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 20,
+                    right: 20,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.edit_rounded,
+                        size: 30,
                         color: Colors.white,
                       ),
                       onPressed: () {
@@ -134,9 +202,9 @@ class _OneStopScreenState extends State<DrawerWidget> {
                     child: Text(
                       '$Name \n$phno \n$mail',
                       style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white,
-                      ),
+                          fontSize: 11,
+                          color: Colors.white,
+                          fontFamily: 'Montserrat'),
                     ),
                   ),
                   if (_isExpanded)
@@ -146,9 +214,9 @@ class _OneStopScreenState extends State<DrawerWidget> {
                       child: Text(
                         "$add1\n$add2\n$dist\ $city $state,\n$country $pincode",
                         style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
+                            fontSize: 12,
+                            color: Colors.white,
+                            fontFamily: 'Montserrat'),
                       ),
                     ),
                   if (_isExpanded)
@@ -159,6 +227,7 @@ class _OneStopScreenState extends State<DrawerWidget> {
                         'Contact: $contact',
                         style: TextStyle(
                           fontSize: 12,
+                          fontFamily: 'Montserrat',
                           color: Colors.white,
                         ),
                       ),
@@ -190,7 +259,10 @@ class _OneStopScreenState extends State<DrawerWidget> {
             //
 
             ListTile(
-              title: const Text("RESET PASSWORD"),
+              title: const Text(
+                "RESET PASSWORD",
+                style: TextStyle(fontFamily: 'Montserrat'),
+              ),
               onTap: () {
                 // Handle home item tap
                 Navigator.push(
@@ -200,7 +272,10 @@ class _OneStopScreenState extends State<DrawerWidget> {
               },
             ),
             ListTile(
-              title: const Text("CONTACT"),
+              title: const Text(
+                "CONTACT",
+                style: TextStyle(fontFamily: 'Montserrat'),
+              ),
               onTap: () {
                 // Handle settings item tap
                 Navigator.push(
@@ -212,10 +287,16 @@ class _OneStopScreenState extends State<DrawerWidget> {
             ),
             ListTile(
               minLeadingWidth: 25,
-              title: const Text("TERMS & CONDITIONS"),
+              title: const Text(
+                "TERMS & CONDITIONS",
+                style: TextStyle(fontFamily: 'Montserrat'),
+              ),
               onTap: () {
                 // Handle settings item tap
-                Navigator.pop(context); // Close the drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Term()),
+                ); // Close the drawer
               },
             ),
             SizedBox(
@@ -223,7 +304,10 @@ class _OneStopScreenState extends State<DrawerWidget> {
             ),
             ListTile(
               minLeadingWidth: 25,
-              title: const Text("VERSION 1.2.0"),
+              title: const Text(
+                "VERSION 1.2.0",
+                style: TextStyle(fontFamily: 'Montserrat'),
+              ),
               onTap: () {
                 // Handle settings item tap
                 Navigator.pop(context); // Close the drawer
@@ -248,7 +332,9 @@ class _OneStopScreenState extends State<DrawerWidget> {
                     child: Text(
                       "Logout",
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat'),
                     ),
                   ),
                 ),

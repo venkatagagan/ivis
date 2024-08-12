@@ -43,7 +43,7 @@ class _MyHomePageState extends State<DevelopmentScreen> {
   DateTime selectedFromDate = DateTime.now();
   DateTime selectedToDate = DateTime.now();
   //DateTime? _selectedDay;
-  List<String> disabledDates = [];
+  //List<String> disabledDates = [""];
 
   final _dateController = TextEditingController();
   DateTime _focusedDay = DateTime.now();
@@ -94,7 +94,6 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     }
   }
 
-
   List<dynamic> siteNames = [];
 
   Future<void> fetchSiteNames() async {
@@ -130,412 +129,449 @@ class _MyHomePageState extends State<DevelopmentScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: SafeArea(child: 
-        Stack(
-          children: [
-            Image.asset(
-              'assets/images/bg.png',
-              fit: BoxFit.cover,
-              height: double.infinity,
-              width: double.infinity,
-              alignment: Alignment.center,
-            ),
-            SizedBox(
-                      height: Height * 0.18,
-                      child: Column(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Image.asset(
+                'assets/images/bg.png',
+                fit: BoxFit.cover,
+                height: double.infinity,
+                width: double.infinity,
+                alignment: Alignment.center,
+              ),
+              SizedBox(
+                  height: Height * 0.18,
+                  child: Column(
+                    children: [
+                      SizedBox(height: Height * 0.03),
+                      Row(
                         children: [
-                          SizedBox(height: Height * 0.03),
-                          Row(
-                            children: [
-                              SizedBox(width: Width * 0.1),
-                              Builder(
-                                builder: (context) => GestureDetector(
-                                  onTap: () {
-                                    Scaffold.of(context).openDrawer();
-                                  },
-                                  child: const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.menu,
-                                        size: 30,
-                                        color: Colors.white,
-                                      ),
-                                    ],
+                          SizedBox(width: Width * 0.1),
+                          Builder(
+                            builder: (context) => GestureDetector(
+                              onTap: () {
+                                Scaffold.of(context).openDrawer();
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(
+                                    Icons.menu,
+                                    size: 30,
+                                    color: Colors.white,
                                   ),
-                                ),
+                                ],
                               ),
-                              SizedBox(
-                                width: Width * 0.05,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Your action when the image is tapped
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => HomePage()),
-                                  );
-                                  // Add your logic here, such as navigating to a new screen or performing some action.
-                                },
-                                child: Image.asset(
-                                  'assets/logos/logo.png',
-                                  height: Height * 0.04,
-                                  width: Width * 0.6,
-                                ),
-                              )
-                            ],
+                            ),
                           ),
                           SizedBox(
-                            height: Height * 0.02,
+                            width: Width * 0.05,
                           ),
-                          const Divider(
+                          GestureDetector(
+                            onTap: () {
+                              // Your action when the image is tapped
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomePage()),
+                              );
+                              // Add your logic here, such as navigating to a new screen or performing some action.
+                            },
+                            child: Image.asset(
+                              'assets/logos/logo.png',
+                              height: Height * 0.04,
+                              width: Width * 0.6,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: Height * 0.02,
+                      ),
+                      const Divider(
+                        height: 1, // Set the height of the line
+                        thickness: 1, // Set the thickness of the line
+                        color: Colors.white, // Set the color of the line
+                      ),
+                      SizedBox(
+                        height: Height * 0.05,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: Width * 0.05,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.arrow_back_ios),
+                              onPressed: currentIndex > 0
+                                  ? () {
+                                      String siteId =
+                                          siteNames[currentIndex - 1]['siteId']
+                                              .toString();
+                                      String sitename =
+                                          siteNames[currentIndex - 1]
+                                                  ['siteName']
+                                              .toString();
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DevelopmentScreen(
+                                            i: currentIndex - 1,
+                                            siteId: siteId,
+                                            Sitename: sitename,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  : null,
+                              iconSize: 21.13,
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                                height: Height * 0.05,
+                                width: Width * 0.6,
+                                child: Center(
+                                  child: Text(
+                                    sitename,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                  ),
+                                )),
+                            SizedBox(
+                              width: Width * 0.01,
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.arrow_forward_ios),
+                              onPressed: currentIndex < siteNames.length - 1
+                                  ? () {
+                                      String siteId =
+                                          siteNames[currentIndex + 1]['siteId']
+                                              .toString();
+                                      String sitename =
+                                          siteNames[currentIndex + 1]
+                                                  ['siteName']
+                                              .toString();
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DevelopmentScreen(
+                                            i: currentIndex + 1,
+                                            siteId: siteId,
+                                            Sitename: sitename,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  : null,
+                              iconSize: 21.13,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(
+                        height: 1, // Set the height of the line
+                        thickness: 1, // Set the thickness of the line
+                        color: Colors.white, // Set the color of the line
+                      ),
+                    ],
+                  )),
+              if (bi == "T") ...[
+                // Display content for Button 1
+                
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: Height * 0.18,
+                        ),
+                        SizedBox(
+                            height: Height * 0.035,
+                            child: Text(
+                              "Analytics",
+                              style:
+                                  TextStyle(color: Colors.white,fontFamily: 'Montserrat', fontSize: 20),
+                            )),
+                        SizedBox(
+                          height: Height * 0.03,
+                        ),
+                        SizedBox(
+                          width: Width * 0.8,
+                          child: Divider(
                             height: 1, // Set the height of the line
-                            thickness: 1, // Set the thickness of the line
+                            thickness: 6, // Set the thickness of the line
                             color: Colors.white, // Set the color of the line
                           ),
-                          SizedBox(
-                            height: Height * 0.05,
+                        ),
+                        SizedBox(
+                          height: Height * 0.025,
+                        ),
+                        Container(
+                          width: Width * 0.8,
+                          height: Height * 0.05,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(1),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 10, top: 0),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                SizedBox(
-                                  width: Width * 0.05,
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 10),
+                                    child: TextField(
+                                      controller: _dateController,
+                                      decoration: InputDecoration(
+                                        hintText: 'yyyy-mm-dd',hintStyle: TextStyle(fontFamily: 'Montserrat',),
+                                        border: InputBorder.none,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.arrow_back_ios),
-                                  onPressed: currentIndex > 0
-                                      ? () {
-                                          String siteId =
-                                              siteNames[currentIndex - 1]
-                                                      ['siteId']
-                                                  .toString();
-                                          String sitename =
-                                              siteNames[currentIndex - 1]
-                                                      ['siteName']
-                                                  .toString();
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => DevelopmentScreen(
-                                                i: currentIndex - 1,
-                                                siteId: siteId,
-                                                Sitename: sitename,
-                                              ),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => Dialog(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            _isLoading
+                                                ? Center(
+                                                    child:
+                                                        CircularProgressIndicator())
+                                                : TableCalendar(
+                                                    locale: 'en_US',
+                                                    firstDay: DateTime(2000),
+                                                    lastDay: DateTime.now(),
+                                                    focusedDay: _focusedDay,
+                                                    selectedDayPredicate:
+                                                        (day) {
+                                                      return isSameDay(
+                                                          _selectedDay, day);
+                                                    },
+                                                    onPageChanged:
+                                                        (DateTime focusedDay) {
+                                                      final currentYear =
+                                                          focusedDay.year;
+                                                      notWorkingDays(
+                                                          currentYear,
+                                                          widget.siteId);
+                                                      ;
+                                                    },
+                                                    onDaySelected: (selectedDay,
+                                                        focusedDay) {
+                                                      if (!_notWorkingDays
+                                                          .contains(DateFormat(
+                                                                  'yyyy-MM-dd')
+                                                              .format(
+                                                                  selectedDay))) {
+                                                        setState(() {
+                                                          _selectedDay =
+                                                              selectedDay;
+                                                          _focusedDay =
+                                                              focusedDay;
+
+                                                          _dateController
+                                                              .text = DateFormat(
+                                                                  'yyyy-MM-dd')
+                                                              .format(
+                                                                  selectedDay);
+                                                          Navigator.pop(
+                                                              context); // Close the dialog
+                                                        });
+                                                      }
+                                                    },
+                                                    calendarBuilders:
+                                                        CalendarBuilders(
+                                                      disabledBuilder:
+                                                          (context, date, _) {
+                                                        final dateFormat =
+                                                            DateFormat(
+                                                                'yyyy-MM-dd');
+                                                        if (_notWorkingDays
+                                                            .contains(dateFormat
+                                                                .format(
+                                                                    date))) {
+                                                          return Center(
+                                                            child: Text(
+                                                              DateFormat.d()
+                                                                  .format(date),
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
+                                                          );
+                                                        }
+                                                        return null;
+                                                      },
+                                                    ),
+                                                    enabledDayPredicate:
+                                                        (date) {
+                                                      final dateFormat =
+                                                          DateFormat(
+                                                              'yyyy-MM-dd');
+                                                      return !_notWorkingDays
+                                                          .contains(dateFormat
+                                                              .format(date));
+                                                    },
+                                                    availableCalendarFormats: {
+                                                      CalendarFormat.month:
+                                                          'Month',
+                                                    },
+                                                    calendarStyle:
+                                                        CalendarStyle(
+                                                      isTodayHighlighted: true,
+                                                      selectedDecoration:
+                                                          BoxDecoration(
+                                                        color: Colors.blue,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      todayDecoration:
+                                                          BoxDecoration(
+                                                        color: Colors.orange,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      disabledTextStyle:
+                                                          TextStyle(
+                                                              color:
+                                                                  Colors.red),
+                                                    ),
+                                                    headerStyle: HeaderStyle(
+                                                        formatButtonVisible:
+                                                            false,
+                                                        titleCentered: true),
+                                                  ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('Close'),
                                             ),
-                                          );
-                                        }
-                                      : null,
-                                  iconSize: 21.13,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                    height: Height * 0.05,
-                                    width: Width * 0.6,
-                                    child: Center(
-                                      child: Text(
-                                        sitename,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white,
+                                          ],
                                         ),
                                       ),
-                                    )),
-                                SizedBox(
-                                  width: Width * 0.01,
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.arrow_forward_ios),
-                                  onPressed: currentIndex < siteNames.length - 1
-                                      ? () {
-                                          String siteId =
-                                              siteNames[currentIndex + 1]
-                                                      ['siteId']
-                                                  .toString();
-                                          String sitename =
-                                              siteNames[currentIndex + 1]
-                                                      ['siteName']
-                                                  .toString();
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => DevelopmentScreen(
-                                                i: currentIndex + 1,
-                                                siteId: siteId,
-                                                Sitename: sitename,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      : null,
-                                  iconSize: 21.13,
-                                  color: Colors.white,
+                                    );
+                                  },
+                                  icon: Icon(Icons.calendar_today),
                                 ),
                               ],
                             ),
                           ),
-                          const Divider(
-                            height: 1, // Set the height of the line
-                            thickness: 1, // Set the thickness of the line
-                            color: Colors.white, // Set the color of the line
-                          ),
-                          
-                        ],
-                      )),
-              
-            if (bi == "T") ...[
-              // Display content for Button 1
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
-                       SizedBox(
-                        height:Height*0.18 ,
-                      ),
-                      SizedBox(
-                        height: Height*0.03 ,
-                        child: Text("Analytics",style: TextStyle(color: Colors.white,fontSize: 20),)),
-                      SizedBox(
-                        height: Height*0.03 ,
-                       ),
-                      
-                      SizedBox(
-                        width: Width*0.8 ,
-                        child: Divider(
-                  height: 1, // Set the height of the line
-                  thickness: 6, // Set the thickness of the line
-                  color: Colors.white, // Set the color of the line
-                ),
-                      ),
-                      SizedBox(
-                        height:Height*0.025 ,
-                      ),
-                      Container(
-                        width: Width*0.8,
-                        height: Height*0.05,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(1),
-                          borderRadius: BorderRadius.circular(5),
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 10, top: 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(left: 10),
-                                  child: TextField(
-                                    controller: _dateController,
-                                    decoration: InputDecoration(
-                                      hintText: 'yyyy-mm-dd',
-                                      border: InputBorder.none,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => Dialog(
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Divider(),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: FutureBuilder<Map<String, dynamic>>(
+                              future:
+                                  fetchDatas(_selectedDay, int.parse(siteId)),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text(
+                                        'Error: ${snapshot.error}',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    );
+                                  } else if (snapshot.data == null ||
+                                      snapshot.data!['AnalyticsList'] == null) {
+                                    return Center(
+                                      child: Text(
+                                        'No data available',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    );
+                                  } else if (snapshot.data!['AnalyticsList']
+                                          is List &&
+                                      (snapshot.data!['AnalyticsList'] as List)
+                                          .isEmpty) {
+                                    return SingleChildScrollView(
                                       child: Column(
-                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          _isLoading
-                                              ? Center(
-                                                  child:
-                                                      CircularProgressIndicator())
-                                              : TableCalendar(
-                                                  locale: 'en_US',
-                                                  firstDay: DateTime(2000),
-                                                  lastDay: DateTime.now(),
-                                                  focusedDay: _focusedDay,
-                                                  selectedDayPredicate: (day) {
-                                                    return isSameDay(
-                                                        _selectedDay, day);
-                                                  },
-                                                  onPageChanged:
-                                                      (DateTime focusedDay) {
-                                                    final currentYear =
-                                                        focusedDay.year;
-                                                    notWorkingDays(currentYear,
-                                                        widget.siteId);
-                                                    ;
-                                                  },
-                                                  onDaySelected: (selectedDay,
-                                                      focusedDay) {
-                                                    if (!_notWorkingDays
-                                                        .contains(DateFormat(
-                                                                'yyyy-MM-dd')
-                                                            .format(
-                                                                selectedDay))) {
-                                                      setState(() {
-                                                        _selectedDay =
-                                                            selectedDay;
-                                                        _focusedDay =
-                                                            focusedDay;
-
-                                                        _dateController
-                                                            .text = DateFormat(
-                                                                'yyyy-MM-dd')
-                                                            .format(
-                                                                selectedDay);
-                                                        Navigator.pop(
-                                                            context); // Close the dialog
-                                                      });
-                                                    }
-                                                  },
-                                                  calendarBuilders:
-                                                      CalendarBuilders(
-                                                    disabledBuilder:
-                                                        (context, date, _) {
-                                                      final dateFormat =
-                                                          DateFormat(
-                                                              'yyyy-MM-dd');
-                                                      if (_notWorkingDays
-                                                          .contains(dateFormat
-                                                              .format(date))) {
-                                                        return Center(
-                                                          child: Text(
-                                                            DateFormat.d()
-                                                                .format(date),
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.red),
-                                                          ),
-                                                        );
-                                                      }
-                                                      return null;
-                                                    },
-                                                  ),
-                                                  enabledDayPredicate: (date) {
-                                                    final dateFormat =
-                                                        DateFormat(
-                                                            'yyyy-MM-dd');
-                                                    return !_notWorkingDays
-                                                        .contains(dateFormat
-                                                            .format(date));
-                                                  },
-                                                  availableCalendarFormats: {
-                                                    CalendarFormat.month:
-                                                        'Month',
-                                                  },
-                                                  calendarStyle: CalendarStyle(
-                                                    isTodayHighlighted: true,
-                                                    selectedDecoration:
-                                                        BoxDecoration(
-                                                      color: Colors.blue,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    todayDecoration:
-                                                        BoxDecoration(
-                                                      color: Colors.orange,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    disabledTextStyle:
-                                                        TextStyle(
-                                                            color: Colors.red),
-                                                  ),
-                                                  headerStyle: HeaderStyle(
-                                                      formatButtonVisible:
-                                                          false,
-                                                      titleCentered: true),
-                                                ),
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text('Close'),
+                                          Text('Empty'),
+                                        ],
+                                      ),
+                                    );
+                                  } else if (snapshot.data!['AnalyticsList']
+                                          is List &&
+                                      (snapshot.data!['AnalyticsList'] as List)
+                                          .isNotEmpty) {
+                                    return SingleChildScrollView(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          YourWidget(
+                                            analyticsList: (snapshot
+                                                        .data!['AnalyticsList']
+                                                    as List<dynamic>)
+                                                .cast<Map<String, dynamic>>(),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  );
-                                },
-                                icon: Icon(Icons.calendar_today),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Divider(),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: FutureBuilder(
-                            future: fetchDatas(_selectedDay, int.parse(siteId)),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.done &&
-                                  !snapshot.hasError) {
-                                if (snapshot.data != null &&
-                                    snapshot.data!['AnalyticsList'] != []) {
-                                  return SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        YourWidget(
-                                          analyticsList:
-                                              (snapshot.data!['AnalyticsList']
-                                                      as List<dynamic>)
-                                                  .cast<Map<String, dynamic>>(),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                                 else {
+                                    );
+                                  } else {
+                                    return Center(
+                                      child: Text(
+                                        'No data available',
+                                        style: TextStyle(color: Colors.white,fontFamily: 'Montserrat',),
+                                      ),
+                                    );
+                                  }
+                                } else {
                                   return Center(
-                                    child: Text(
-                                      'No data available',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
+                                    child: CircularProgressIndicator(),
                                   );
                                 }
-                              } else {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                            },
+                              },
+                            ),
                           ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+
+                // Add rows and columns specific to Button 1
+              ],
+              if (bi == "F") // change logic as alarm == "F"
+                ...[
+                Column(
+                  children: [
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.143),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.726,
+                      width: MediaQuery.of(context).size.width * 1,
+                      color: Colors.black54,
+                      child: Center(
+                        child: Text(
+                          "You have not availed this service.\n To subscribe please CONTACT",
+                          style: TextStyle(color: Colors.white,fontFamily: 'Montserrat',),
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-
-              // Add rows and columns specific to Button 1
-            ],  if (bi == "F") // change logic as alarm == "F"
-              ...[
-              Column(
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.143
-                  ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.726,
-                    width: MediaQuery.of(context).size.width * 1,
-                    color: Colors.black54,
-                    child: Center(
-                      child: Text(
-                        "You have not availed this service.\n To subscribe please CONTACT",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  )
-                ],
-              ),
+                    )
+                  ],
+                ),
+              ],
             ],
-          ],
-        ),
+          ),
         ),
         bottomNavigationBar: CustomBottomNavigationBar(
           selected: 2,
@@ -579,35 +615,9 @@ class _MyHomePageState extends State<DevelopmentScreen> {
       throw Exception('Failed to load data');
     }
   }
-
 // Modify your initState to use the async function
-
 // Rest of your code remains the same...
-
-  Future<void> downloadPdf(FromDate, ToDate) async {
-    // Replace 'YOUR_PDF_API_URL' with your actual API endpoint
-    final pdfApiUrl =
-        'http://usmgmt.iviscloud.net:777/businessInterface/insights/getPdfReport?siteId=1003&startdate=$ToDate&enddate=$ToDate&calling_System_Detail=IVISUSA';
-
-    try {
-      final response = await http.get(Uri.parse(pdfApiUrl));
-
-      if (response.statusCode == 200) {
-        final documentDirectory = await getApplicationDocumentsDirectory();
-        final file = File('${documentDirectory.path}/downloaded_file.pdf');
-
-        await file.writeAsBytes(response.bodyBytes);
-
-        print('PDF downloaded and saved to: ${file.path}');
-      } else {
-        throw Exception('Failed to download PDF');
-      }
-    } catch (e) {
-      print('Error downloading PDF: $e');
-    }
-  }
 }
-
 
 @override
 class YourWidget extends StatelessWidget {
@@ -633,19 +643,18 @@ class YourWidget extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-
         // Create a list of Container widgets for each item in analyticsList
         for (var analytics in analyticsList) ...[
           SizedBox(
-            height: Height*0.01,
+            height: Height * 0.01,
           ),
 
           // ignore: unnecessary_null_comparison
           if (analytics != null && analytics['service'] is String)
             SingleChildScrollView(
               child: Container(
-                width: Width*0.8,
-                height: Height*0.14,
+                width: Width * 0.8,
+                height: Height * 0.14,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(1),
                   borderRadius: BorderRadius.circular(5),
@@ -657,14 +666,14 @@ class YourWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SizedBox(
-                          height: Height*0.02,
+                          height: Height * 0.02,
                         ),
                         SizedBox(
-                            width: Width*0.8,
+                            width: Width * 0.8,
                             child: Row(
                               children: [
                                 SizedBox(
-                                  width: Width*0.05,
+                                  width: Width * 0.05,
                                 ),
                                 Flexible(
                                   flex: 2, // Adjust this flex value as needed
@@ -674,12 +683,13 @@ class YourWidget extends StatelessWidget {
                                       fontSize: 13,
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
+                                      fontFamily: 'Montserrat',
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 SizedBox(
-                                  width: Width*0.02,
+                                  width: Width * 0.02,
                                 ),
                                 Flexible(
                                   flex: 2, // Adjust this flex value as needed
@@ -687,6 +697,7 @@ class YourWidget extends StatelessWidget {
                                     '(Compare with prior period)',
                                     style: const TextStyle(
                                       fontSize: 9,
+                                      fontFamily: 'Montserrat',
                                       color: Colors.grey,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -695,16 +706,16 @@ class YourWidget extends StatelessWidget {
                               ],
                             )),
                         SizedBox(
-                          height: Height*0.01,
+                          height: Height * 0.01,
                         ),
                         Row(
                           children: [
                             SizedBox(
-                                  width: Width*0.05,
-                                ),
+                              width: Width * 0.05,
+                            ),
                             Container(
-                              height: Height*0.066,
-                              width: Width*0.22,
+                              height: Height * 0.066,
+                              width: Width * 0.22,
                               decoration: BoxDecoration(
                                 color: getColorBasedOnCriteria(
                                     analytics['analytics'][0]['status']),
@@ -713,7 +724,7 @@ class YourWidget extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: Height*0.01,
+                                    height: Height * 0.01,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -722,31 +733,33 @@ class YourWidget extends StatelessWidget {
                                         '${analytics['analytics'][0]['type']}',
                                         style: TextStyle(
                                           color: Colors.white,
+                                          fontFamily: 'Montserrat',
                                         ),
                                       ),
                                       SizedBox(
                                         width: 3,
                                       ),
                                       SizedBox(
-                                        width: Width*0.1,
-                                        height: Height*0.011,
+                                        width: Width * 0.1,
+                                        height: Height * 0.012,
                                         child: Text(
                                           '(${analytics['analytics'][0]['percentage']}%)',
                                           style: TextStyle(
                                             color: Colors.white,
+                                            fontFamily: 'Montserrat',
                                             fontSize: 8,
                                           ),
                                         ),
                                       )
                                     ],
                                   ),
-                                  
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
                                         '${analytics['analytics'][0]['count']}',
                                         style: TextStyle(
+                                          fontFamily: 'Montserrat',
                                           color: Colors.white,
                                         ),
                                       ),
@@ -756,11 +769,11 @@ class YourWidget extends StatelessWidget {
                               ),
                             ),
                             SizedBox(
-                              width: Width*0.03,
+                              width: Width * 0.03,
                             ),
                             Container(
-                              height: Height*0.066,
-                              width: Width*0.22,
+                              height: Height * 0.066,
+                              width: Width * 0.22,
                               decoration: BoxDecoration(
                                 color: getColorBasedOnCriteria(
                                     analytics['analytics'][1]['status']),
@@ -769,29 +782,31 @@ class YourWidget extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: Height*0.01,
+                                    height: Height * 0.01,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      
                                       Text(
                                         '${analytics['analytics'][1]['type']}',
                                         style: TextStyle(
+                                          fontFamily: 'Montserrat',
                                           color: Colors.white,
+                                          fontSize: 10,
                                         ),
                                       ),
                                       SizedBox(
                                         width: 3,
                                       ),
                                       SizedBox(
-                                        width: Width*0.1,
-                                        height: Height*0.011,
+                                        width: Width * 0.1,
+                                        height: Height * 0.012,
                                         child: Text(
                                           '(${analytics['analytics'][1]['percentage']}%)',
                                           style: TextStyle(
+                                            fontFamily: 'Montserrat',
                                             color: Colors.white,
-                                            fontSize: 8,
+                                            fontSize: 7,
                                           ),
                                         ),
                                       )
@@ -804,6 +819,7 @@ class YourWidget extends StatelessWidget {
                                         "${analytics['analytics'][1]['count']}",
                                         style: TextStyle(
                                           color: Colors.white,
+                                          fontFamily: 'Montserrat',
                                         ),
                                       ),
                                     ],
@@ -812,11 +828,11 @@ class YourWidget extends StatelessWidget {
                               ),
                             ),
                             SizedBox(
-                              width: Width*0.03,
+                              width: Width * 0.03,
                             ),
                             Container(
-                              height: Height*0.066,
-                              width: Width*0.22,
+                              height: Height * 0.066,
+                              width: Width * 0.22,
                               decoration: BoxDecoration(
                                 color: getColorBasedOnCriteria(
                                     analytics['analytics'][3]['status']),
@@ -825,29 +841,30 @@ class YourWidget extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: Height*0.01,
+                                    height: Height * 0.01,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                     
                                       Text(
                                         'QTR',
                                         style: TextStyle(
                                           color: Colors.white,
+                                          fontFamily: 'Montserrat',
                                         ),
                                       ),
                                       SizedBox(
                                         width: 3,
                                       ),
                                       SizedBox(
-                                        width: Width*0.1,
-                                        height: Height*0.011,
+                                        width: Width * 0.1,
+                                        height: Height * 0.012,
                                         child: Text(
                                           '(${analytics['analytics'][3]['percentage']}%)',
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 8,
+                                            fontFamily: 'Montserrat',
                                           ),
                                         ),
                                       )
@@ -860,6 +877,7 @@ class YourWidget extends StatelessWidget {
                                         "${analytics['analytics'][3]['count']}",
                                         style: TextStyle(
                                           color: Colors.white,
+                                          fontFamily: 'Montserrat',
                                         ),
                                       ),
                                     ],

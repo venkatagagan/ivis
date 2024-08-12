@@ -259,6 +259,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                           style: TextStyle(
                                             fontSize: 16,
                                             color: Colors.white,
+                                            fontFamily: 'Montserrat',
                                           ),
                                         ),
                                       )),
@@ -319,7 +320,9 @@ class _MyHomePageState extends State<CctvScreen> {
                             'CAMERAS',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 13, // Set the text color to black
+                              fontSize: 13,
+                              fontFamily:
+                                  'Montserrat', // Set the text color to black
                               // Thickness of the underline
                             ),
                           ),
@@ -333,7 +336,9 @@ class _MyHomePageState extends State<CctvScreen> {
                             'MONITORING',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 13, // Set the text color to black
+                              fontSize: 13,
+                              fontFamily:
+                                  'Montserrat', // Set the text color to black
                             ),
                           ),
                         ),
@@ -346,7 +351,9 @@ class _MyHomePageState extends State<CctvScreen> {
                             'STATUS',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 13, // Set the text color to black
+                              fontSize: 13,
+                              fontFamily:
+                                  'Montserrat', // Set the text color to black
                             ),
                           ),
                         ),
@@ -424,7 +431,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.42,
+                                                    0.37,
                                                 height: MediaQuery.of(context)
                                                         .size
                                                         .height *
@@ -437,6 +444,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                                     color: Color(0xFF000000),
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,
+                                                    fontFamily: 'Montserrat',
                                                   ),
                                                 ),
                                               ),
@@ -459,13 +467,14 @@ class _MyHomePageState extends State<CctvScreen> {
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.3,
+                                                    0.35,
                                                 child: Text(
                                                   camera.snapshotUrl.isNotEmpty
                                                       ? 'Connected'
                                                       : 'Disconnected',
                                                   style: TextStyle(
                                                     fontSize: 16,
+                                                    fontFamily: 'Montserrat',
                                                     color: camera.snapshotUrl
                                                             .isNotEmpty
                                                         ? Color(
@@ -492,25 +501,20 @@ class _MyHomePageState extends State<CctvScreen> {
                                                       children: [
                                                         Image.network(
                                                           camera.snapshotUrl,
-                                                          //errorBuilder:
-                                                            //  (context, error,
-                                                            //      stackTrace) {
-                                                            //return Icon(
-                                                              //Icons
-                                                                //  .visibility_off,
-                                                              //size: 50,
-                                                              //color:
-                                                                //  Colors.grey,
-                                                            //);
-                                                          //},
+                                                          errorBuilder:
+                                                              (context, error,
+                                                                  stackTrace) {
+                                                            return Text(
+                                                                'Image              Issue');
+                                                          },
                                                         ),
                                                         //if (errorBuilder)
-                                                          Icon(
-                                                              Icons
-                                                                  .play_circle_filled,
-                                                              size: 50,
-                                                              color:
-                                                                  Colors.white),
+                                                        Icon(
+                                                            Icons
+                                                                .play_circle_filled,
+                                                            size: 50,
+                                                            color:
+                                                                Colors.white),
                                                       ],
                                                     )
                                                   : Stack(
@@ -590,6 +594,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                     fontSize: 13,
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
+                                    fontFamily: 'Montserrat',
                                   ),
                                 ),
                                 SizedBox(
@@ -735,6 +740,7 @@ class _MyHomePageState extends State<CctvScreen> {
                         fontSize: 20,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
                       ),
                     ),
                   )
@@ -752,7 +758,10 @@ class _MyHomePageState extends State<CctvScreen> {
                         child: Center(
                           child: Text(
                             "You have not availed this service.\n To subscribe please CONTACT",
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Montserrat',
+                            ),
                           ),
                         ),
                       )

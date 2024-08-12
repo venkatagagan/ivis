@@ -26,102 +26,104 @@ class ResetScreen extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Stack(
-
-        children: [
-          Image.asset(
-              'assets/images/bg.png',
-              fit: BoxFit.cover,
-              height: double.infinity,
-              width: double.infinity,
-              alignment: Alignment.center,
-            ),
-          Column(children: [
-            SizedBox(height: Height * 0.05),
-            Row(
-              children: [
-                SizedBox(width: Width * 0.1),
-                 GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Row(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Image.asset(
+                'assets/images/bg.png',
+                fit: BoxFit.cover,
+                height: double.infinity,
+                width: double.infinity,
+                alignment: Alignment.center,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(children: [
+                    SizedBox(height: Height * 0.03),
+                    Row(
                       children: [
-                        Icon(
-                          Icons.arrow_back,
-                          size: 30,
-                          color: Colors.white,
+                        SizedBox(width: Width * 0.1),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.arrow_back,
+                                size: 30,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
                         ),
+                        SizedBox(
+                          width: Width * 0.05,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context, true);
+                            // Your action when the image is tapped
+                          },
+                          child: Image.asset(
+                            'assets/logos/logo.png',
+                            height: Height * 0.04,
+                            width: Width * 0.6,
+                          ),
+                        )
                       ],
                     ),
-                  ),
-                
-                SizedBox(
-                  width: Width * 0.05,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context, true);
-                    // Your action when the image is tapped
-                  },
-                  child: Image.asset(
-                    'assets/logos/logo.png',
-                    height: Height * 0.04,
-                    width: Width * 0.6,
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: Height * 0.1,
-            ),
-            const Text(
-              'RESET PASSWORD',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(
-              height: Height * 0.03,
-            ),
-            Container(
-              width: Width*0.8,
-              height: Height*0.64,
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 3,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: const ResetForm(),
-            ),
-          ]),
-          
-          
-          Positioned(
-            bottom: 40,
-            width: MediaQuery.of(context).size.width, // Full width
-            child: Container(
-              alignment: Alignment.center,
-              child: const Text(
-                'Version 1.2.0',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+                    SizedBox(
+                      height: Height * 0.05,
+                    ),
+                    const Text(
+                      'RESET PASSWORD',
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontFamily: 'Montserrat'),
+                    ),
+                    SizedBox(
+                      height: Height * 0.03,
+                    ),
+                    Container(
+                      width: Width * 0.8,
+                      height: Height * 0.64,
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 3,
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: const ResetForm(),
+                    ),
+                  ]),
                 ),
               ),
-            ),
+              Positioned(
+                bottom: 40,
+                width: MediaQuery.of(context).size.width, // Full width
+                child: Container(
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Version 1.2.0',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'Montserrat'),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
       ),
     );
   }
@@ -276,6 +278,7 @@ class _PasswordValidatorState extends State<ResetForm> {
             controller: _oldPasswordController,
             decoration: const InputDecoration(
                 labelText: 'Old Password',
+                labelStyle: TextStyle(fontFamily: 'Montserrat'),
                 border: OutlineInputBorder(),
                 filled: true,
                 fillColor: Colors.white),
@@ -286,6 +289,7 @@ class _PasswordValidatorState extends State<ResetForm> {
             controller: _newPasswordController,
             decoration: InputDecoration(
               labelText: 'New Password',
+              labelStyle: TextStyle(fontFamily: 'Montserrat'),
               border: const OutlineInputBorder(),
               filled: true,
               fillColor: Colors.white,
@@ -317,8 +321,10 @@ class _PasswordValidatorState extends State<ResetForm> {
             obscureText: !_showPassword,
             controller: _reenterPasswordController,
             decoration: InputDecoration(
-              labelText: _matched ? 'Enter New Password' : "invalid",
-              labelStyle: TextStyle(color: _matched ? Colors.grey : Colors.red),
+              labelText: _matched ? 'Enter New Password' : "Invalid",
+              labelStyle: TextStyle(
+                  color: _matched ? Colors.grey : Colors.red,
+                  fontFamily: 'Montserrat'),
               border: const OutlineInputBorder(),
               filled: true,
               fillColor: Colors.white,
@@ -382,10 +388,9 @@ class _PasswordValidatorState extends State<ResetForm> {
                         width: 340,
                         padding: const EdgeInsets.all(16),
                         child: const Text(
-                          "invalid old password ",
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
+                          "Invalid old password ",
+                          style:
+                              TextStyle(fontSize: 16, fontFamily: 'Montserrat'),
                         ),
                       ),
                       actions: [
@@ -404,9 +409,13 @@ class _PasswordValidatorState extends State<ResetForm> {
                   borderRadius: BorderRadius.circular(25.0),
                 ),
               ),
+              backgroundColor: MaterialStateProperty.all(Color(0xFF084982)),
               minimumSize: MaterialStateProperty.all(const Size(125, 50)),
             ),
-            child: const Text('SUBMIT'),
+            child: const Text(
+              'SUBMIT',
+              style: TextStyle(fontFamily: 'Montserrat',color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -442,7 +451,8 @@ class _PasswordValidatorState extends State<ResetForm> {
           Text(
             text,
             style: TextStyle(
-              fontSize: 16,
+              fontFamily: 'Montserrat',
+              fontSize: 14,
               color: isSatisfied ? Colors.green : Colors.red,
             ),
           ),
