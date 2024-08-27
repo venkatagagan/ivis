@@ -114,11 +114,10 @@ class MyApp extends State<BigScreen> {
                           ),
                         ),
                       ),
-                      if (currentCameraIndex != maxIndex)
                         IconButton(
-                          icon: Icon(Icons.arrow_forward),
+                          icon: Icon(Icons.arrow_forward,color: currentCameraIndex != maxIndex ? Colors.black : Colors.grey,),
                           onPressed: () {
-                            goToNextCamera(maxIndex);
+                            currentCameraIndex != maxIndex ? goToNextCamera(maxIndex):null;
                           },
                         ),
                     ],
@@ -128,7 +127,24 @@ class MyApp extends State<BigScreen> {
             ),
           ],
         ),
-        body: FutureBuilder<List<Camera>>(
+        backgroundColor: Colors.black,
+        body: Column(children: [
+         Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            
+            IconButton(
+  icon: Icon(Icons.close, color: Colors.white),
+  onPressed: () {
+    // Define the action that happens when the button is pressed
+    Navigator.pop(context); // Example action: close the current screen
+  },
+),
+            SizedBox(width: 10,),
+            ],),
+         
+         Expanded(child: 
+         FutureBuilder<List<Camera>>(
           future: _camerasFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -152,6 +168,8 @@ class MyApp extends State<BigScreen> {
             }
           },
         ),
+         ),
+        ],),
       ),
     );
   }

@@ -31,7 +31,7 @@ class LoginScreen extends StatelessWidget {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  SizedBox(height: Height * 0.1),
+                  SizedBox(height: Height * 0.12),
                   Image.asset(
                     'assets/logos/logo.png',
                     height: Height * 0.035,
@@ -142,7 +142,6 @@ class _LoginFormState extends State<LoginForm> {
     return SafeArea(child: Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SizedBox(height: Height * 0.04),
         TextFormField(
           controller: userController,
           decoration: const InputDecoration(
@@ -192,7 +191,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ],
         ),
-        SizedBox(height: Height * 0.03),
+        SizedBox(height: Height * 0.02),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -205,13 +204,13 @@ class _LoginFormState extends State<LoginForm> {
               'Remember Me',
               style: TextStyle(
                 color: Color(0xFF084982),//#084982
-                fontSize: 20,
+                fontSize: 16,
                 fontFamily: 'Montserrat',
               ),
             ),
           ],
         ),
-        SizedBox(height: Height * 0.025),
+        SizedBox(height: Height * 0.02),
         ElevatedButton(
           onPressed: () {
             // Handle login button press
@@ -219,7 +218,7 @@ class _LoginFormState extends State<LoginForm> {
             
           },
           style: ElevatedButton.styleFrom(
-            minimumSize: const Size(150, 50),
+            minimumSize: const Size(150, 45),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(50),
             ),
