@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ivis_security/request.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
 import 'package:ivis_security/apis/Services.dart';
 import 'package:ivis_security/apis/fetchdata.dart';
 import 'package:ivis_security/cctv/camBigScreen.dart';
 import 'package:ivis_security/cctv/camList.dart';
-import 'package:ivis_security/center.dart';
 import 'package:ivis_security/drawer.dart';
 import 'package:ivis_security/home.dart';
 import 'package:ivis_security/navigation.dart';
@@ -45,6 +46,9 @@ class _MyHomePageState extends State<CctvScreen> {
 
   late Map<String, dynamic> services;
   String liveview = "F";
+  
+  // ignore: unused_field
+  late WebViewController _webViewController;
 
   late Future<List<Camera>> _camerasFuture;
 
@@ -56,7 +60,7 @@ class _MyHomePageState extends State<CctvScreen> {
     currentIndex = widget.i;
     _camerasFuture = fetchCameras(siteId);
     sitID = int.parse(widget.siteId);
-
+    fetchCameras( siteId);
     fetchSiteNames();
     fetchData(sitID);
   }
@@ -67,7 +71,10 @@ class _MyHomePageState extends State<CctvScreen> {
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
+      List<String> httpUrls = data.map<String>((json) => json['httpUrl'] as String).toList();
+      
       return data.map((json) => Camera.fromJson(json)).toList();
+
     } else {
       throw Exception('Failed to load cameras');
     }
@@ -384,174 +391,139 @@ class _MyHomePageState extends State<CctvScreen> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.only(top: 200), // Add top padding here
-                    child: FutureBuilder<List<Camera>>(
-                      future: _camerasFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          List<Camera> cameras = snapshot.data!;
-                          return ListView.builder(
-                            itemCount: cameras.length,
-                            itemBuilder: (context, index) {
-                              Camera camera = cameras[index];
-                              return Column(
+        padding: const EdgeInsets.only(top: 200), // Add top padding here
+        child: FutureBuilder<List<Camera>>(
+          future: _camerasFuture,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Camera> cameras = snapshot.data!;
+              return ListView.builder(
+                itemCount: cameras.length,
+                itemBuilder: (context, index) {
+                  Camera camera = cameras[index];
+                  return Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          // Navigate to the next screen here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BigScreen(
+                                httpUrl: camera.httpUrl,
+                                cameraId: camera.cameraId,
+                                cameraName: camera.name,
+                                siteId: int.parse(widget.siteId),
+                                index: index,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: Width * 0.85,
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      // Navigate to the next screen here
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => BigScreen(
-                                            httpUrl: camera.httpUrl,
-                                            cameraId: camera.cameraId,
-                                            cameraName: camera.name,
-                                            siteId: int.parse(widget.siteId),
-                                            index: index,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      width: Width * 0.9,
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.37,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.04,
-                                                child: Text(
-                                                  camera.name,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    color: Color(0xFF000000),
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: 'Montserrat',
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.1,
-                                                child: Icon(
-                                                  Icons.visibility,
-                                                  size: 20,
-                                                  color: camera.snapshotUrl
-                                                          .isNotEmpty
-                                                      ? Color(
-                                                          0xFF00A44C) //#00A44C
-                                                      : Color(0xFFEF2800),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.35,
-                                                child: Text(
-                                                  camera.snapshotUrl.isNotEmpty
-                                                      ? 'Connected'
-                                                      : 'Disconnected',
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontFamily: 'Montserrat',
-                                                    color: camera.snapshotUrl
-                                                            .isNotEmpty
-                                                        ? Color(
-                                                            0xFF00A44C) //#00A44C
-                                                        : Color(
-                                                            0xFFEF2800), //#EF2800
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          SizedBox(height: 10),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.3,
-                                            child: Center(
-                                              child: camera
-                                                      .snapshotUrl.isNotEmpty
-                                                  ? Stack(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      children: [
-                                                        Image.network(
-                                                          camera.snapshotUrl,
-                                                          errorBuilder:
-                                                              (context, error,
-                                                                  stackTrace) {
-                                                            return Text(
-                                                                'Image              Issue');
-                                                          },
-                                                        ),
-                                                        //if (errorBuilder)
-                                                        Icon(
-                                                            Icons
-                                                                .play_circle_filled,
-                                                            size: 50,
-                                                            color:
-                                                                Colors.white),
-                                                      ],
-                                                    )
-                                                  : Stack(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      children: [
-                                                        Icon(
-                                                            Icons
-                                                                .visibility_off,
-                                                            size: 50,
-                                                            color: Colors.grey),
-                                                      ],
-                                                    ),
-                                            ),
-                                          ),
-                                        ],
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.37,
+                                    height: MediaQuery.of(context).size.height * 0.025,
+                                    child: Text(
+                                      camera.name,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Color(0xFF000000),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Montserrat',
                                       ),
                                     ),
                                   ),
                                   SizedBox(
-                                      height: Width *
-                                          0.05), // Add space between the containers
+                                    width: MediaQuery.of(context).size.width * 0.1,
+                                    child: Icon(
+                                      Icons.visibility,
+                                      size: 20,
+                                      color: camera.httpUrl.isNotEmpty
+                                          ? Color(0xFF00A44C) // #00A44C
+                                          : Color(0xFFEF2800),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Text(
+                                      camera.httpUrl.isNotEmpty
+                                          ? 'Connected'
+                                          : 'Disconnected',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'Montserrat',
+                                        color: camera.httpUrl.isNotEmpty
+                                            ? Color(0xFF00A44C) // #00A44C
+                                            : Color(0xFFEF2800), // #EF2800
+                                      ),
+                                    ),
+                                  )
                                 ],
-                              );
-                            },
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text('Error: ${snapshot.error}'),
-                          );
-                        }
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      },
-                    ),
-                  ),
+                              ),
+                              SizedBox(height: 10),
+                              SizedBox(
+                                height: MediaQuery.of(context).size.height * 0.2,
+                                child: Center(
+                                  child: camera.httpUrl.isNotEmpty
+                                      ? Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            WebView(
+                                              initialUrl: camera.httpUrl,
+                                              javascriptMode: JavascriptMode.unrestricted,
+                                              gestureNavigationEnabled: true,
+                                              onWebViewCreated: (WebViewController webViewController) {
+                                                // Optional: Assign the WebViewController if needed
+                                              },
+                                            ),
+                                          ],
+                                        )
+                                      : Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.visibility_off,
+                                              size: 50,
+                                              color: Colors.grey,
+                                            ),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: Width * 0.05), // Add space between the containers
+                    ],
+                  );
+                },
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ),
+      ),
+    
 
                   // Add rows and columns specific to Button 1
                 ] else if (selectedButtonIndex == 1) ...[
@@ -589,7 +561,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                     width: Width *
                                         0.1), // Add spacing between text and image
                                 const Text(
-                                  'Hours',
+                                  'Monitoring Hours',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Colors.black,
@@ -599,13 +571,13 @@ class _MyHomePageState extends State<CctvScreen> {
                                 ),
                                 SizedBox(
                                     width: Width *
-                                        0.4), // Add spacing between text and next image
+                                        0.2), // Add spacing between text and next image
                                 InkWell(
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => CenterScreen(
+                                          builder: (context) => RequestScreen(
                                                 i: currentIndex - 1,
                                                 siteId: siteId,
                                                 Sitename: sitename,
@@ -655,7 +627,7 @@ class _MyHomePageState extends State<CctvScreen> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      CenterScreen(
+                                                      RequestScreen(
                                                         i: currentIndex - 1,
                                                         siteId: siteId,
                                                         Sitename: sitename,

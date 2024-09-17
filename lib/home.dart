@@ -136,9 +136,8 @@ class _MyHomePageState extends State<HomePage> {
                     color: Colors.white,
                   ),
                   SizedBox(height: Height * 0.02),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    Center(
+                      child: 
                       const Text(
                         'S I T E S',
                         style: TextStyle(
@@ -147,26 +146,26 @@ class _MyHomePageState extends State<HomePage> {
                           fontFamily: 'Montserrat',
                         ),
                       ),
-                    ],
-                  ),
+                    
+                    ),
+                    SizedBox(height: Height * 0.02),
+                    SizedBox(width: Width*0.84,child:Divider(
+                    height: 1, // Set the height of the line
+                    thickness: 6, // Set the thickness of the line
+                    color: Colors.white, // Set the color of the line
+                  ) ,),
+                  SizedBox(height: Height * 0.02),
+                    
+                    
                 ],
               ),
               if (selectedButtonIndex == 0) ...[
                 // Display content for Button 1
-                Positioned(
-                  top: Height * 0.24, // Adjust the position from the bottom
-                  left: Width * 0.08,
-                  right: Width * 0.08,
-                  child: Divider(
-                    height: 1, // Set the height of the line
-                    thickness: 6, // Set the thickness of the line
-                    color: Colors.white, // Set the color of the line
-                  ),
-                ),
+                
                 Center(
                   child: Column(
                     children: [
-                      SizedBox(height: Height * 0.25),
+                      SizedBox(height: Height * 0.27),
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
@@ -195,7 +194,7 @@ class _MyHomePageState extends State<HomePage> {
                                     },
                                     child: Container(
                                       width: Width * 0.85,
-                                      height: Height * 0.08,
+                                      height: 55,
                                       decoration: BoxDecoration(
                                         color: Colors.white.withOpacity(1),
                                         borderRadius: BorderRadius.circular(5),

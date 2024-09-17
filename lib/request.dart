@@ -726,6 +726,42 @@ class _MyHomePageState extends State<RequestScreen> {
                                             setState(() {
                                               isChecked = value ?? false;
                                             });
+                                            if (isChecked) {
+  showModalBottomSheet<DateTime>(
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+        height: MediaQuery.of(context).size.height * 0.3, // Adjusted height
+        child: Column(
+          children: [
+            // CupertinoDatePicker
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.dateAndTime,
+                onDateTimeChanged: (DateTime newDate) {
+                  setState(() {
+                    date = newDate;
+                  });
+                },
+              ),
+            ),
+            // Close button
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                child: const Text('Set'),
+                onPressed: () {
+                  Navigator.pop(context); // Close the bottom sheet
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
                                           },
                                         ),
                                         SizedBox(width: 12),
@@ -737,47 +773,6 @@ class _MyHomePageState extends State<RequestScreen> {
                                       ],
                                     ),
                                     SizedBox(height: Height * 0.01),
-                                    if (isChecked)
-                                      Row(
-                                        children: [
-                                          SizedBox(width: 100),
-                                          OutlinedButton(
-                                            onPressed: () {
-                                              showModalBottomSheet<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext builder) {
-                                                    return Container(
-                                                        height: Height * 0.3,
-                                                        child:
-                                                            CupertinoDatePicker(
-                                                          onDateTimeChanged:
-                                                              (newDate) {
-                                                            setState(() {
-                                                              date = newDate;
-                                                            });
-                                                          },
-                                                        ));
-                                                  });
-                                              // Add your button press logic here
-                                            },
-                                            style: OutlinedButton.styleFrom(
-                                              side: BorderSide(
-                                                  color: Colors.blue),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                              ),
-                                            ),
-                                            child: Text(
-                                              'Set Time',
-                                              style: TextStyle(
-                                                  color: Colors.blue,
-                                                  fontFamily: 'Montserrat'),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                                     SizedBox(height: Height * 0.01),
                                     Row(
                                       mainAxisAlignment:

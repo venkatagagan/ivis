@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/Bussiness_int_api.dart';
 import 'package:ivis_security/apis/Services.dart';
 import 'package:http/http.dart' as http;
-import 'package:ivis_security/cctv/screens.dart';
+import 'package:video_player/video_player.dart';
 import 'package:ivis_security/navigation.dart';
 import 'package:ivis_security/home.dart';
 import 'package:ivis_security/drawer.dart';
@@ -311,7 +311,7 @@ class _MyHomePageState extends State<AlarmScreen> {
                             height: Height * 0.03,
                           ),
                         ],
-                      )),
+                      )), 
                   SizedBox(
                       height: Height * 0.65,
                       child: Column(
@@ -351,37 +351,61 @@ class _MyHomePageState extends State<AlarmScreen> {
                                 width: Width * 0.05,
                               ),
                               Container(
-                                width: Width * 0.4,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(1),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: TextFormField(
-                                  controller: _dateController1,
-                                  decoration: InputDecoration(
-                                    suffixIcon: IconButton(
-                                      icon: const Icon(
-                                        Icons.calendar_month_outlined,
-                                      ),
-                                      onPressed: () => _selectDate(
-                                          context, _dateController1),
-                                    ),
-                                  ),
-                                  readOnly: true,
-                                ),
-                              ),
+      width: Width*0.4,
+      padding: const EdgeInsets.symmetric(horizontal: 10.0), // Add horizontal padding
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [ // Optional: Add shadow for better visual effect
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: _dateController1,
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0), // Padding inside the TextFormField
+          suffixIcon: IconButton(
+            icon: const Icon(
+              Icons.calendar_month_outlined,
+              color: Colors.black, // Icon color
+            ),
+            onPressed: () => _selectDate(context, _dateController1),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: BorderSide.none, // Remove the border if not needed
+          ),
+        ),
+        readOnly: true,
+        style: const TextStyle(fontSize: 16.0), // Adjust text style
+      ),
+    ),
                               SizedBox(
                                 width: Width * 0.08,
                               ),
                               Container(
-                                width: Width * 0.4,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(1),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
+      width: Width*0.4,
+      padding: const EdgeInsets.symmetric(horizontal: 10.0), // Add horizontal padding
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [ // Optional: Add shadow for better visual effect
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
                                 child: TextFormField(
                                   controller: _dateController2,
                                   decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0), // Padding inside the TextFormField
+          
                                     suffixIcon: IconButton(
                                       icon: const Icon(
                                           Icons.calendar_month_outlined),
@@ -427,8 +451,10 @@ class _MyHomePageState extends State<AlarmScreen> {
                                 } else {
                                   Map<String, List<Incident>> groupedIncidents =
                                       groupIncidentsByActionTag(snapshot.data!);
-                                  return IncidentGroupWidget(
-                                      groupedIncidents: groupedIncidents);
+                                  return Padding(padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                  child: IncidentGroupWidget(
+                                      groupedIncidents: groupedIncidents),);
+                                  
                                 }
                               },
                             ),
@@ -559,24 +585,46 @@ class IncidentDetailPage extends StatelessWidget {
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text('${incident.name} (${incident.objectName})'),
-                    subtitle: Text(
-                      'From: ${incident.eventFromTime}\nTo: ${incident.eventToTime}\nDuration: ${duration.inMinutes} minutes',
+                    title:  Row(
+      children: [
+        Expanded(
+          child: Text(
+            incident.name,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            incident.objectName,
+            style: TextStyle(fontWeight: FontWeight.bold),
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
+    ),//Text('${incident.name} ${incident.objectName}'),
+                    subtitle: Stack(
+                      
+                      children: [
+                        Row(
+                          children: [
+                      Text(
+                      'Start Time: ${incident.eventFromTime.toString().substring(0,16)}\nEnd Time:   ${incident.eventToTime.toString().substring(0,16)}\nDuration:     ${duration.inMinutes} ${duration.inMinutes == 1 ? 'minute' : 'minutes'}',
                     ),
-                    trailing: ElevatedButton(
-                      child: const Text('View'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.blue, // Background color of the button
-                      ),
-                      onPressed: () {
+                          ],
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: TextButton( 
+                           onPressed: () {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
                             content: SizedBox(
-                              height: 400,
+                              width: double.maxFinite,
+                              height: double.maxFinite,
                               child: incident.files.isEmpty
                                   ? Center(
+                                    
                                       child: Text(
                                         'No files available',
                                         style: TextStyle(fontSize: 18),
@@ -605,15 +653,25 @@ class IncidentDetailPage extends StatelessWidget {
                                             ),
                                           );
                                         }
-                                        
-                                        return SizedBox();
+                                        else if  
+                                         (file.contains('.3gp') ||
+                                           file.contains('.mp4')) {
+                                           return Padding(
+                                             padding: const EdgeInsets.all(8.0),
+                                             child: VideoPlayerWidget(videoUrl: file)
+                                           );
+                                             }
                                       },
                                     ),
                             ),
                           ),
                         );
                       },
-                    ),
+                          child: const Text('View'),),
+                        )
+                      
+                    ],), 
+                    
                   ),
                 );
               },
@@ -622,6 +680,76 @@ class IncidentDetailPage extends StatelessWidget {
         ));
   }
 }
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  VideoPlayerWidget({required this.videoUrl});
+
+  @override
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(widget.videoUrl);
+    _initializeVideoPlayerFuture = _controller.initialize();
+    _controller.setLooping(true); // Optional: Loop the video
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: <Widget>[
+          FutureBuilder<void>(
+            future: _initializeVideoPlayerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                );
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error loading video'));
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+          SizedBox(height: 8.0),
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                if (_controller.value.isPlaying) {
+                  _controller.pause();
+                } else {
+                  _controller.play();
+                }
+              });
+            },
+            child: Icon(
+              _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+}
+
 
 class VlcPlayerWidget extends StatefulWidget {
   final String videoUrl;
@@ -640,10 +768,7 @@ class _VlcPlayerWidgetState extends State<VlcPlayerWidget> {
     super.initState();
     _controller = _controller = VlcPlayerController.network(
       widget.videoUrl,
-      hwAcc: HwAcc.full,
-      autoPlay: true,
-      options: VlcPlayerOptions(),
-    );
+     );
   }
 
   @override
@@ -705,14 +830,15 @@ class IncidentGroupWidget extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 90,
-                        child: Text(
+                        child:Center(child: Text(
                           actionTag,
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 14,
                             fontFamily: 'Montserrat',
                           ),
-                        ),
+                        ),) 
+                        
                       )
                     ],
                   ),

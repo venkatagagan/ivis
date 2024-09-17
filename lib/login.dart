@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ivis_security/apis/login_api_service.dart';
 import 'package:ivis_security/forgot_Pass.dart';
-import 'package:ivis_security/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -48,15 +47,18 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: Height * 0.05),
+                  Center(child: 
                   Container(
+                    width:Width*0.8,
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: const LoginForm(),
                   ),
+                  )
                 ],
               ),
             ),
@@ -142,6 +144,7 @@ class _LoginFormState extends State<LoginForm> {
     return SafeArea(child: Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        SizedBox(height: Height * 0.07,child: 
         TextFormField(
           controller: userController,
           decoration: const InputDecoration(
@@ -151,7 +154,10 @@ class _LoginFormState extends State<LoginForm> {
             fillColor: Color(0xFFEFEFEF)
           ),
         ),
+        ),
         SizedBox(height: Height * 0.02),
+        SizedBox(height: Height * 0.07,child: 
+        
         TextFormField(
           obscureText: !_showPassword,
           controller: passwordController,
@@ -173,25 +179,29 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
         ),
-        SizedBox(height: Height * 0.025),
-        Row(
-          children: [
-            SizedBox(width: Width * 0.4),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ForgotPasswordScreen()),
-                );
-              },
-              child: const Text(
-                'Forgot Password?',style:TextStyle(color: Color(0xFFABABAB),fontFamily: 'Montserrat',fontStyle: FontStyle.italic),
-              ),
-            ),
-          ],
         ),
         SizedBox(height: Height * 0.02),
+        Align(
+  alignment: Alignment.centerRight,
+  child: GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const ForgotPasswordScreen()),
+      );
+    },
+    child: const Text(
+      'Forgot Password?',
+      style: TextStyle(
+        color: Color(0xFFABABAB),
+        fontFamily: 'Montserrat',
+        fontStyle: FontStyle.italic,
+      ),
+    ),
+  ),
+),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -210,7 +220,6 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ],
         ),
-        SizedBox(height: Height * 0.02),
         ElevatedButton(
           onPressed: () {
             // Handle login button press

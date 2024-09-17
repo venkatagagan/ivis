@@ -241,7 +241,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                       Text(
                         "GUARD",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: Width * 0.05,
                           color: Colors.white,
                           fontFamily: 'Montserrat',
                         ),
@@ -329,7 +329,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                         },
                         child: CustomButton(
                           imagePath: 'assets/logos/Acenter-circle.png',
-                          text1: 'Safety \n Escord',
+                          text1: 'Safety \n Escort',
                           isEnabled: se == "T",
                         ),
                       ),
@@ -422,7 +422,7 @@ class _OneStopScreenState extends State<OneStopScreen> {
                         width: Width * 0.08,
                       ),
                       Text(
-                        'HELPDESK',
+                        'HELP DESK',
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
